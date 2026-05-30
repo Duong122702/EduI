@@ -1,0 +1,27 @@
+# Môi trường ảo (Virtual Environment)
+.venv/
+venv/
+env/
+ENV/
+
+# Python tạo ra khi chạy code (Byte-compiled / optimized / DLL)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# File cấu hình bảo mật (CHỨA PASSWORD, SECRET KEY - TUYỆT ĐỐI KHÔNG COMMIT)
+.env
+.env.[a-zA-Z]*
+!.env.example
+
+# Thư mục cấu hình của IDE (VS Code, PyCharm)
+.vscode/
+.idea/
+
+# File log và dữ liệu tạm
+*.log
+crash.log
+
+# Nếu bạn dùng database SQLite cục bộ để test
+*.sqlite3
+*.db

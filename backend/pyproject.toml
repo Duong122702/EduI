@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "fastapi-senior-architecture"
+version = "0.1.0"
+description = "Production-ready FastAPI boilerplate using Modular Architecture"
+authors = ["Senior Backend Engineer <senior@example.com>"]
+readme = "README.md"
+# Vì đây là một ứng dụng (Application) chứ không phải thư viện (Library) để publish lên PyPI,
+# chúng ta set package-mode = false để tránh việc Poetry bắt buộc phải đóng gói source code.
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# Web Framework chính
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
+
+# Data Validation & Cấu hình môi trường (Pydantic v2)
+pydantic = {extras = ["email"], version = "^2.7.4"}
+pydantic-settings = "^2.3.3"
+
+# Database Layer (SQLAlchemy 2.0 Async + PostgreSQL Driver)
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+asyncpg = "^0.29.0"
+alembic = "^1.13.1"
+
+# Bảo mật & Xác thực (Sử dụng pwdlib thay cho passlib đã out-dated)
+pwdlib = {extras = ["bcrypt"], version = "^0.2.1"}
+pyjwt = "^2.8.0"
+
+[tool.poetry.group.dev.dependencies]
+# Công cụ linter, formatter, sắp xếp import đa năng (Thay thế Black, Isort, Flake8)
+ruff = "^0.4.10"
+
+# Testing Framework
+pytest = "^8.2.2"
+pytest-asyncio = "^0.23.7"
+httpx = "^0.27.0"  # Dùng để giả lập gọi API trong Integration Test
+
+# ------------------------------------------------------------------------------
+# Cấu hình cho RUFF (Linter & Formatter)
+# ------------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py311"
+line-length = 88  # Độ dài tối đa của 1 dòng code theo chuẩn PEP 8
+
+[tool.ruff.lint]
+# Các bộ luật (Rules) áp dụng cho dự án
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (bắt các lỗi code như biến chưa định nghĩa)
+    "I",   # isort (tự động sắp xếp import theo bảng chữ cái và phân nhóm)
+    "B",   # flake8-bugbear (bắt các lỗi logic tiềm ẩn nguy hiểm)
+    "UP",  # pyupgrade (gợi ý nâng cấp syntax lên phiên bản Python mới hơn)
+    "C4",  # flake8-comprehensions (tối ưu cách viết list/dict comprehension)
+]
+ignore = [
+    "E501", # Bỏ qua lỗi dòng quá dài vì đã có formatter tự cắt dòng phù hợp
+]
+
+[tool.ruff.lint.isort]
+# Khai báo thư mục gốc để Isort biết "app" là code nội bộ (First-party), 
+# giúp tách biệt khi import: Thư viện ngoài -> Khoảng trống -> Code nội bộ.
+known-first-party = ["app"]
