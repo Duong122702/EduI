@@ -39,7 +39,6 @@ function Header() {
             Tổ chức kỳ thi, làm bài kiểm tra và chấm điểm tự động dễ dàng trong
             5 phút. Nhanh chóng, ổn định và hoàn toàn miễn phí.
           </p>
-          <div className=""></div>
         </div>
       </div>
     </>
