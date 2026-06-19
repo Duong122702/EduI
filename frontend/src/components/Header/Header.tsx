@@ -1,4 +1,3 @@
-import ArrowRight from '../ui/ArrowRight';
 import Button from '../ui/Button';
 import { CustomIcon } from '../ui/CustomIcon';
 import { Input } from '../ui/Input';
@@ -59,7 +58,10 @@ function Header() {
             />
             <Button variant="orange" size="large" className="flex-2 font-bold">
               Vào thi ngay
-              <ArrowRight />
+              <CustomIcon
+                name="arrowRight"
+                className="lucide lucide-arrow-right ml-2 h-5 w-5"
+              />
             </Button>
           </div>
           <p className="text-base text-gray-500">
