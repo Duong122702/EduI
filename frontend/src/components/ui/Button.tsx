@@ -17,11 +17,13 @@ const buttonVariant = cva(
         dark: 'bg-primary-dark/90 text-white hover:bg-primary-dark focus:ring-primary-dark shadow-sm rounded-4xl',
         outline:
           'border-2 border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+        orange:
+          'bg-button-orange text-white hover:bg-button-orange/90 focus:ring-button-orange shadow-sm rounded-xl',
       },
       size: {
         small: 'px-3 py-1.5',
         medium: 'px-4 py-2',
-        large: 'px-6 py-3',
+        large: 'px-6 py-3 text-lg',
       },
     },
     defaultVariants: {

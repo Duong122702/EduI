@@ -1,4 +1,6 @@
+import ArrowRight from '../ui/ArrowRight';
 import Button from '../ui/Button';
+import { Input } from '../ui/Input';
 import Logo from '../ui/Logo';
 import NavItem from './components/NavItem';
 
@@ -39,6 +41,17 @@ function Header() {
             Tổ chức kỳ thi, làm bài kiểm tra và chấm điểm tự động dễ dàng trong
             5 phút. Nhanh chóng, ổn định và hoàn toàn miễn phí.
           </p>
+          <div className="align-center mx-auto mb-6 flex h-22 max-w-xl flex-col justify-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-xl shadow-teal-900/5 transition-all duration-200 md:flex-row">
+            <Input
+              inputSize="lg"
+              placeholder="NHẬP MÃ PHÒNG THI"
+              className="flex-3"
+            />
+            <Button variant="orange" size="large" className="flex-2 font-bold">
+              Vào thi ngay
+              <ArrowRight />
+            </Button>
+          </div>
         </div>
       </div>
     </>
