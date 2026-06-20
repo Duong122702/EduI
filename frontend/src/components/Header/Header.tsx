@@ -1,6 +1,7 @@
 import Button from '../ui/Button';
 import { CustomIcon } from '../ui/CustomIcon';
 import { Input } from '../ui/Input';
+import HeroCard from './components/HeroCard';
 import NavItem from './components/NavItem';
 
 function Header() {
@@ -78,34 +79,12 @@ function Header() {
       <div className="border-y border-gray-100 bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="grid gap-6 divide-y divide-gray-200/50 sm:grid-cols-1 md:grid-cols-2 md:gap-8 md:divide-x md:divide-y-0 lg:grid-cols-4">
-            <div className="flex flex-col items-center px-4 pt-4 text-center md:pt-0">
-              <div className="text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  className="lucide lucide-badge-dollar-sign h-6 w-6"
-                  data-fg-edye6="1.20:1.1511:/src/app/components/Commitment.tsx:35:17:1205:33:e:item.icon"
-                  data-fgid-edye6=":r19:"
-                >
-                  <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path>
-                  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
-                  <path d="M12 18V6"></path>
-                </svg>
-              </div>
-              <h3 className="mb-2 text-lg font-bold text-gray-900">
-                0đ — Miễn phí
-              </h3>
-              <p className="text-sm leading-relaxed text-gray-500">
-                Hoàn toàn miễn phí cho mọi tính năng cốt lõi
-              </p>
-            </div>
+            <HeroCard
+              name="badgeDollarSign"
+              className="lucide lucide-badge-dollar-sign h-6 w-6"
+              title="0đ — Miễn phí"
+              dercription="Hoàn toàn miễn phí cho mọi tính năng cốt lõi"
+            />
             <div className="flex flex-col items-center px-4 pt-4 text-center md:pt-0">
               <div className="text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
                 <svg
