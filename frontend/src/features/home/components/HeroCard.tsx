@@ -1,4 +1,7 @@
-import { CustomIcon, type CustomIconName } from '../../ui/CustomIcon';
+import {
+  CustomIcon,
+  type CustomIconName,
+} from '../../../components/ui/CustomIcon';
 
 interface HeroCardProps {
   name: CustomIconName;
