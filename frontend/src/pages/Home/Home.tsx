@@ -1,6 +1,7 @@
 import Button from '../../components/ui/Button';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { Input } from '../../components/ui/Input';
+import FeatureHeroCard from '../../features/home/components/FeatureHeroCard';
 import HeroCard from '../../features/home/components/HeroCard';
 import Header from '../../features/home/Header';
 
@@ -92,19 +93,13 @@ function Home() {
             </p>
           </div>
           <div className="grid grid-cols-4 gap-8">
-            <div className="group rounded-2xl border border-gray-100 p-8 shadow-sm transition-all duration-300 hover:border-teal-200 hover:shadow-lg">
-              <div className="group-hover:bg-primary-dark mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 transition-colors duration-200">
-                <CustomIcon
-                  name="badgeWarning"
-                  className="text-primary h-7 w-7 transition-colors duration-300 group-hover:text-white"
-                />
-              </div>
-              <h3 className="mb-3 text-xl font-bold">Chống gian lận</h3>
-              <p className="text-sm leading-relaxed text-gray-500">
-                Giám sát bằng AI thông minh, tự động khóa màn hình và cảnh báo
-                thí sinh khi phát hiện chuyển tab hoặc rời khỏi trang thi.
-              </p>
-            </div>
+            <FeatureHeroCard
+              name="badgeWarning"
+              className="text-primary h-7 w-7 transition-colors duration-300 group-hover:text-white"
+              title="Chống gian lận"
+              description="Giám sát bằng AI thông minh, tự động khóa màn hình và cảnh báo thí sinh
+        khi phát hiện chuyển tab hoặc rời khỏi trang thi."
+            />
           </div>
         </div>
       </div>
