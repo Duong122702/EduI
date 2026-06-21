@@ -1,14 +1,5 @@
-import {
-  CustomIcon,
-  type CustomIconName,
-} from '../../../components/ui/CustomIcon';
-
-interface FeatureCardProps {
-  name: CustomIconName;
-  className?: string;
-  title: string;
-  description: string;
-}
+import { CustomIcon } from '../../../components/ui/CustomIcon';
+import type { FeatureCardProps } from '../../../types/featureCardProps.type';
 
 function FeatureHeroCard({
   name,

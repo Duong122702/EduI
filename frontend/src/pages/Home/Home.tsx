@@ -1,6 +1,7 @@
 import Button from '../../components/ui/Button';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { Input } from '../../components/ui/Input';
+import { featureHeroData } from '../../constants/featureHeroPaths';
 import FeatureHeroCard from '../../features/home/components/FeatureHeroCard';
 import HeroCard from '../../features/home/components/HeroCard';
 import Header from '../../features/home/Header';
@@ -93,13 +94,9 @@ function Home() {
             </p>
           </div>
           <div className="grid grid-cols-4 gap-8">
-            <FeatureHeroCard
-              name="badgeWarning"
-              className="text-primary h-7 w-7 transition-colors duration-300 group-hover:text-white"
-              title="Chống gian lận"
-              description="Giám sát bằng AI thông minh, tự động khóa màn hình và cảnh báo thí sinh
-        khi phát hiện chuyển tab hoặc rời khỏi trang thi."
-            />
+            {featureHeroData.map((data) => (
+              <FeatureHeroCard key={data.name} {...data} />
+            ))}
           </div>
         </div>
       </div>
