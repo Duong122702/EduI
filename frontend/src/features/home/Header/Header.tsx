@@ -19,12 +19,12 @@ function Header() {
         </div>
 
         <div className="flex gap-8 font-light opacity-70">
-          <NavItem>Trang chủ</NavItem>
-          <NavItem>Tính năng</NavItem>
-          <NavItem>Hướng dẫn</NavItem>
+          <NavItem href="#home">Trang chủ</NavItem>
+          <NavItem href="#features">Tính năng</NavItem>
+          <NavItem href="tutorials">Hướng dẫn</NavItem>
         </div>
         <div className="flex items-center justify-center gap-4">
-          <NavItem>Đăng nhập</NavItem>
+          <NavItem href="">Đăng nhập</NavItem>
           <Button variant="dark" size="medium">
             {' '}
             Đăng ký

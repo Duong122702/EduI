@@ -1,11 +1,15 @@
 interface NavItemProps {
   children: React.ReactNode;
+  href: string;
 }
-const NavItem: React.FC<NavItemProps> = ({ children }) => {
+const NavItem: React.FC<NavItemProps> = ({ children, href }) => {
   return (
-    <div className="hover:text-primary cursor-pointer transition-all duration-200 hover:opacity-100">
+    <a
+      href={href}
+      className="hover:text-primary cursor-pointer transition-all duration-200 hover:opacity-100"
+    >
       {children}
-    </div>
+    </a>
   );
 };
 

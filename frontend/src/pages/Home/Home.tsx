@@ -2,6 +2,7 @@ import Button from '../../components/ui/Button';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { Input } from '../../components/ui/Input';
 import { featureHeroData } from '../../constants/featureHeroPaths';
+import { heroCardPaths } from '../../constants/heroCardPaths';
 import FeatureHeroCard from '../../features/home/components/FeatureHeroCard';
 import HeroCard from '../../features/home/components/HeroCard';
 import Header from '../../features/home/Header';
@@ -55,34 +56,13 @@ function Home() {
       <div className="border-y border-gray-100 bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <div className="grid gap-6 divide-y divide-gray-200/50 sm:grid-cols-1 md:grid-cols-2 md:gap-8 md:divide-x md:divide-y-0 lg:grid-cols-4">
-            <HeroCard
-              name="badgeDollarSign"
-              className="h-6 w-6"
-              title="0đ — Miễn phí"
-              dercription="Hoàn toàn miễn phí cho mọi tính năng cốt lõi"
-            />
-            <HeroCard
-              name="badgeGearSgin"
-              className="h-6 w-6"
-              title="100% — Tự động"
-              dercription="Quy trình trộn đề và chấm điểm hoàn toàn tự động"
-            />
-            <HeroCard
-              name="badgeShield"
-              className="h-6 w-6"
-              title="Bảo mật — An toàn"
-              dercription="Lưu bài tự động mỗi giây, không lo mất dữ liệu"
-            />
-            <HeroCard
-              name="badgeHeadPhone"
-              className="h-6 w-6"
-              title="Hỗ trợ — 24/7"
-              dercription="Hệ thống hỗ trợ thi nhiều môn, file nghe, công thức"
-            />
+            {heroCardPaths.map((path) => (
+              <HeroCard key={path.name} {...path} />
+            ))}
           </div>
         </div>
       </div>
-      <div className="py-24">
+      <div id="features" className="py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-4xl">
@@ -93,7 +73,7 @@ function Home() {
               bằng, minh bạch và hiệu quả nhất.
             </p>
           </div>
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {featureHeroData.map((data) => (
               <FeatureHeroCard key={data.name} {...data} />
             ))}

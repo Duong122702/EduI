@@ -14,3 +14,6 @@
   /* Cấu hình font chữ */
   --font-sans: "Inter", sans-serif;
 }
+html {
+  @apply scroll-smooth
+}
