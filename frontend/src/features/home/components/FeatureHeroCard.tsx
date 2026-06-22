@@ -1,5 +1,5 @@
 import { CustomIcon } from '../../../components/ui/CustomIcon';
-import type { FeatureCardProps } from '../../../types/featureCardProps.type';
+import type { FeatureCardProps } from '../../../types/HomeTypes/featureCardProps.type';
 
 function FeatureHeroCard({
   name,

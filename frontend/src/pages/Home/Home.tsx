@@ -7,6 +7,8 @@ import { heroCardPaths } from '../../constants/heroCardPaths';
 import FeatureHeroCard from '../../features/home/components/FeatureHeroCard';
 import HeroCard from '../../features/home/components/HeroCard';
 import Header from '../../features/home/Header';
+import { tutorialCardPaths } from '../../constants/tutorialCardPaths';
+import TutorialCard from '../../features/home/components/TutorialCard';
 
 function Home() {
   const [isActive, setIsActive] = useState<boolean>();
@@ -101,13 +103,13 @@ function Home() {
           <div className="mx-auto mb-12 flex max-w-md rounded-full border border-gray-200 p-1.5 shadow-sm">
             <button
               onClick={handleSetAcitve}
-              className={`${classBtn} ${isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
+              className={`${classBtn} ${!isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
             >
               Dành cho Giáo viên
             </button>
             <button
               onClick={handleSetAcitve}
-              className={`${classBtn} ${!isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
+              className={`${classBtn} ${isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
             >
               Dành cho Thí sinh
             </button>
@@ -115,23 +117,15 @@ function Home() {
           <div className="mx-auto max-w-5xl">
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
               <div className="absolute top-11 right-[15%] left-[15%] hidden h-0.5 bg-gray-200 md:block"></div>
-              <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="group relative mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-gray-50 bg-white shadow-lg">
-                  <div className="bg-primary-dark absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
-                  <div className="bg-primary-dark absolute -top-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-sm font-bold text-white">
-                    1
-                  </div>
-                  <CustomIcon
-                    name="badgeUpload"
-                    className="text-primary-dark h-10 w-10"
-                  />
-                </div>
-                <h3 className="mb-3 text-xl font-bold">Tải đề lên</h3>
-                <p className="max-w-70 text-sm leading-relaxed text-gray-500">
-                  Tải lên ngân hàng câu hỏi bằng file Word, Excel hoặc tạo trực
-                  tiếp trên hệ thống nhanh chóng.
-                </p>
-              </div>
+              {tutorialCardPaths.slice(0, 3).map((path) => (
+                <TutorialCard
+                  key={path.name}
+                  order={path.order}
+                  name={path.name}
+                  title={path.title}
+                  decription={path.decription}
+                />
+              ))}
             </div>
           </div>
         </div>

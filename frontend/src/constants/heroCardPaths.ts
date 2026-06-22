@@ -1,4 +1,4 @@
-import type { HeroCardProps } from '../types/heroCardProps.type';
+import type { HeroCardProps } from '../types/HomeTypes/heroCardProps.type';
 
 export const heroCardPaths: HeroCardProps[] = [
   {
