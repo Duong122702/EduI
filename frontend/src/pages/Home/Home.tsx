@@ -14,6 +14,8 @@ function Home() {
   const [isActive, setIsActive] = useState<boolean>();
   const classBtn =
     'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200';
+  const startIdx = isActive ? 0 : 3;
+  const endIdx = isActive ? 3 : 6;
   const handleSetAcitve = () => {
     setIsActive(!isActive);
   };
@@ -117,7 +119,7 @@ function Home() {
           <div className="mx-auto max-w-5xl">
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
               <div className="absolute top-11 right-[15%] left-[15%] hidden h-0.5 bg-gray-200 md:block"></div>
-              {tutorialCardPaths.slice(0, 3).map((path) => (
+              {tutorialCardPaths.slice(startIdx, endIdx).map((path) => (
                 <TutorialCard
                   key={path.name}
                   order={path.order}

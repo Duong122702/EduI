@@ -22,4 +22,25 @@ export const tutorialCardPaths: TutorialCardProps[] = [
     decription:
       'Gửi mã phòng thi hoặc đường dẫn cho thí sinh để bắt đầu làm bài ngay lập tức.',
   },
+  {
+    order: '1',
+    name: 'badgeInput',
+    title: 'Nhập mã phòng thi',
+    decription:
+      'Truy cập trang chủ, nhập mã phòng thi do giáo viên cung cấp để xác thực thông tin.',
+  },
+  {
+    order: '2',
+    name: 'badgePen',
+    title: 'Làm bài trực tuyến',
+    decription:
+      'Thực hiện bài thi trên giao diện tối ưu, tập trung cao độ với tính năng lưu tự động.',
+  },
+  {
+    order: '3',
+    name: 'badgeChart',
+    title: 'Xem kết quả & Phổ điểm',
+    decription:
+      'Biết điểm ngay sau khi nộp bài, xem lại đáp án và phổ điểm chung của cả lớp.',
+  },
 ];
