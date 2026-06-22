@@ -73,4 +73,11 @@ export const ICON_PATHS = {
       <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
     </>
   ),
+  badgeUpload: (
+    <>
+      <path d="M12 13v8"></path>
+      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+      <path d="m8 17 4-4 4 4"></path>
+    </>
+  ),
 };
