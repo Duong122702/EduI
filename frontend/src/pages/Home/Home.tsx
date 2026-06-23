@@ -9,6 +9,7 @@ import HeroCard from '../../features/home/components/HeroCard';
 import Header from '../../features/home/Header';
 import { tutorialCardPaths } from '../../constants/tutorialCardPaths';
 import TutorialCard from '../../features/home/components/TutorialCard';
+import Footer from '../../features/home/Footer/Footer';
 
 function Home() {
   const [isActive, setIsActive] = useState<boolean>();
@@ -164,6 +165,7 @@ function Home() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
