@@ -25,7 +25,11 @@ function Header() {
         </div>
         <div className="flex items-center justify-center gap-4">
           <NavItem href="">Đăng nhập</NavItem>
-          <Button variant="dark" size="medium">
+          <Button
+            variant="dark"
+            size="medium"
+            className="rounded-full shadow-sm"
+          >
             {' '}
             Đăng ký
           </Button>

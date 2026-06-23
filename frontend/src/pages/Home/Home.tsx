@@ -14,8 +14,8 @@ function Home() {
   const [isActive, setIsActive] = useState<boolean>();
   const classBtn =
     'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200';
-  const startIdx = isActive ? 0 : 3;
-  const endIdx = isActive ? 3 : 6;
+  const startIdx = !isActive ? 0 : 3;
+  const endIdx = !isActive ? 3 : 6;
   const handleSetAcitve = () => {
     setIsActive(!isActive);
   };
@@ -23,10 +23,10 @@ function Home() {
     <>
       <Header />
       <div id="home" className="relative overflow-hidden pt-32 pb-32">
-        <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-full w-full max-w-7xl -translate-x-1/2 overflow-hidden">
+        {/* <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-full w-full max-w-7xl -translate-x-1/2 overflow-hidden">
           <div className="absolute top-[10%] left-[-10%] h-125 w-125 rounded-full bg-teal-50/50 blur-3xl"></div>
           <div className="absolute right-[-5%] bottom-[-10%] h-150 w-150 rounded-full bg-orange-50/30 blur-3xl"></div>
-        </div>
+        </div> */}
         <div className="container mx-auto px-4 text-center">
           <h1 className="mx-auto mb-6 max-w-4xl text-4xl font-bold text-gray-900 md:text-6xl">
             Nền tảng Thi trực tuyến
@@ -45,7 +45,11 @@ function Home() {
               placeholder="NHẬP MÃ PHÒNG THI"
               className="flex-3"
             />
-            <Button variant="orange" size="large" className="flex-2 font-bold">
+            <Button
+              variant="orange"
+              size="large"
+              className="flex-2 rounded-xl font-bold shadow-sm"
+            >
               Vào thi ngay
               <CustomIcon
                 name="arrowRight"
@@ -129,6 +133,34 @@ function Home() {
                 />
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+      <div className="bg-teal-900 py-24">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="mx-auto mb-6 max-w-3xl text-5xl leading-tight font-bold tracking-tight text-white">
+            Sẵn sàng tổ chức kỳ thi chuyên nghiệp đầu tiên của bạn?
+          </h2>
+          <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-teal-100">
+            Miễn phí hoàn toàn. Không cần cài đặt. Bắt đầu ngay trong chưa đầy 5
+            phút.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Button
+              variant={'orange'}
+              size="extralarge"
+              className="gap-2 rounded-full font-bold"
+            >
+              Trải nghiệm miễn phí ngay
+              <CustomIcon name="arrowRight" />
+            </Button>
+            <Button
+              variant={'dark'}
+              size="extralarge"
+              className="rounded-full font-bold"
+            >
+              Tạo đề thi ngay
+            </Button>
           </div>
         </div>
       </div>
