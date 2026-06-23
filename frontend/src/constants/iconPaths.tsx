@@ -128,4 +128,14 @@ export const ICON_PATHS = {
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
     </>
   ),
+  iconClose: (
+    <>
+      <path d="M6 18L18 6M6 6l12 12" />
+    </>
+  ),
+  iconBurger: (
+    <>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </>
+  ),
 };

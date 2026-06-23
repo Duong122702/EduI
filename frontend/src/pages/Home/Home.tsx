@@ -99,7 +99,7 @@ function Home() {
       <div id="tutorials" className="py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-2xl text-center">
-            <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-4xl">
+            <h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-3xl">
               Cách thức hoạt động
             </h2>
             <p className="text-lg text-gray-500">
@@ -139,14 +139,14 @@ function Home() {
       </div>
       <div className="bg-teal-900 py-24">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="mx-auto mb-6 max-w-3xl text-5xl leading-tight font-bold tracking-tight text-white">
+          <h2 className="mx-auto mb-6 max-w-3xl text-3xl leading-tight font-bold tracking-tight text-white md:text-5xl">
             Sẵn sàng tổ chức kỳ thi chuyên nghiệp đầu tiên của bạn?
           </h2>
           <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-teal-100">
             Miễn phí hoàn toàn. Không cần cài đặt. Bắt đầu ngay trong chưa đầy 5
             phút.
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
             <Button
               variant={'orange'}
               size="extralarge"
