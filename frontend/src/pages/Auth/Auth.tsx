@@ -26,6 +26,16 @@ function Auth() {
             <p>Mã hóa đầu cuối hệ thống và giám sát trực tiếp</p>
           </div>
         </div>
+        <div className="col-span-1 flex flex-col items-center justify-center p-16 sm:p-12 md:col-span-7">
+          <div className="mx-auto w-full max-w-md">
+            <h2 className="mb-3 text-2xl font-bold tracking-tight">
+              Chào mừng ban trở lại
+            </h2>
+            <p className="text-md text-gray-400">
+              Vui lòng nhập thông tin để truy cập phòng thi.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
