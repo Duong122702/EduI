@@ -14,7 +14,7 @@ import Footer from '../../features/home/Footer/Footer';
 function Home() {
   const [isActive, setIsActive] = useState<boolean>();
   const classBtn =
-    'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200';
+    'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200 bg-white';
   const startIdx = !isActive ? 0 : 3;
   const endIdx = !isActive ? 3 : 6;
   const handleSetAcitve = () => {
@@ -108,18 +108,18 @@ function Home() {
             </p>
           </div>
           <div className="mx-auto mb-12 flex max-w-md rounded-full border border-gray-200 p-1.5 shadow-sm">
-            <button
+            <Button
               onClick={handleSetAcitve}
               className={`${classBtn} ${!isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
             >
               Dành cho Giáo viên
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSetAcitve}
               className={`${classBtn} ${isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
             >
               Dành cho Thí sinh
-            </button>
+            </Button>
           </div>
           <div className="mx-auto max-w-5xl">
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">

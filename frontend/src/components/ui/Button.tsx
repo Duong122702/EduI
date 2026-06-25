@@ -5,31 +5,61 @@ import { twMerge } from 'tailwind-merge';
 // Định nghĩa các biến thể cho Button
 const buttonVariant = cva(
   // Các lớp CSS cơ bản cho Button
-  'inline-flex items-center justify-center text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex items-center justify-center font-medium transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
         // Các biến thể cho kiểu Button
         primary:
-          'bg-primary text-white hover:bg-primary/90 focus:ring-primary shadow-sm rounded-4xl',
-        secondary:
-          'bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary shadow-sm',
-        dark: 'bg-primary-dark/90 text-white hover:bg-primary-dark focus:ring-primary-dark ',
+          'bg-primary text-white hover:bg-primary/90  shadow-sm rounded-4xl',
+        secondary: 'bg-secondary text-white hover:bg-secondary/90  shadow-sm',
+        dark: 'bg-primary-dark/90 text-white hover:bg-primary-dark  ',
         outline:
           'border-2 border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-        orange:
-          'bg-button-orange text-white hover:bg-button-orange/90 focus:ring-button-orange',
+        orange: 'bg-button-orange text-white hover:bg-button-orange/90 ',
+        tabPill: 'rounded-full',
+        tabGrayBox: 'rounded-lg',
       },
       size: {
         small: 'px-3 py-1.5',
-        medium: 'px-4 py-2',
+        medium: 'px-4 py-2 text-sm',
         large: 'px-6 py-3 text-lg',
         extralarge: 'px-8 py-4 text-xl',
       },
+      isActive: {
+        true: '',
+        false: '',
+      },
     },
+    compoundVariants: [
+      {
+        variant: 'tabPill',
+        isActive: true,
+        className:
+          'bg-primary-dark text-white shadow-md hover:bg-primary-dark/90',
+      },
+      {
+        variant: 'tabPill',
+        isActive: false,
+        className:
+          'bg-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900 shadow-none',
+      },
+      // 2. Kiểu tabGrayBox (Khung xám nút trắng)
+      {
+        variant: 'tabGrayBox',
+        isActive: true,
+        className: 'bg-white text-gray-800 shadow-sm hover:bg-white/90',
+      },
+      {
+        variant: 'tabGrayBox',
+        isActive: false,
+        className: 'bg-transparent text-white hover:bg-white/10 shadow-none',
+      },
+    ],
     defaultVariants: {
       variant: 'primary',
       size: 'medium',
+      isActive: false,
     },
   }
 );
