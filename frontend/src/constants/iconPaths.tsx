@@ -163,4 +163,15 @@ export const ICON_PATHS = {
       <path d="m7 21 5-5 5 5"></path>
     </>
   ),
+  iconAvatar: (
+    <>
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </>
+  ),
+  iconCheckNoCircle: (
+    <>
+      <path d="M20 6 9 17l-5-5"></path>
+    </>
+  ),
 };
