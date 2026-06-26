@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 
 function Auth() {
   const [currentTab, setCurrentTab] = useState<string | number>('login');
+  const [isSelect, setIsSelect] = useState<boolean>(true);
 
   const handleTabChange = (id: string | number) => {
     setCurrentTab(id);
@@ -48,7 +49,7 @@ function Auth() {
             <FlexibleTabs
               tabs={[
                 { id: 'login', label: 'Đăng nhập' },
-                { id: 'regis', label: 'Đăng ký' },
+                { id: 'regis', label: 'Đăng ký mới' },
               ]}
               variant={'grayBox'}
               activeTabId={currentTab}
@@ -56,7 +57,9 @@ function Auth() {
               size="medium"
               className="mt-8"
             />
-            <div className="mt-8">
+            <div
+              className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}
+            >
               <div className="mb-5">
                 <span className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
                   Email học tập
@@ -118,6 +121,43 @@ function Auth() {
                 Đăng nhập ngay
                 <CustomIcon name="arrowRight" />
               </Button>
+            </div>
+            <div className="mt-8">
+              <div className="mb-5">
+                <span className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
+                  Bạn đăng ký với vai trò
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div
+                    className={`${isSelect ? 'border-primary' : 'border-gray-300 hover:border-gray-400'} relative cursor-pointer rounded-xl border-2 p-3 text-center transition-all duration-300`}
+                  >
+                    <div
+                      className={`${isSelect ? 'block' : 'hidden'} text-primary-dark absolute top-2 right-2`}
+                    >
+                      <CustomIcon name="iconCheck" />
+                    </div>
+                    <CustomIcon
+                      name="logo"
+                      className={`"${isSelect ? 'text-primary-dark' : 'text-gray-400'} w-6" mx-auto mb-2 h-6`}
+                    />
+                    <p className="text-center text-xs leading-relaxed font-semibold">
+                      Học viên / Thí sinh
+                    </p>
+                  </div>
+                  <div className="border-primary relative cursor-pointer rounded-xl border-2 p-3 text-center transition-all duration-300 hover:border-gray-400">
+                    <div className="text-primary-dark absolute top-2 right-2 block">
+                      <CustomIcon name="iconCheck" />
+                    </div>
+                    <CustomIcon
+                      name="iconRepresent"
+                      className="text-primary-dark mx-auto mb-2 h-6 w-6"
+                    />
+                    <p className="text-center text-xs leading-relaxed font-semibold">
+                      Giảng viên / Soạn đề
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

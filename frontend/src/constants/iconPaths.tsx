@@ -150,4 +150,17 @@ export const ICON_PATHS = {
       <circle cx="12" cy="12" r="3"></circle>
     </>
   ),
+  iconCheck: (
+    <>
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="m9 12 2 2 4-4"></path>
+    </>
+  ),
+  iconRepresent: (
+    <>
+      <path d="M2 3h20"></path>
+      <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path>
+      <path d="m7 21 5-5 5 5"></path>
+    </>
+  ),
 };
