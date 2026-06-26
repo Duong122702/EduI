@@ -19,7 +19,8 @@ const buttonVariant = cva(
         orange: 'bg-button-orange text-white hover:bg-button-orange/90 ',
         tabPill:
           'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold  duration-200 bg-white',
-        tabGrayBox: 'rounded-lg',
+        tabGrayBox:
+          'rounded-xl px-8 w-1/2 font-semibold duration-300 ease-in-out',
       },
       size: {
         small: 'px-3 py-1.5',
@@ -54,7 +55,7 @@ const buttonVariant = cva(
       {
         variant: 'tabGrayBox',
         isActive: false,
-        className: 'bg-transparent text-white hover:bg-white/10 shadow-none',
+        className: 'bg-gray text-stale-200 hover:bg-white/10 shadow-none',
       },
     ],
     defaultVariants: {

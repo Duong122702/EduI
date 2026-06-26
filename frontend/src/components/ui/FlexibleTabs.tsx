@@ -7,7 +7,7 @@ const tabsContainerVariants = cva(' flex max-w-md p-1.5 ', {
   variants: {
     variant: {
       pill: 'rounded-full border border-gray-200 shadow-sm bg-white mx-auto mb-12 ',
-      grayBox: 'rounded-2xl bg-slate-200/7 items-center',
+      grayBox: 'rounded-2xl bg-slate-200/70 w-full',
     },
   },
   defaultVariants: {
