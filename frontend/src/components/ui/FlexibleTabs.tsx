@@ -6,8 +6,8 @@ import Button from './Button';
 const tabsContainerVariants = cva(' flex max-w-md p-1.5 ', {
   variants: {
     variant: {
-      pill: 'rounded-full border border-gray-200 shadow-sm bg-white mx-auto mb-12',
-      grayBox: 'rounded-2xl bg-stale-200/7 items-center',
+      pill: 'rounded-full border border-gray-200 shadow-sm bg-white mx-auto mb-12 ',
+      grayBox: 'rounded-2xl bg-slate-200/7 items-center',
     },
   },
   defaultVariants: {
@@ -24,13 +24,15 @@ interface FlexibleTabsProps extends VariantProps<typeof tabsContainerVariants> {
   tabs: TabItem[];
   activeTabId: string | number;
   onChange: (id: string | number) => void;
-  className: string;
+  className?: string;
+  size?: 'small' | 'medium' | 'large' | 'extralarge';
 }
 
 const FlexibleTabs: React.FC<FlexibleTabsProps> = ({
   tabs,
   activeTabId,
   onChange,
+  size,
   variant = 'pill',
   className,
 }) => {
@@ -40,7 +42,8 @@ const FlexibleTabs: React.FC<FlexibleTabsProps> = ({
       grayBox: 'tabGrayBox',
     };
 
-  const currentBtnVariant = buttonVariantMap[variant ?? 'pill'];
+  const currentBtnVariant = buttonVariantMap[variant ?? 'pill'] || 'tabPill';
+  console.log(currentBtnVariant);
   return (
     <div
       className={twMerge(clsx(tabsContainerVariants({ variant }), className))}
@@ -52,8 +55,8 @@ const FlexibleTabs: React.FC<FlexibleTabsProps> = ({
             key={tab.id}
             variant={currentBtnVariant}
             isActive={isActive}
-            onClick={() => onChange}
-            className=""
+            size={size}
+            onClick={() => onChange(tab.id)}
           >
             {tab.label}
           </Button>
@@ -62,3 +65,5 @@ const FlexibleTabs: React.FC<FlexibleTabsProps> = ({
     </div>
   );
 };
+
+export default FlexibleTabs;

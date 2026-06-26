@@ -10,15 +10,14 @@ import Header from '../../features/home/Header';
 import { tutorialCardPaths } from '../../constants/tutorialCardPaths';
 import TutorialCard from '../../features/home/components/TutorialCard';
 import Footer from '../../features/home/Footer/Footer';
+import FlexibleTabs from '../../components/ui/FlexibleTabs';
 
 function Home() {
-  const [isActive, setIsActive] = useState<boolean>();
-  const classBtn =
-    'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200 bg-white';
-  const startIdx = !isActive ? 0 : 3;
-  const endIdx = !isActive ? 3 : 6;
-  const handleSetAcitve = () => {
-    setIsActive(!isActive);
+  const [currentTab, setCurrentTab] = useState<string | number>('student');
+  const startIdx = currentTab === 'student' ? 0 : 3;
+  const endIdx = currentTab === 'student' ? 3 : 6;
+  const handleTabChange = (id: string | number) => {
+    setCurrentTab(id);
   };
   return (
     <>
@@ -107,20 +106,17 @@ function Home() {
               giản hóa chỉ trong 3 bước.
             </p>
           </div>
-          <div className="mx-auto mb-12 flex max-w-md rounded-full border border-gray-200 p-1.5 shadow-sm">
-            <Button
-              onClick={handleSetAcitve}
-              className={`${classBtn} ${!isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
-            >
-              Dành cho Giáo viên
-            </Button>
-            <Button
-              onClick={handleSetAcitve}
-              className={`${classBtn} ${isActive ? `bg-primary-dark text-white shadow-md` : `text-gray-500 hover:bg-gray-50 hover:text-gray-900`}`}
-            >
-              Dành cho Thí sinh
-            </Button>
-          </div>
+          <FlexibleTabs
+            tabs={[
+              { id: 'student', label: 'Dành cho giáo viên' },
+              { id: 'teacher', label: 'Dành cho học sinh' },
+            ]}
+            activeTabId={currentTab}
+            onChange={handleTabChange}
+            variant="pill"
+            size="large"
+            className=""
+          />
           <div className="mx-auto max-w-5xl">
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
               <div className="absolute top-11 right-[15%] left-[15%] hidden h-0.5 bg-gray-200 md:block"></div>

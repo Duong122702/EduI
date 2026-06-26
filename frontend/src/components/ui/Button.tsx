@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge';
 // Định nghĩa các biến thể cho Button
 const buttonVariant = cva(
   // Các lớp CSS cơ bản cho Button
-  'inline-flex items-center justify-center font-medium transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex items-center justify-center font-medium transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -17,13 +17,14 @@ const buttonVariant = cva(
         outline:
           'border-2 border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900',
         orange: 'bg-button-orange text-white hover:bg-button-orange/90 ',
-        tabPill: 'rounded-full',
+        tabPill:
+          'flex-1 cursor-pointer rounded-full px-6 py-3 text-sm font-semibold  duration-200 bg-white',
         tabGrayBox: 'rounded-lg',
       },
       size: {
         small: 'px-3 py-1.5',
         medium: 'px-4 py-2 text-sm',
-        large: 'px-6 py-3 text-lg',
+        large: 'px-6 py-3',
         extralarge: 'px-8 py-4 text-xl',
       },
       isActive: {
@@ -76,11 +77,14 @@ function Button({
   size,
   isLoading,
   children,
+  isActive,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={twMerge(clsx(buttonVariant({ variant, size }), className))}
+      className={twMerge(
+        clsx(buttonVariant({ variant, size, isActive }), className)
+      )}
       disabled={isLoading || props.disabled}
       {...props}
     >
