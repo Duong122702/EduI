@@ -39,7 +39,7 @@ function Auth() {
             <p>Mã hóa đầu cuối hệ thống và giám sát trực tiếp</p>
           </div>
         </div>
-        <div className="col-span-1 flex flex-col items-center justify-center p-16 sm:p-12 md:col-span-7">
+        <div className="col-span-1 flex flex-col items-center justify-center p-8 md:col-span-7 md:p-16">
           <div className="mx-auto w-full max-w-md">
             <div>
               <h2 className="mb-3 text-2xl font-bold tracking-tight">

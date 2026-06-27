@@ -4,6 +4,7 @@ import { CustomIcon } from '../../../components/ui/CustomIcon';
 import Logo from '../../../components/ui/Logo';
 
 import NavItem from './components/NavItem';
+import { Link } from 'react-router-dom';
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,14 +30,16 @@ function Header() {
           </div>
           <div className="hidden items-center justify-center gap-4 md:flex">
             <NavItem href="">Đăng nhập</NavItem>
-            <Button
-              variant="dark"
-              size="medium"
-              className="rounded-full shadow-sm"
-            >
-              {' '}
-              Đăng ký
-            </Button>
+            <Link to="/auth">
+              <Button
+                variant="dark"
+                size="medium"
+                className="rounded-full shadow-sm"
+              >
+                {' '}
+                Đăng ký
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center md:hidden">
             <Button size={'small'} onClick={handleOpen}>
