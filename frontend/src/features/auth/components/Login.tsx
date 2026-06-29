@@ -3,7 +3,8 @@ import Button from '../../../components/ui/Button';
 import { CustomIcon } from '../../../components/ui/CustomIcon';
 import { Input } from '../../../components/ui/Input';
 import type { LoginProps } from '../../../types/AuthTypes/login.type';
-import type { UserFormLoginValues } from '../schemas/login.schema';
+import { loginSchema, type UserFormLoginValues } from '../schemas/login.schema';
+import * as Yup from 'yup';
 
 function Login({ currentTab }: LoginProps) {
   const [loginFormData, setLoginFormData] = useState<UserFormLoginValues>({
@@ -11,6 +12,9 @@ function Login({ currentTab }: LoginProps) {
     password: '',
     acceptTerms: false,
   });
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof UserFormLoginValues, string>>
+  >({});
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>
   ) => {
@@ -19,10 +23,34 @@ function Login({ currentTab }: LoginProps) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+    if (errors[name as keyof UserFormLoginValues]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     // 2. Chỉ gửi dữ liệu lên component cha khi user click Submit
+    try {
+      await loginSchema.validate(loginFormData, { abortEarly: false });
+
+      setErrors({});
+    } catch (yupError) {
+      if (yupError instanceof Yup.ValidationError) {
+        const newErrors: Partial<Record<keyof UserFormLoginValues, string>> =
+          {};
+
+        yupError.inner.forEach((validationError) => {
+          if (validationError.path) {
+            newErrors[validationError.path as keyof UserFormLoginValues] =
+              validationError.message;
+          }
+        });
+
+        setErrors(newErrors);
+      }
+    }
   };
   return (
     <div className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}>
@@ -40,11 +68,16 @@ function Login({ currentTab }: LoginProps) {
             type="email"
             value={loginFormData.email}
             inputSize={'md'}
-            className="bg-white px-10"
+            className={`bg-white px-10 ${errors.email ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="student@example.com"
             onChange={handleInputChange}
           />
         </div>
+        {errors.email && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+            ⚠️ {errors.email}
+          </p>
+        )}
       </div>
       <div className="mb-5">
         <div className="flex items-center justify-between">
@@ -69,7 +102,7 @@ function Login({ currentTab }: LoginProps) {
             value={loginFormData.password}
             onChange={handleInputChange}
             inputSize={'md'}
-            className="items-center bg-white px-10"
+            className={`items-center bg-white px-10 ${errors.password ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="••••••••"
           />
           <div className="cursor-pointer">
@@ -79,6 +112,11 @@ function Login({ currentTab }: LoginProps) {
             />
           </div>
         </div>
+        {errors.password && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+            ⚠️ {errors.password}
+          </p>
+        )}
       </div>
       <div className="mb-5 flex items-center justify-start gap-2">
         <input
