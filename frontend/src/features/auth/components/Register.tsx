@@ -126,6 +126,9 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           />
           <Input
             type="email"
+            name="fullName"
+            value={registerFormData.fullName}
+            onChange={handleInputChange}
             inputSize={'md'}
             className={`bg-white px-10 ${errors.fullName ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="Nguyễn Văn A"
@@ -148,6 +151,9 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           />
           <Input
             type="email"
+            name="email"
+            value={registerFormData.email}
+            onChange={handleInputChange}
             inputSize={'md'}
             className={`bg-white px-10 ${errors.email ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="exemple@example.com"
@@ -172,6 +178,9 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           />
           <Input
             type="password"
+            name="password"
+            value={registerFormData.password}
+            onChange={handleInputChange}
             inputSize={'md'}
             className={`items-center bg-white px-10 ${errors.password ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="••••••••"
@@ -190,7 +199,13 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
         )}
       </div>
       <div className="mb-5 flex items-center justify-start gap-2">
-        <input type="checkbox" className="h-4 w-4" />
+        <input
+          type="checkbox"
+          className="h-4 w-4"
+          name="acceptTerms"
+          checked={registerFormData.acceptTerm}
+          onChange={handleInputChange}
+        />
         <span className="text-xs text-gray-800">
           Tôi đồng ý với
           <a
@@ -214,6 +229,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
         )}
       </div>
       <Button
+        onClick={handleSubmit}
         variant={'dark'}
         className="w-full gap-2 rounded-2xl py-3 font-semibold shadow-xl"
       >
