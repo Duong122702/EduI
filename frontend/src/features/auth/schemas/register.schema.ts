@@ -10,4 +10,7 @@ export const registerSchema = Yup.object().shape({
     [true],
     'Bạn phải đồng ý với điều khoản dịch vụ'
   ),
+  role: Yup.string().required(),
 });
+
+export type UserFormRegisterValues = Yup.InferType<typeof registerSchema>;

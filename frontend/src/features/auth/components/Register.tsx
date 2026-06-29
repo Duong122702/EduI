@@ -1,9 +1,73 @@
+import { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import { CustomIcon } from '../../../components/ui/CustomIcon';
 import { Input } from '../../../components/ui/Input';
 import type { RegisterProps } from '../../../types/AuthTypes/register.type';
+import {
+  registerSchema,
+  type UserFormRegisterValues,
+} from '../schemas/register.schema';
+import * as Yup from 'yup';
 
 function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
+  const [registerFormData, setRegisterFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    acceptTerm: false,
+  });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof UserFormRegisterValues, string>>
+  >({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setRegisterFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+    if (errors[name as keyof UserFormRegisterValues]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    const dataToValidate: UserFormRegisterValues = {
+      ...registerFormData,
+      role: isSelect ? 'student' : 'teacher',
+    };
+
+    try {
+      await registerSchema.validate(dataToValidate, { abortEarly: false });
+      setErrors({});
+
+      console.log('call API');
+    } catch (yupError) {
+      if (yupError instanceof Yup.ValidationError) {
+        const newErrors: Partial<Record<keyof UserFormRegisterValues, string>> =
+          {};
+        yupError.inner.forEach((validationError) => {
+          if (validationError.path)
+            [
+              (newErrors[validationError.path as keyof UserFormRegisterValues] =
+                validationError.message),
+            ];
+        });
+        setErrors(newErrors);
+        // UI Trượt lên cho form quá dài
+        // const firstErrorKey = Object.keys(newErrors)[0];
+        // const errorElement = document.getElementsByName(firstErrorKey)[0];
+        // if (errorElement) {
+        //   errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // }
+      }
+    }
+  };
   return (
     <div className={`${currentTab === 'regis' ? 'block' : 'hidden'} mt-8`}>
       <div className="mb-5">
@@ -63,10 +127,15 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type="email"
             inputSize={'md'}
-            className="bg-white px-10"
+            className={`bg-white px-10 ${errors.fullName ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="Nguyễn Văn A"
           />
         </div>
+        {errors.fullName && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+            ⚠️ {errors.fullName}
+          </p>
+        )}
       </div>
       <div className="mb-5">
         <span className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
@@ -80,10 +149,15 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type="email"
             inputSize={'md'}
-            className="bg-white px-10"
+            className={`bg-white px-10 ${errors.email ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="exemple@example.com"
           />
         </div>
+        {errors.email && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+            ⚠️ {errors.email}
+          </p>
+        )}
       </div>
       <div className="mb-5">
         <div className="flex items-center justify-between">
@@ -99,7 +173,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type="password"
             inputSize={'md'}
-            className="items-center bg-white px-10"
+            className={`items-center bg-white px-10 ${errors.password ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="••••••••"
           />
           <div className="cursor-pointer">
@@ -109,6 +183,11 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             />
           </div>
         </div>
+        {errors.password && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
+            ⚠️ {errors.password}
+          </p>
+        )}
       </div>
       <div className="mb-5 flex items-center justify-start gap-2">
         <input type="checkbox" className="h-4 w-4" />
@@ -128,6 +207,11 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             Chính sách bảo mật
           </a>
         </span>
+        {errors.acceptTerms && (
+          <p className="mt-1.5 text-xs font-medium text-red-500">
+            ⚠️ {errors.acceptTerms}
+          </p>
+        )}
       </div>
       <Button
         variant={'dark'}
