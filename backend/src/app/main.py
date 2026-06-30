@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from backend.src.app.core.exceptions import CustomAPIException
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -15,6 +18,32 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(CustomAPIException)
+async def custom_exception_handle(request: Request, exc: CustomAPIException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": {"code": exc.code, "message": exc.message, "details": exc.details},
+        },
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handle(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Input data is invalid",
+                "details": exc.errors(),
+            },
+        },
+    )
 
 
 @app.get("/")
