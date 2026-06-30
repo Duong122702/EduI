@@ -1,11 +1,16 @@
 import os
 
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()  # Tải biến môi trường từ file .env
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",  # Bỏ qua nếu trong file .env có các biến thừa không khai báo ở đây
+    )
+
     PROJECT_NAME: str = "Education Improvement API"
     API_V1_STR: str = "/api/v1"
 
