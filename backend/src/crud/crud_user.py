@@ -1,0 +1,19 @@
+from typing import Annotated
+
+from backend.src.app.core.database import get_db
+from backend.src.app.model.user import User
+from backend.src.app.schemas.user.CreateUser import CreateUser
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+
+def create_user(user: CreateUser, db: Annotated[Session, Depends(get_db)]) -> User:
+    db_user = User(
+        email=user.email,
+        hashed_password=user.password,  # In a real application, you should hash the password
+        full_name=user.fullname,
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
