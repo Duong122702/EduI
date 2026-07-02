@@ -17,3 +17,9 @@ def create_user(user: CreateUser, db: Annotated[Session, Depends(get_db)]) -> Us
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_user_by_email(
+    email: str, db: Annotated[Session, Depends(get_db)]
+) -> User | None:
+    return db.query(User).filter(User.email == email).first()
