@@ -7,19 +7,23 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 
-def create_user(user: CreateUser, db: Annotated[Session, Depends(get_db)]) -> User:
-    db_user = User(
-        email=user.email,
-        hashed_password=user.password,  # In a real application, you should hash the password
-        full_name=user.fullname,
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+class UserCRUD:
+    def create_user(
+        self, user: CreateUser, db: Annotated[Session, Depends(get_db)]
+    ) -> User:
+        db_user = User(
+            email=user.email, hashed_password=user.password, fullname=user.fullname
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return db_user
+
+    def get_user_by_email(
+        self, email: str, db: Annotated[Session, Depends(get_db)]
+    ) -> User | None:
+        return db.query(User).filter(User.email == email).first()
 
 
-def get_user_by_email(
-    email: str, db: Annotated[Session, Depends(get_db)]
-) -> User | None:
-    return db.query(User).filter(User.email == email).first()
+user_crud = UserCRUD()
