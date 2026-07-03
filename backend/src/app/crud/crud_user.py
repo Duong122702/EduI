@@ -9,10 +9,13 @@ from sqlalchemy.orm import Session
 
 class UserCRUD:
     def create_user(
-        self, user: CreateUser, db: Annotated[Session, Depends(get_db)]
+        self,
+        user: CreateUser,
+        hashed_password: str,
+        db: Annotated[Session, Depends(get_db)],
     ) -> User:
         db_user = User(
-            email=user.email, hashed_password=user.password, fullname=user.fullname
+            email=user.email, hashed_password=hashed_password, fullname=user.fullname
         )
         db.add(db_user)
         db.commit()
