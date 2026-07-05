@@ -20,6 +20,8 @@ pyjwt = "^2.8.0"
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 ignore_missing_imports = true
 follow_imports = "silent"
+mypy_path = "."
+explicit_package_bases = true
 
 # 2. Khối cấu hình chi tiết nằm DƯỚI
 [[tool.mypy.overrides]]

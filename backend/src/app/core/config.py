@@ -1,6 +1,9 @@
 import os
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -21,6 +24,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
     DB_ECHO: bool = True
+
+    RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
+    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
 
 
 settings = Settings()
