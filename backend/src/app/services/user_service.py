@@ -1,13 +1,13 @@
 from typing import Annotated
 
 from backend.src.app.api.deps import verify_email_unique
+from backend.src.app.constant.codes import UserCodes
+from backend.src.app.constant.messages import UserMessages
 from backend.src.app.core.database import get_db
 from backend.src.app.core.exceptions import CustomAPIException
 from backend.src.app.core.security import hashed_password
 from backend.src.app.crud.crud_user import user_crud
 from backend.src.app.schemas.user.CreateUser import CreateUser
-from backend.src.constant.codes import UserCodes
-from backend.src.constant.messages import UserMessages
 from fastapi import Depends, status
 from sqlalchemy.orm import Session
 
