@@ -19,6 +19,12 @@ router = APIRouter()
 def register_user_routes(
     user_data: CreateUser, db: Annotated[Session, Depends(get_db)]
 ) -> APIResponse:
-    response = UserResponse(active_token=user_service.register_user(user_data, db))
+    user_service.register_user(user_data, db)
+    response = UserResponse(
+        user_id=user_data.user_id, email=user_data.email, is_active=False
+    )
 
-    return APIResponse(data=response)
+    return APIResponse(
+        data=response,
+        message="Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
+    )

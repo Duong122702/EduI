@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 class UserService:
     def register_user(
         self, user_data: CreateUser, db: Annotated[Session, Depends(get_db)]
-    ) -> str:
+    ) -> None:
         existing_user = verify_email_unique(user_data, db)
         if existing_user:
             raise CustomAPIException(
@@ -25,8 +25,6 @@ class UserService:
             )
         hashed_password_value = hashed_password(user_data.password)
         user_crud.create_user(user_data, hashed_password_value, db)
-        active_token = "Simulate active token"
-        return active_token
 
 
 user_service = UserService()
