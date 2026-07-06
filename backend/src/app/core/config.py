@@ -28,5 +28,9 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
     FROM_EMAIL: str = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
 
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
 
 settings = Settings()
