@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String
+from sqlalchemy import Boolean, Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase
 
@@ -12,3 +12,4 @@ class User(DeclarativeBase):
     email = Column(String, unique=True, index=True)
     full_name = Column(String, nullable=True)
     role = Column(String, nullable=True)
+    is_verified = Column(Boolean, nullable=False, default=False)

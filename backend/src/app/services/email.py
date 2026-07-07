@@ -28,14 +28,15 @@ class EmailService:
         </div>
         """
         try:
-            params = {
-                "from": settings.FROM_EMAIL,
-                "to": to_email,
-                "subject": "Xác nhận kích hoạt tài khoản",
-                "html": html_content,
-            }
             # Gọi SDK Resend để gửi đi
-            resend.Emails.send(**params)
+            resend.Emails.send(
+                {
+                    "from": settings.FROM_EMAIL,
+                    "to": to_email,
+                    "subject": "Xác nhận kích hoạt tài khoản",
+                    "html": html_content,
+                }
+            )
         except Exception as e:
             # Trong thực tế, bạn nên sử dụng thư viện logging của Python để ghi log lỗi
             print(f"Lỗi hệ thống khi gửi email đến {to_email}: {str(e)}")

@@ -1,6 +1,8 @@
 from datetime import timedelta
 from typing import Annotated
+from uuid import UUID
 
+import jwt
 from backend.src.app.api.deps import verify_email_unique
 from backend.src.app.constant.codes import UserCodes
 from backend.src.app.constant.messages import UserMessages
@@ -11,6 +13,8 @@ from backend.src.app.crud.crud_user import user_crud
 from backend.src.app.schemas.user.CreateUser import CreateUser
 from fastapi import Depends, status
 from sqlalchemy.orm import Session
+
+from app.core.config import settings
 
 
 class UserService:
@@ -30,6 +34,14 @@ class UserService:
             subject=user.id, expires_delta=timedelta(minutes=30)
         )
         return verify_token
+
+    def verify_email(self, token: str, db: Annotated[Session, Depends(get_db)]) -> None:
+        payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
+        user_id_str: str | None = payload.get("sub")
+
+        if user_id_str is not None:
+            user_id = UUID(user_id_str)
+        user_crud.active_user(user_id, db)
 
 
 user_service = UserService()

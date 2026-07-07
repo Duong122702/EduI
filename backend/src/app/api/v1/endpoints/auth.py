@@ -32,3 +32,9 @@ def register_user_routes(
         data=response,
         message="Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
     )
+
+
+@router.get("/verify_email")
+def verify_email(token: str, db: Annotated[Session, Depends(get_db)]) -> APIResponse:
+    user_service.verify_email(token, db)
+    return APIResponse(message="Xác thực tài khoản thành công")
