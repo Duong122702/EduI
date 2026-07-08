@@ -3,7 +3,7 @@ from typing import Annotated
 from backend.src.app.core.database import get_db
 from backend.src.app.schemas.response import APIResponse
 from backend.src.app.schemas.user.CreateUser import CreateUser
-from backend.src.app.schemas.user.UserResponse import UserResponse
+from backend.src.app.schemas.user.UserCreateResponse import UserCreateResponse
 from backend.src.app.services.email import EmailService
 from backend.src.app.services.user_service import user_service
 from fastapi import APIRouter, Depends, status
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post(
     "/register",
-    response_model=APIResponse(data=UserResponse),
+    response_model=APIResponse(data=UserCreateResponse),
     status_code=status.HTTP_201_CREATED,
 )
 def register_user_routes(
@@ -26,7 +26,7 @@ def register_user_routes(
         fullname=user_data.fullname,
         activation_token=verify_token,
     )
-    response = UserResponse(email=user_data.email, is_active=False)
+    response = UserCreateResponse(email=user_data.email, is_active=False)
 
     return APIResponse(
         data=response,

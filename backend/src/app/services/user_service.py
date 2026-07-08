@@ -69,5 +69,28 @@ class UserService:
                 message=UserMessages.INVALID_TOKEN,
             )
 
+    def login_user(
+        self, email: str, password: str, db: Annotated[Session, Depends(get_db)]
+    ) -> None:
+        user = user_crud.get_user_by_email(email, db)
+        if not user:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code=UserCodes.USER_NOT_FOUND,
+                message=UserMessages.USER_NOT_FOUND,
+            )
+        if user.is_verified is False:
+            raise CustomAPIException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                code=UserCodes.USER_NOT_VERIFIED,
+                message=UserMessages.USER_NOT_VERIFIED,
+            )
+        if not hashed_password(password) == user.hashed_password:
+            raise CustomAPIException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                code=UserCodes.INVALID_CREDENTIALS,
+                message=UserMessages.INVALID_CREDENTIALS,
+            )
+
 
 user_service = UserService()

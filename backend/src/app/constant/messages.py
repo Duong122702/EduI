@@ -6,3 +6,6 @@ class UserMessages(StrEnum):
     ALREADY_EXISTS = "A user with this email already exists"
     LOGIN_SUCCESS = "Login successfully"
     INVALID_TOKEN = "Invalid token or token has expired"
+    USER_NOT_FOUND = "User not found"
+    USER_NOT_VERIFIED = "User not verified"
+    INVALID_CREDENTIALS = "Invalid credentials"
