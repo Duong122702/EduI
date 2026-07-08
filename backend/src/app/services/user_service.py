@@ -36,12 +36,38 @@ class UserService:
         return verify_token
 
     def verify_email(self, token: str, db: Annotated[Session, Depends(get_db)]) -> None:
-        payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
-        user_id_str: str | None = payload.get("sub")
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
+            user_id_str: str | None = payload.get("sub")
 
-        if user_id_str is not None:
+        except jwt.PyJWTError:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code=UserCodes.INVALID_TOKEN,
+                message=UserMessages.INVALID_TOKEN,
+            ) from None
+
+        if not user_id_str:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code=UserCodes.INVALID_TOKEN,
+                message=UserMessages.INVALID_TOKEN,
+            )
+        try:
             user_id = UUID(user_id_str)
-        user_crud.active_user(user_id, db)
+        except ValueError:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code=UserCodes.INVALID_TOKEN,
+                message=UserMessages.INVALID_TOKEN,
+            ) from None
+        user = user_crud.active_user(user_id, db)
+        if not user:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code=UserCodes.INVALID_TOKEN,
+                message=UserMessages.INVALID_TOKEN,
+            )
 
 
 user_service = UserService()
