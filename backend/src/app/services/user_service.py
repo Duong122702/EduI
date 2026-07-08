@@ -8,9 +8,16 @@ from backend.src.app.constant.codes import UserCodes
 from backend.src.app.constant.messages import UserMessages
 from backend.src.app.core.database import get_db
 from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.core.security import create_verify_email_token, hashed_password
+from backend.src.app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    create_verify_email_token,
+    hashed_password,
+)
 from backend.src.app.crud.crud_user import user_crud
 from backend.src.app.schemas.user.CreateUser import CreateUser
+from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
+from backend.src.app.schemas.user.UserLogin import UserLogin
 from fastapi import Depends, status
 from sqlalchemy.orm import Session
 
@@ -70,9 +77,12 @@ class UserService:
             )
 
     def login_user(
-        self, email: str, password: str, db: Annotated[Session, Depends(get_db)]
-    ) -> None:
-        user = user_crud.get_user_by_email(email, db)
+        self,
+        user_data: UserLogin,
+        isKeepLogin: bool | None,
+        db: Annotated[Session, Depends(get_db)],
+    ) -> UserLoginResponse:
+        user = user_crud.get_user_by_email(user_data.email, db)
         if not user:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -85,12 +95,21 @@ class UserService:
                 code=UserCodes.USER_NOT_VERIFIED,
                 message=UserMessages.USER_NOT_VERIFIED,
             )
-        if not hashed_password(password) == user.hashed_password:
+        if not hashed_password(user_data.password) == user.hashed_password:
             raise CustomAPIException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 code=UserCodes.INVALID_CREDENTIALS,
                 message=UserMessages.INVALID_CREDENTIALS,
             )
+        # Generate access token and refresh token
+        access_token = create_access_token(subject=user.id)
+        if isKeepLogin:
+            refresh_token = create_refresh_token(subject=user.id)
+
+        return UserLoginResponse(
+            access_token=access_token,
+            refresh_token=refresh_token if isKeepLogin else None,
+        )
 
 
 user_service = UserService()
