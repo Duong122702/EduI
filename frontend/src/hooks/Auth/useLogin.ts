@@ -9,7 +9,7 @@ export const useLogin = () => {
     mutationFn: loginAndFetchUserApi,
     onSuccess: (data) => {
       // Cập nhật cả accessToken và object User (đã có đủ id, role từ api /me) vào Zustand
-      loginSuccess(data.accessToken, data.user);
+      loginSuccess(data.accessToken, data.user.data);
     },
   });
 };

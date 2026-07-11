@@ -7,7 +7,7 @@ import { authApi } from '../../api/auth/auth.api';
 
 export const loginAndFetchUserApi = async (payload: LoginPayload) => {
   const loginRes = await authApi.login(payload);
-  const { accessToken, refreshToken } = loginRes.data;
+  const { accessToken, refreshToken } = loginRes.data.data;
   // Trả về cả token và thông tin user cho bước xử lý tiếp theo
   Cookies.set('refresh_token', refreshToken, {
     expires: 7,
