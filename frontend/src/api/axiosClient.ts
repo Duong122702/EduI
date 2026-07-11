@@ -52,12 +52,13 @@ axiosClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Lấy refresh token từ cookie
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) throw new Error('No refresh token available');
 
         // Gửi request đổi token mới (API này nhận refresh_token và trả về cặp token mới)
         const res = await axios.post(
-          'https://api.your-exam-domain.com/v1/auth/refresh',
+          'https://api.your-exam-domain.com/auth/refresh',
           { refreshToken }
         );
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
@@ -65,9 +66,10 @@ axiosClient.interceptors.response.use(
 
         // Giải mã để cập nhật lại thông tin user vào store
         const decoded: any = jwtDecode(newAccessToken);
-
+        //decoded ở đấy sẽ chứa thông tin id của user do đó không thể lưu được id vào state logiSuccess, cần phải fetch lại thông tin user từ api /me để lấy đủ thông tin id và role
         useAuthStore.getState().loginSuccess(newAccessToken, decoded);
         if (newRefreshToken)
+          // Nếu API trả về refresh token mới, cập nhật lại cookie
           localStorage.setItem('refresh_token', newRefreshToken);
 
         processQueue(null, newAccessToken);
