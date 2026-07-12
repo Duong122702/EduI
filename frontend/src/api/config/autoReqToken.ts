@@ -1,23 +1,11 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/authStore';
-import { jwtDecode } from 'jwt-decode'; // Cài đặt qua: npm install jwt-decode
-
-const axiosClient = axios.create({
-  baseURL: 'https://api.your-exam-domain.com/v1',
-  headers: { 'Content-Type': 'application/json' },
-});
-
-// Request Interceptor: Đính kèm Access Token vào mọi request gửi đi
-axiosClient.interceptors.request.use(
-  (config) => {
-    const accessToken = useAuthStore.getState().accessToken;
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+import { useAuthStore } from '../../store/authStore';
+import { getProfile } from '../auth/getMe.api';
+import { refreshTokenApi } from '../auth/refresh.api';
+import axiosClient from './axiosClient';
+import Cookies from 'js-cookie';
+import type { ApiResponse } from '../../schemas/response/apiResponse';
+import type { User } from '../../Models/user.model';
 
 // Response Interceptor: Xử lý Silent Refresh khi gặp lỗi 401
 let isRefreshing = false;
@@ -28,6 +16,13 @@ const processQueue = (error: any, token: string | null = null) => {
     error ? prom.reject(error) : prom.resolve(token)
   );
   failedQueue = [];
+};
+
+const getCookie = (name: string) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  return null;
 };
 
 axiosClient.interceptors.response.use(
@@ -53,24 +48,34 @@ axiosClient.interceptors.response.use(
 
       try {
         // Lấy refresh token từ cookie
-        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshToken = Cookies.get('refresh_token');
         if (!refreshToken) throw new Error('No refresh token available');
 
         // Gửi request đổi token mới (API này nhận refresh_token và trả về cặp token mới)
-        const res = await axios.post(
-          'https://api.your-exam-domain.com/auth/refresh',
-          { refreshToken }
-        );
+        const res = await refreshTokenApi(refreshToken);
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
           res.data;
 
         // Giải mã để cập nhật lại thông tin user vào store
-        const decoded: any = jwtDecode(newAccessToken);
+        //const decoded: any = jwtDecode(newAccessToken);
+        const userResponse = await axios.get<ApiResponse<User>>(
+          'https://api.your-exam-domain.com/v1/auth/me',
+          {
+            headers: {
+              Authorization: `Bearer ${newAccessToken}`,
+            },
+          }
+        );
+        const user_data = userResponse.data;
         //decoded ở đấy sẽ chứa thông tin id của user do đó không thể lưu được id vào state logiSuccess, cần phải fetch lại thông tin user từ api /me để lấy đủ thông tin id và role
-        useAuthStore.getState().loginSuccess(newAccessToken, decoded);
+        useAuthStore.getState().loginSuccess(newAccessToken, user_data.data);
         if (newRefreshToken)
           // Nếu API trả về refresh token mới, cập nhật lại cookie
-          localStorage.setItem('refresh_token', newRefreshToken);
+          Cookies.set('refresh_token', newRefreshToken, {
+            expires: 30,
+            secure: true,
+            sameSite: 'strict',
+          });
 
         processQueue(null, newAccessToken);
         isRefreshing = false;
@@ -87,5 +92,3 @@ axiosClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export default axiosClient;
