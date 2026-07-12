@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
-import { getProfile } from '../auth/getMe.api';
 import { refreshTokenApi } from '../auth/refresh.api';
 import axiosClient from './axiosClient';
 import Cookies from 'js-cookie';
@@ -16,13 +15,6 @@ const processQueue = (error: any, token: string | null = null) => {
     error ? prom.reject(error) : prom.resolve(token)
   );
   failedQueue = [];
-};
-
-const getCookie = (name: string) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
-  return null;
 };
 
 axiosClient.interceptors.response.use(

@@ -14,6 +14,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
+  role: null,
   isAuthenticated: false,
   loginSuccess: (accessToken, user) =>
     set({ accessToken, user, isAuthenticated: true }),
