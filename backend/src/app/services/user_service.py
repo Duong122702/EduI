@@ -4,8 +4,8 @@ from uuid import UUID
 
 import jwt
 from backend.src.app.api.deps import verify_email_unique
-from backend.src.app.constant.codes import UserCodes
-from backend.src.app.constant.messages import UserMessages
+from backend.src.app.constant.codes import UserCodes, UserSessionCodes
+from backend.src.app.constant.messages import UserMessages, UserSessionMessages
 from backend.src.app.core.database import get_db
 from backend.src.app.core.exceptions import CustomAPIException
 from backend.src.app.core.security import (
@@ -15,7 +15,8 @@ from backend.src.app.core.security import (
     hashed_password,
 )
 from backend.src.app.crud.crud_user import user_crud
-from backend.src.app.crud.crud_usersessions import UserSessionCRUD
+from backend.src.app.crud.crud_usersessions import UserSessionCRUD, user_session_crud
+from backend.src.app.model.user import User
 from backend.src.app.schemas.user.CreateUser import CreateUser
 from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
 from backend.src.app.schemas.user.UserLogin import UserLogin
@@ -118,6 +119,31 @@ class UserService:
             access_token=access_token,
             refresh_token=new_refresh_token if isKeepLogin else None,
         )
+
+    def get_profile(
+        self,
+        user_id: UUID,
+        ip_adress: str,
+        user_agent: str,
+        db: Annotated[Session, Depends(get_db)],
+    ) -> User:
+        user = user_crud.get_user_by_id(user_id, db)
+        if user is None:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code=UserCodes.USER_NOT_FOUND,
+                message=UserMessages.USER_NOT_FOUND,
+            )
+        user_session = user_session_crud.get_user_session(user_id, db)
+        if user_session is None:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code=UserSessionCodes.USER_SESSION_NOT_FOUND,
+                message=UserSessionMessages.USER_SESSION_NOT_FOUND,
+            )
+        user_session.user_agent = user_agent
+        user_session.ip_address = ip_adress
+        return user
 
 
 user_service = UserService()

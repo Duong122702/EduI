@@ -30,6 +30,11 @@ class UserCRUD:
     ) -> User | None:
         return db.query(User).filter(User.email == email).first()
 
+    def get_user_by_id(
+        self, id: UUID, db: Annotated[Session, Depends(get_db)]
+    ) -> User | None:
+        return db.query(User).filter(User.id == id).first()
+
     def get_user_by_user_id(
         self, user_id: UUID, db: Annotated[Session, Depends(get_db)]
     ) -> User | None:

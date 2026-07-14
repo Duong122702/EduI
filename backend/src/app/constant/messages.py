@@ -9,3 +9,7 @@ class UserMessages(StrEnum):
     USER_NOT_FOUND = "User not found"
     USER_NOT_VERIFIED = "User not verified"
     INVALID_CREDENTIALS = "Invalid credentials"
+
+
+class UserSessionMessages(StrEnum):
+    USER_SESSION_NOT_FOUND = "User session not found"

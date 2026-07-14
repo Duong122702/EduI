@@ -17,3 +17,11 @@ class UserSessionCRUD:
         db.commit()
         db.refresh(session)
         return session
+
+    def get_user_session(
+        self, user_id, db: Annotated[Session, Depends(get_db)]
+    ) -> UserSessions | None:
+        return db.query(UserSessions).filter(UserSessions.id == user_id).first()
+
+
+user_session_crud = UserSessionCRUD()

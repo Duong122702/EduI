@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from backend.src.app.api.deps import get_current_token
 from backend.src.app.core.database import get_db
 from backend.src.app.schemas.response import APIResponse
 from backend.src.app.schemas.user.CreateUser import CreateUser
@@ -56,3 +57,14 @@ def login_user_routes(
         refresh_token=login_response.refresh_token,
     )
     return APIResponse(data=response, message="Đăng nhập thành công")
+
+
+@router.post("/getProfile")
+def get_profile_routes(
+    ip_adress: str,
+    user_agent: str,
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[Session, Depends(get_db)],
+) -> APIResponse:
+
+    return APIResponse()
