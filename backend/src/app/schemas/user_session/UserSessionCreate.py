@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class UserSessionCreate(BaseModel):
     user_id: UUID
     refresh_token: str
-    ip_address: str
-    user_agent: str
-    is_revoked: bool
+    ip_address: str | None = None
+    user_agent: str | None = None
+    is_revoked: bool = False
     expires_at: datetime

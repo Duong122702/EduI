@@ -1,15 +1,17 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, String
+from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class User(DeclarativeBase):
     __tablename__ = "users"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    hashed_password = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True)
-    full_name = Column(String, nullable=True)
-    role = Column(String, nullable=True)
-    is_verified = Column(Boolean, nullable=False, default=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
+    )
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] | None = mapped_column(String, unique=True, index=True)
+    full_name: Mapped[str] | None = mapped_column(String, nullable=True)
+    role: Mapped[str] | None = mapped_column(String, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)

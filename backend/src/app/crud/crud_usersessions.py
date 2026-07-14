@@ -12,14 +12,7 @@ class UserSessionCRUD:
         self, session_data: UserSessionCreate, db: Annotated[Session, Depends(get_db)]
     ) -> UserSessions:
         # Logic to register a new user session
-        session = UserSessions(
-            user_id=session_data.user_id,
-            user_agent=session_data.user_agent,
-            refresh_token=session_data.refresh_token,
-            ip_address=session_data.ip_address,
-            is_revoked=session_data.is_revoked,
-            expires_at=session_data.expires_at,
-        )
+        session = UserSessions(**session_data.model_dump())
         db.add(session)
         db.commit()
         db.refresh(session)

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Annotated
 from uuid import UUID
 
@@ -15,9 +15,11 @@ from backend.src.app.core.security import (
     hashed_password,
 )
 from backend.src.app.crud.crud_user import user_crud
+from backend.src.app.crud.crud_usersessions import UserSessionCRUD
 from backend.src.app.schemas.user.CreateUser import CreateUser
 from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
 from backend.src.app.schemas.user.UserLogin import UserLogin
+from backend.src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 from fastapi import Depends, status
 from sqlalchemy.orm import Session
 
@@ -104,10 +106,17 @@ class UserService:
         # Generate access token and refresh token
         access_token = create_access_token(subject=user.id)
         if isKeepLogin:
-            refresh_token = create_refresh_token(subject=user.id)
+            new_refresh_token = create_refresh_token(subject=user.id)
+        session_data = UserSessionCreate(
+            user_id=user.id,
+            refresh_token=new_refresh_token,
+            expires_at=datetime.now() + timedelta(days=30),
+        )
+        crud = UserSessionCRUD()
+        crud.register_user_session(session_data=session_data, db=db)
         return UserLoginResponse(
             access_token=access_token,
-            refresh_token=refresh_token if isKeepLogin else None,
+            refresh_token=new_refresh_token if isKeepLogin else None,
         )
 
 
