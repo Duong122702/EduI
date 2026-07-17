@@ -123,7 +123,7 @@ class UserService:
     def get_profile(
         self,
         user_id: UUID,
-        ip_adress: str,
+        ip_address: str,
         user_agent: str,
         db: Annotated[Session, Depends(get_db)],
     ) -> User:
@@ -142,7 +142,7 @@ class UserService:
                 message=UserSessionMessages.USER_SESSION_NOT_FOUND,
             )
         user_session.user_agent = user_agent
-        user_session.ip_address = ip_adress
+        user_session.ip_address = ip_address
         return user
 
 
