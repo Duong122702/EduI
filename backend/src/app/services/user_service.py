@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 from typing import Annotated
 from uuid import UUID
@@ -13,11 +14,13 @@ from backend.src.app.core.security import (
     create_refresh_token,
     create_verify_email_token,
     hashed_password,
+    verify_refresh_token,
 )
 from backend.src.app.crud.crud_user import user_crud
 from backend.src.app.crud.crud_usersessions import UserSessionCRUD, user_session_crud
 from backend.src.app.model.user import User
 from backend.src.app.schemas.user.CreateUser import CreateUser
+from backend.src.app.schemas.user.RefreshSchema import RefreshSchema
 from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
 from backend.src.app.schemas.user.UserLogin import UserLogin
 from backend.src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
@@ -134,7 +137,7 @@ class UserService:
                 code=UserCodes.USER_NOT_FOUND,
                 message=UserMessages.USER_NOT_FOUND,
             )
-        user_session = user_session_crud.get_user_session(user_id, db)
+        user_session = user_session_crud.get_user_session_by_id(user_id, db)
         if user_session is None:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -144,6 +147,84 @@ class UserService:
         user_session.user_agent = user_agent
         user_session.ip_address = ip_address
         return user
+
+    def refresh_session(
+        self,
+        refresh_token: str,
+        ip_address: str,
+        user_agent: str,
+        db: Annotated[Session, Depends(get_db)],
+    ) -> RefreshSchema:
+        # 1. Giải mã JWT và xác thực cơ bản
+        user_id = verify_refresh_token(refresh_token)
+        if user_id is None:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code=UserCodes.INVALID_TOKEN,
+                message=UserMessages.INVALID_TOKEN,
+            )
+        user_id_uuid = uuid.UUID(user_id)
+
+        # 2. Kiểm tra DB
+        session_record = user_session_crud.get_user_session(refresh_token, db)
+        if not session_record:
+            raise CustomAPIException(
+                status_code=401,
+                code="SESSION_NOT_FOUND",
+                message="Phiên không tồn tại.",
+            )
+
+        # 3. Phát hiện Replay Attack
+        if session_record.is_revoked:
+            user_session_crud.revoke_all_user_sessions(user_id=user_id_uuid, db=db)
+            db.commit()
+            raise CustomAPIException(
+                status_code=401,
+                code="REPLAY_ATTACK",
+                message="Phát hiện truy cập đáng ngờ. Hủy toàn bộ phiên.",
+            )
+
+        # 4. Kiểm tra hết hạn trong DB
+        now = (
+            datetime.now(datetime.astimezone.utc)
+            if session_record.expires_at.tzinfo
+            else datetime.now()
+        )
+        if session_record.expires_at < now:
+            raise CustomAPIException(
+                status_code=401, code="TOKEN_EXPIRED", message="Phiên đã hết hạn."
+            )
+
+        # 5. Xoay vòng token: Vô hiệu hóa cái cũ
+        session_record.is_revoked = True
+        db.add(session_record)
+
+        # 6. Tạo cặp token mới
+        new_access_token = create_access_token(subject=str(user_id_uuid))
+        new_refresh_token = create_refresh_token(subject=str(user_id_uuid))
+
+        new_expires_at = datetime.now(datetime.astimezone.utc) + timedelta(
+            minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
+        )
+        # 7. Lưu session mới vào DB
+        user_session_crud.register_user_session(
+            UserSessionCreate(
+                user_id=user_id_uuid,
+                refresh_token=new_refresh_token,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                expires_at=new_expires_at,
+            ),
+            db,
+        )
+        db.commit()
+
+        # Trả về cả 2 token cho tầng Route xử lý tiếp
+        return RefreshSchema(
+            access_token=new_access_token,
+            refresh_token=new_refresh_token,
+            expires_at=new_expires_at,
+        )
 
 
 user_service = UserService()

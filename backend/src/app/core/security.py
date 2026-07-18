@@ -65,7 +65,7 @@ def create_refresh_token(
     to_encode = {"exp": expire, "sub": str(subject)}
 
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.REFRESH_TOKEN_SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
 
@@ -79,6 +79,21 @@ def verify_token(token: str) -> str | None:
         if subject is None:
             return None
 
+        return subject
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+
+def verify_refresh_token(token: str) -> str | None:
+    try:
+        payload = jwt.decode(
+            token, settings.REFRESH_TOKEN_SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        subject = payload.get("sub")
+        if subject is None:
+            return None
         return subject
     except jwt.ExpiredSignatureError:
         return None
