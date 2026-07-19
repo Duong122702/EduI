@@ -6,7 +6,7 @@ from .config import settings
 engine = create_async_engine(settings.DATABASE_URL, echo=settings.DB_ECHO)
 
 # Create a session factorythat will be used to create new sessions for interacting with the database. (using async_sessionmaker to create asynchronous sessions)
-SessionLocal = async_sessionmaker(bind=engine, autoflush=False)
+SessionLocal = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
 # Base class for all the models in the application. It inherits from DeclarativeBase, which is a base class provided by SQLAlchemy for defining models using the declarative syntax.

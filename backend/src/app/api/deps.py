@@ -6,15 +6,15 @@ from backend.src.app.model.user import User
 from backend.src.app.schemas.user.CreateUser import CreateUser
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 security_scheme = HTTPBearer()
 
 
 async def verify_email_unique(
-    user_data: CreateUser, db: Annotated[Session, Depends(get_db)]
+    user_data: CreateUser, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> User | None:
-    existing_user = user_crud.get_user_by_email(user_data.email, db)
+    existing_user = await user_crud.get_user_by_email(user_data.email, db)
 
     return existing_user
 

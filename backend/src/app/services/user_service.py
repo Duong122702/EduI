@@ -25,16 +25,16 @@ from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginRes
 from backend.src.app.schemas.user.UserLogin import UserLogin
 from backend.src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 from fastapi import Depends, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 
 
 class UserService:
-    def register_user(
-        self, user_data: CreateUser, db: Annotated[Session, Depends(get_db)]
+    async def register_user(
+        self, user_data: CreateUser, db: Annotated[AsyncSession, Depends(get_db)]
     ) -> str:
-        existing_user = verify_email_unique(user_data, db)
+        existing_user = await verify_email_unique(user_data, db)
         if existing_user:
             raise CustomAPIException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -42,13 +42,15 @@ class UserService:
                 message=UserMessages.ALREADY_EXISTS,
             )
         hashed_password_value = hashed_password(user_data.password)
-        user = user_crud.create_user(user_data, hashed_password_value, db)
+        user = await user_crud.create_user(user_data, hashed_password_value, db)
         verify_token = create_verify_email_token(
             subject=user.id, expires_delta=timedelta(minutes=30)
         )
         return verify_token
 
-    def verify_email(self, token: str, db: Annotated[Session, Depends(get_db)]) -> None:
+    async def verify_email(
+        self, token: str, db: Annotated[AsyncSession, Depends(get_db)]
+    ) -> None:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
             user_id_str: str | None = payload.get("sub")
@@ -74,21 +76,22 @@ class UserService:
                 code=UserCodes.INVALID_TOKEN,
                 message=UserMessages.INVALID_TOKEN,
             ) from None
-        user = user_crud.active_user(user_id, db)
+        user = await user_crud.get_user_by_id(user_id, db)
         if not user:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 code=UserCodes.INVALID_TOKEN,
                 message=UserMessages.INVALID_TOKEN,
             )
+        await user_crud.active_user(user_id, db)
 
-    def login_user(
+    async def login_user(
         self,
         user_data: UserLogin,
         isKeepLogin: bool | None,
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[AsyncSession, Depends(get_db)],
     ) -> UserLoginResponse:
-        user = user_crud.get_user_by_email(user_data.email, db)
+        user = await user_crud.get_user_by_email(user_data.email, db)
         if not user:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -117,27 +120,27 @@ class UserService:
             expires_at=datetime.now() + timedelta(days=30),
         )
         crud = UserSessionCRUD()
-        crud.register_user_session(session_data=session_data, db=db)
+        await crud.register_user_session(session_data=session_data, db=db)
         return UserLoginResponse(
             access_token=access_token,
             refresh_token=new_refresh_token if isKeepLogin else None,
         )
 
-    def get_profile(
+    async def get_profile(
         self,
         user_id: UUID,
         ip_address: str,
         user_agent: str,
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[AsyncSession, Depends(get_db)],
     ) -> User:
-        user = user_crud.get_user_by_id(user_id, db)
+        user = await user_crud.get_user_by_id(user_id, db)
         if user is None:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 code=UserCodes.USER_NOT_FOUND,
                 message=UserMessages.USER_NOT_FOUND,
             )
-        user_session = user_session_crud.get_user_session_by_id(user_id, db)
+        user_session = await user_session_crud.get_user_session_by_id(user_id, db)
         if user_session is None:
             raise CustomAPIException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -148,12 +151,12 @@ class UserService:
         user_session.ip_address = ip_address
         return user
 
-    def refresh_session(
+    async def refresh_session(
         self,
         refresh_token: str,
         ip_address: str,
         user_agent: str,
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[AsyncSession, Depends(get_db)],
     ) -> RefreshSchema:
         # 1. Giải mã JWT và xác thực cơ bản
         user_id = verify_refresh_token(refresh_token)
@@ -166,7 +169,7 @@ class UserService:
         user_id_uuid = uuid.UUID(user_id)
 
         # 2. Kiểm tra DB
-        session_record = user_session_crud.get_user_session(refresh_token, db)
+        session_record = await user_session_crud.get_user_session(refresh_token, db)
         if not session_record:
             raise CustomAPIException(
                 status_code=401,
@@ -176,8 +179,10 @@ class UserService:
 
         # 3. Phát hiện Replay Attack
         if session_record.is_revoked:
-            user_session_crud.revoke_all_user_sessions(user_id=user_id_uuid, db=db)
-            db.commit()
+            await user_session_crud.revoke_all_user_sessions(
+                user_id=user_id_uuid, db=db
+            )
+            await db.commit()
             raise CustomAPIException(
                 status_code=401,
                 code="REPLAY_ATTACK",
@@ -207,7 +212,7 @@ class UserService:
             minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
         )
         # 7. Lưu session mới vào DB
-        user_session_crud.register_user_session(
+        await user_session_crud.register_user_session(
             UserSessionCreate(
                 user_id=user_id_uuid,
                 refresh_token=new_refresh_token,
@@ -217,7 +222,7 @@ class UserService:
             ),
             db,
         )
-        db.commit()
+        await db.commit()
 
         # Trả về cả 2 token cho tầng Route xử lý tiếp
         return RefreshSchema(

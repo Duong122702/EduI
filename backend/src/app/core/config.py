@@ -7,22 +7,12 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-        extra="ignore",  # Bỏ qua nếu trong file .env có các biến thừa không khai báo ở đây
-    )
-
     PROJECT_NAME: str = "Education Improvement API"
     API_V1_STR: str = "/api/v1"
     DOMAIN: str = os.getenv("DOMAIN", "localhost")
 
     # Chuỗi kết nối Database (Asyncpg cho PostgreSQL)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
-
-    # Đọc từ file .env nếu có, ưu tiên biến môi trường hệ thống
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
     DB_ECHO: bool = True
 
@@ -34,6 +24,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",  # Bỏ qua nếu trong file .env có các biến thừa không khai báo ở đây
+    )
 
 
 settings = Settings()

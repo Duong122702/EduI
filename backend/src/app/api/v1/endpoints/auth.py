@@ -14,8 +14,16 @@ from backend.src.app.schemas.user.response.UserCreateResponse import UserCreateR
 from backend.src.app.schemas.user.UserLogin import UserLogin
 from backend.src.app.services.email import EmailService
 from backend.src.app.services.user_service import user_service
-from fastapi import APIRouter, Cookie, Depends, Request, Response, status
-from sqlalchemy.orm import Session
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Cookie,
+    Depends,
+    Request,
+    Response,
+    status,
+)
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -25,13 +33,16 @@ router = APIRouter()
     response_model=APIResponse(data=UserCreateResponse),
     status_code=status.HTTP_201_CREATED,
 )
-def register_user_routes(
-    user_data: CreateUser, db: Annotated[Session, Depends(get_db)]
+async def register_user_routes(
+    user_data: CreateUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    background_tasks: BackgroundTasks,
 ) -> APIResponse:
-    verify_token = user_service.register_user(user_data, db)
-    EmailService.send_activation_email(
+    verify_token = await user_service.register_user(user_data, db)
+    background_tasks.add_task(
+        EmailService.send_activation_email,
         to_email=user_data.email,
-        fullname=user_data.fullname,
+        fullname=user_data.full_name,
         activation_token=verify_token,
     )
     response = UserCreateResponse(email=user_data.email, is_active=False)
@@ -43,8 +54,10 @@ def register_user_routes(
 
 
 @router.get("/verify_email/{token}", response_model=APIResponse())
-def verify_email(token: str, db: Annotated[Session, Depends(get_db)]) -> APIResponse:
-    user_service.verify_email(token, db)
+async def verify_email(
+    token: str, db: Annotated[AsyncSession, Depends(get_db)]
+) -> APIResponse:
+    await user_service.verify_email(token, db)
     return APIResponse(message="Xác thực tài khoản thành công")
 
 
@@ -53,10 +66,12 @@ def verify_email(token: str, db: Annotated[Session, Depends(get_db)]) -> APIResp
     response_model=APIResponse(data=str),
     status_code=status.HTTP_200_OK,
 )
-def login_user_routes(
-    user_data: UserLogin, db: Annotated[Session, Depends(get_db)], response: Response
+async def login_user_routes(
+    user_data: UserLogin,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    response: Response,
 ) -> APIResponse:
-    login_response = user_service.login_user(user_data, user_data.isKeepLogin, db)
+    login_response = await user_service.login_user(user_data, user_data.isKeepLogin, db)
     if login_response.refresh_token is not None:
         response.set_cookie(
             key="refresh_token",
@@ -74,10 +89,10 @@ def login_user_routes(
     response_model=APIResponse(data=GetUserResponse),
     status_code=status.HTTP_200_OK,
 )
-def get_profile_routes(
+async def get_profile_routes(
     request: Request,
     token: Annotated[str, Depends(get_current_token)],
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> APIResponse:
     user_id = verify_token(token)
     if user_id is None:
@@ -97,16 +112,16 @@ def get_profile_routes(
         ) from None
     ip_address = request.client.host if request.client else "127.0.0.1"
     user_agent = request.headers.get("user_agent") or "unknown"
-    user_data = user_service.get_profile(user_id_uuid, ip_address, user_agent, db)
+    user_data = await user_service.get_profile(user_id_uuid, ip_address, user_agent, db)
 
     return APIResponse(data=user_data)
 
 
 @router.post("/refresh", response_model=APIResponse(data=str))
-def get_new_token_route(
+async def get_new_token_route(
     request: Request,
     response: Response,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[AsyncSession, Depends(get_db)],
     refresh_token: Annotated[str | None, Cookie()] = None,
 ) -> APIResponse:
     if not refresh_token:
@@ -118,7 +133,9 @@ def get_new_token_route(
     user_agent = request.headers.get("user-agent") or "unknown"
 
     # GỌI TẦNG SERVICE XỬ LÝ LOGIC TRUNG TÂM
-    tokens = user_service.refresh_session(refresh_token, ip_address, user_agent, db)
+    tokens = await user_service.refresh_session(
+        refresh_token, ip_address, user_agent, db
+    )
 
     # ROUTE CHỈ LÀM ĐÚNG NHIỆM VỤ HTTP: SET COOKIE VÀ TRẢ JSON BODY
     response.set_cookie(
