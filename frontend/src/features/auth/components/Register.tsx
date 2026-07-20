@@ -10,6 +10,7 @@ import {
 import * as Yup from 'yup';
 
 function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
+  const [showPassword, setShowPassword] = useState(false);
   const [registerFormData, setRegisterFormData] = useState({
     fullName: '',
     email: '',
@@ -177,7 +178,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
           />
           <Input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             name="password"
             value={registerFormData.password}
             onChange={handleInputChange}
@@ -185,10 +186,13 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             className={`items-center bg-white px-10 ${errors.password ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="••••••••"
           />
-          <div className="cursor-pointer">
+          <div
+            className="cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
+          >
             <CustomIcon
               name="iconEyes"
-              className="hover:text-primary absolute top-1/2 right-4 -translate-y-1/2 text-gray-400"
+              className={`hover:text-primary absolute top-1/2 right-4 -translate-y-1/2 ${showPassword ? 'text-primary' : 'text-gray-400'}`}
             />
           </div>
         </div>

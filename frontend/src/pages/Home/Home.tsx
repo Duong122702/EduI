@@ -108,8 +108,8 @@ function Home() {
           </div>
           <FlexibleTabs
             tabs={[
-              { id: 'student', label: 'Dành cho giáo viên' },
-              { id: 'teacher', label: 'Dành cho học sinh' },
+              { id: 'teacher', label: 'Dành cho giáo viên' },
+              { id: 'student', label: 'Dành cho học sinh' },
             ]}
             activeTabId={currentTab}
             onChange={handleTabChange}
@@ -126,7 +126,7 @@ function Home() {
                   order={path.order}
                   name={path.name}
                   title={path.title}
-                  decription={path.decription}
+                  description={path.description}
                 />
               ))}
             </div>

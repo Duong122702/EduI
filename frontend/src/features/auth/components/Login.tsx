@@ -106,7 +106,10 @@ function Login({ currentTab }: LoginProps) {
             className={`items-center bg-white px-10 ${errors.password ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="••••••••"
           />
-          <div className="cursor-pointer">
+          <div
+            className="cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
+          >
             <CustomIcon
               name="iconEyes"
               className={`hover:text-primary absolute top-1/2 right-4 -translate-y-1/2 ${showPassword ? 'text-primary' : 'text-gray-400'}`}

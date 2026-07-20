@@ -1,7 +1,7 @@
 import { CustomIcon } from '../../../components/ui/CustomIcon';
 import type { TutorialCardProps } from '../../../types/HomeTypes/tutorialCardProps.type';
 
-function TutorialCard({ decription, name, order, title }: TutorialCardProps) {
+function TutorialCard({ description, name, order, title }: TutorialCardProps) {
   return (
     <div className="relative z-10 flex flex-col items-center text-center">
       <div className="group relative mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-gray-50 bg-white shadow-lg">
@@ -13,7 +13,7 @@ function TutorialCard({ decription, name, order, title }: TutorialCardProps) {
       </div>
       <h3 className="mb-3 text-xl font-bold">{title}</h3>
       <p className="max-w-70 text-sm leading-relaxed text-gray-500">
-        {decription}
+        {description}
       </p>
     </div>
   );

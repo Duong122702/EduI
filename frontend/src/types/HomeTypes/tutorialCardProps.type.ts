@@ -4,5 +4,5 @@ export interface TutorialCardProps {
   order: string;
   name: CustomIconName;
   title: string;
-  decription: string;
+  description: string;
 }

@@ -1,4 +1,4 @@
-import type { FeatureCardProps } from '../types/featureCardProps.type';
+import type { FeatureCardProps } from '../types/HomeTypes/featureCardProps.type';
 
 const classNameConst =
   'text-primary h-7 w-7 transition-colors duration-300 group-hover:text-white';
