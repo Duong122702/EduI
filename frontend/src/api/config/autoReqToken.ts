@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 import { refreshTokenApi } from '../auth/refresh.api';
 import axiosClient from './axiosClient';
@@ -50,8 +49,8 @@ axiosClient.interceptors.response.use(
 
         // Giải mã để cập nhật lại thông tin user vào store
         //const decoded: any = jwtDecode(newAccessToken);
-        const userResponse = await axios.get<ApiResponse<User>>(
-          'https://api.your-exam-domain.com/v1/auth/me',
+        const userResponse = await axiosClient.get<ApiResponse<User>>(
+          '/auth/me',
           {
             headers: {
               Authorization: `Bearer ${newAccessToken}`,

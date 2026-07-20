@@ -7,6 +7,7 @@ import { loginSchema, type UserFormLoginValues } from '../schemas/login.schema';
 import * as Yup from 'yup';
 
 function Login({ currentTab }: LoginProps) {
+  const [showPassword, setShowPassword] = useState(false);
   const [loginFormData, setLoginFormData] = useState<UserFormLoginValues>({
     email: '',
     password: '',
@@ -97,7 +98,7 @@ function Login({ currentTab }: LoginProps) {
             className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
           />
           <Input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             name="password"
             value={loginFormData.password}
             onChange={handleInputChange}
@@ -108,7 +109,7 @@ function Login({ currentTab }: LoginProps) {
           <div className="cursor-pointer">
             <CustomIcon
               name="iconEyes"
-              className="hover:text-primary absolute top-1/2 right-4 -translate-y-1/2 text-gray-400"
+              className={`hover:text-primary absolute top-1/2 right-4 -translate-y-1/2 ${showPassword ? 'text-primary' : 'text-gray-400'}`}
             />
           </div>
         </div>
