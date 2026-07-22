@@ -37,7 +37,9 @@ export function useForm<T extends Record<string, any>>({
   };
 
   // Xử lý Submit chung & Parse lỗi Yup
-  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     setLoading(true);
 

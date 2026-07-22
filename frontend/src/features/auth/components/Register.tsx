@@ -7,68 +7,22 @@ import {
   registerSchema,
   type UserFormRegisterValues,
 } from '../schemas/register.schema';
-import * as Yup from 'yup';
+import { useForm } from '../../../hooks/useForm';
 
 function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [registerFormData, setRegisterFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    acceptTerm: false,
-  });
-
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof UserFormRegisterValues, string>>
-  >({});
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setRegisterFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-    if (errors[name as keyof UserFormRegisterValues]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleSubmit = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-
-    const dataToValidate: UserFormRegisterValues = {
-      ...registerFormData,
-      role: isSelect ? 'student' : 'teacher',
-    };
-
-    try {
-      await registerSchema.validate(dataToValidate, { abortEarly: false });
-      setErrors({});
-
-      console.log('call API');
-    } catch (yupError) {
-      if (yupError instanceof Yup.ValidationError) {
-        const newErrors: Partial<Record<keyof UserFormRegisterValues, string>> =
-          {};
-        yupError.inner.forEach((validationError) => {
-          if (validationError.path)
-            [
-              (newErrors[validationError.path as keyof UserFormRegisterValues] =
-                validationError.message),
-            ];
-        });
-        setErrors(newErrors);
-        // UI Trượt lên cho form quá dài
-        // const firstErrorKey = Object.keys(newErrors)[0];
-        // const errorElement = document.getElementsByName(firstErrorKey)[0];
-        // if (errorElement) {
-        //   errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // }
-      }
-    }
-  };
+  const { errors, formData, handleChange, handleSubmit } =
+    useForm<UserFormRegisterValues>({
+      initialValues: {
+        email: '',
+        password: '',
+        fullName: '',
+        role: '',
+        acceptTerms: false,
+      },
+      validationSchema: registerSchema,
+      onSubmit: async (valiData) => {},
+    });
   return (
     <div className={`${currentTab === 'regis' ? 'block' : 'hidden'} mt-8`}>
       <div className="mb-5">
@@ -128,8 +82,8 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type="email"
             name="fullName"
-            value={registerFormData.fullName}
-            onChange={handleInputChange}
+            value={formData.fullName}
+            onChange={handleChange}
             inputSize={'md'}
             className={`bg-white px-10 ${errors.fullName ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="Nguyễn Văn A"
@@ -153,8 +107,8 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type="email"
             name="email"
-            value={registerFormData.email}
-            onChange={handleInputChange}
+            value={formData.email}
+            onChange={handleChange}
             inputSize={'md'}
             className={`bg-white px-10 ${errors.email ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="exemple@example.com"
@@ -180,8 +134,8 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           <Input
             type={showPassword ? 'text' : 'password'}
             name="password"
-            value={registerFormData.password}
-            onChange={handleInputChange}
+            value={formData.password}
+            onChange={handleChange}
             inputSize={'md'}
             className={`items-center bg-white px-10 ${errors.password ? 'focus:boder-red-500! border-red-500' : ''}`}
             placeholder="••••••••"
@@ -207,8 +161,8 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           type="checkbox"
           className="h-4 w-4"
           name="acceptTerms"
-          checked={registerFormData.acceptTerm}
-          onChange={handleInputChange}
+          checked={formData.acceptTerms}
+          onChange={handleChange}
         />
         <span className="text-xs text-gray-800">
           Tôi đồng ý với
