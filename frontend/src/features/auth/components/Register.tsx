@@ -11,7 +11,7 @@ import { useForm } from '../../../hooks/useForm';
 
 function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const { errors, formData, handleChange, handleSubmit } =
+  const { errors, formData, handleChange, handleSubmit, loading } =
     useForm<UserFormRegisterValues>({
       initialValues: {
         email: '',
@@ -190,8 +190,9 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
         onClick={handleSubmit}
         variant={'dark'}
         className="w-full gap-2 rounded-2xl py-3 font-semibold shadow-xl"
+        disabled={loading}
       >
-        Đăng ký tài khoản
+        {loading ? 'Đang xử lý' : 'Đăng ký tài khoản'}
         <CustomIcon name="iconCheckNoCircle" className="text-xs" />
       </Button>
     </div>
