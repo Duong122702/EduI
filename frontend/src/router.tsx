@@ -3,6 +3,7 @@ import { MainLayout } from './layouts/MainLayout';
 import Home from './pages/Home';
 import { useAuthStore } from './store/authStore';
 import Auth from './pages/Auth/Auth';
+import DashBoardLayout from './layouts/DashBoardLayout';
 
 const ProtectedRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -11,7 +12,7 @@ const ProtectedRoute = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  return;
+  return <Outlet />;
 };
 const PublicOnlyRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -49,12 +50,17 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />, // Sử dụng ProtectedRoute làm wrapper
     children: [
       {
-        path: 'dashboard',
-        //element: <Dashboard />,
-      },
-      {
-        path: 'profile',
-        //element: <Profile />,
+        element: <DashBoardLayout />,
+        children: [
+          {
+            path: 'dashboard',
+            //element: <Dashboard />,
+          },
+          {
+            path: 'profile',
+            //element: <Profile />,
+          },
+        ],
       },
     ],
   },
