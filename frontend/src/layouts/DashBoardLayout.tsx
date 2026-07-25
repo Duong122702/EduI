@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Logo from '../components/ui/Logo';
 import { useAuthStore } from '../store/authStore';
+import { CustomIcon } from '../components/ui/CustomIcon';
 
 export const DashBoardLayout = () => {
   const currentUser = useAuthStore((state) => state.user);
@@ -44,7 +45,7 @@ export const DashBoardLayout = () => {
             title="Đăng xuất"
             onClick={logout}
           >
-            {/* <LogOut className="w-5 h-5" /> */}
+            <CustomIcon name="iconLogout" className="h-6 w-6" />
           </button>
         </div>
       </aside>

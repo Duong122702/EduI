@@ -1,4 +1,7 @@
 import * as Yup from 'yup';
+import type { UserRole } from '../../../store/authStore';
+
+const VALID_ROLES: UserRole[] = ['STUDENT', 'TEACHER'];
 
 export const registerSchema = Yup.object().shape({
   fullName: Yup.string().required('Họ và tên là bắt buộc'),
@@ -10,7 +13,9 @@ export const registerSchema = Yup.object().shape({
     [true],
     'Bạn phải đồng ý với điều khoản dịch vụ'
   ),
-  role: Yup.string().required(),
+  role: Yup.string()
+    .oneOf<UserRole>(VALID_ROLES)
+    .required('Vui lòng chọn vai trò'),
 });
 
 export type UserFormRegisterValues = Yup.InferType<typeof registerSchema>;

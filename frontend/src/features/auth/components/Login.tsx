@@ -1,60 +1,37 @@
 import { useState } from 'react';
 import Button from '../../../components/ui/Button';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { CustomIcon } from '../../../components/ui/CustomIcon';
 import { Input } from '../../../components/ui/Input';
 import type { LoginProps } from '../../../types/AuthTypes/login.type';
 import { loginSchema, type UserFormLoginValues } from '../schemas/login.schema';
-import { useForm } from '../../../hooks/useForm';
+import { useLogin } from '../../../hooks/Auth/useLogin';
+import { useForm } from 'react-hook-form';
 
 function Login({ currentTab }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const { formData, errors, loading, handleChange, handleSubmit } =
-    useForm<UserFormLoginValues>({
-      initialValues: { email: '', password: '', acceptTerms: false },
-      validationSchema: loginSchema,
-      onSubmit: async (validData) => {
-        console.log('Call API');
-        //
-      },
-    });
-  //   e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>
-  // ) => {
-  //   const { name, value, type, checked } = e.target;
-  //   setLoginFormData((prev) => ({
-  //     ...prev,
-  //     [name]: type === 'checkbox' ? checked : value,
-  //   }));
-  //   if (errors[name as keyof UserFormLoginValues]) {
-  //     setErrors((prev) => ({ ...prev, [name]: '' }));
-  //   }
-  // };
-  // const handleSubmit = async (
-  //   e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  // ) => {
-  //   e.preventDefault();
-  //   // 2. Chỉ gửi dữ liệu lên component cha khi user click Submit
-  //   try {
-  //     await loginSchema.validate(loginFormData, { abortEarly: false });
+  const { mutate: login, isPending } = useLogin();
 
-  //     setErrors({});
-  //   } catch (yupError) {
-  //     if (yupError instanceof Yup.ValidationError) {
-  //       const newErrors: Partial<Record<keyof UserFormLoginValues, string>> =
-  //         {};
-
-  //       yupError.inner.forEach((validationError) => {
-  //         if (validationError.path) {
-  //           newErrors[validationError.path as keyof UserFormLoginValues] =
-  //             validationError.message;
-  //         }
-  //       });
-
-  //       setErrors(newErrors);
-  //     }
-  //   }
-  // };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserFormLoginValues>({
+    resolver: yupResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      acceptTerms: false,
+    },
+  });
+  const onSubmit = (data: UserFormLoginValues) => {
+    login(data);
+  };
   return (
-    <div className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}
+    >
       <div className="mb-5">
         <span className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
           Email học tập
@@ -65,18 +42,16 @@ function Login({ currentTab }: LoginProps) {
             className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
           />
           <Input
-            name="email"
             type="email"
-            value={formData.email}
+            {...register('email')}
             inputSize={'md'}
             className={`bg-white px-10 ${errors.email ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="student@example.com"
-            onChange={handleChange}
           />
         </div>
         {errors.email && (
           <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
-            ⚠️ {errors.email}
+            ⚠️ {errors.email.message}
           </p>
         )}
       </div>
@@ -99,9 +74,7 @@ function Login({ currentTab }: LoginProps) {
           />
           <Input
             type={showPassword ? 'text' : 'password'}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
+            {...register('password')}
             inputSize={'md'}
             className={`items-center bg-white px-10 ${errors.password ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="••••••••"
@@ -118,7 +91,7 @@ function Login({ currentTab }: LoginProps) {
         </div>
         {errors.password && (
           <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-red-500">
-            ⚠️ {errors.password}
+            ⚠️ {errors.password.message}
           </p>
         )}
       </div>
@@ -126,9 +99,7 @@ function Login({ currentTab }: LoginProps) {
         <input
           type="checkbox"
           className="h-4 w-4"
-          name="acceptTerms"
-          checked={formData.acceptTerms}
-          onChange={handleChange}
+          {...register('acceptTerms')}
         />
         <span className="text-xs text-gray-800">
           Duy trì đăng nhập trong 30 ngày
@@ -137,13 +108,12 @@ function Login({ currentTab }: LoginProps) {
       <Button
         variant={'dark'}
         className="w-full gap-2 rounded-2xl py-3 font-semibold shadow-xl"
-        onClick={handleSubmit}
-        disabled={loading}
+        disabled={isPending}
       >
-        {loading ? 'Đang xử lý' : 'Đăng nhập ngay'}
+        {isPending ? 'Đang xử lý' : 'Đăng nhập ngay'}
         <CustomIcon name="arrowRight" />
       </Button>
-    </div>
+    </form>
   );
 }
 

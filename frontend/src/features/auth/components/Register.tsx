@@ -8,21 +8,36 @@ import {
   type UserFormRegisterValues,
 } from '../schemas/register.schema';
 import { useForm } from '../../../hooks/useForm';
+import { registerApi } from '../../../api/auth/register.api';
+import type { UserRole } from '../../../store/authStore';
 
 function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const { errors, formData, handleChange, handleSubmit, loading } =
-    useForm<UserFormRegisterValues>({
-      initialValues: {
-        email: '',
-        password: '',
-        fullName: '',
-        role: '',
-        acceptTerms: false,
-      },
-      validationSchema: registerSchema,
-      onSubmit: async (valiData) => {},
-    });
+  const {
+    errors,
+    formData,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    loading,
+  } = useForm<UserFormRegisterValues>({
+    initialValues: {
+      email: '',
+      password: '',
+      fullName: '',
+      role: isSelect ? 'STUDENT' : 'TEACHER',
+      acceptTerms: false,
+    },
+    validationSchema: registerSchema,
+    onSubmit: async (valiData) => {
+      const { acceptTerms, ...payload } = valiData;
+      registerApi(payload);
+    },
+  });
+  const onSelectRole = (roleValue: UserRole) => {
+    setFieldValue('role', roleValue);
+    handleRoleChange(); // Đổi UI ngoài parent nếu cần
+  };
   return (
     <div className={`${currentTab === 'regis' ? 'block' : 'hidden'} mt-8`}>
       <div className="mb-5">
@@ -32,7 +47,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
         <div className="grid grid-cols-2 gap-3">
           <div
             className={`${isSelect ? 'border-primary' : 'border-gray-300 hover:border-gray-400'} relative cursor-pointer rounded-xl border-2 p-3 text-center transition-all duration-300`}
-            onClick={handleRoleChange}
+            onClick={() => onSelectRole('STUDENT')}
           >
             <div
               className={`${isSelect ? 'block' : 'hidden'} text-primary-dark absolute top-2 right-2`}
@@ -51,7 +66,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
           </div>
           <div
             className={`${!isSelect ? 'border-primary' : 'border-gray-300 hover:border-gray-400'} relative cursor-pointer rounded-xl border-2 p-3 text-center transition-all duration-300`}
-            onClick={handleRoleChange}
+            onClick={() => onSelectRole('TEACHER')}
           >
             <div
               className={`${!isSelect ? 'block' : 'hidden'} text-primary-dark absolute top-2 right-2`}
@@ -80,12 +95,12 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
           />
           <Input
-            type="email"
+            type="text"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
             inputSize={'md'}
-            className={`bg-white px-10 ${errors.fullName ? 'focus:boder-red-500! border-red-500' : ''}`}
+            className={`bg-white px-10 ${errors.fullName ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="Nguyễn Văn A"
           />
         </div>
@@ -110,7 +125,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             value={formData.email}
             onChange={handleChange}
             inputSize={'md'}
-            className={`bg-white px-10 ${errors.email ? 'focus:boder-red-500! border-red-500' : ''}`}
+            className={`bg-white px-10 ${errors.email ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="exemple@example.com"
           />
         </div>
@@ -137,7 +152,7 @@ function Register({ currentTab, handleRoleChange, isSelect }: RegisterProps) {
             value={formData.password}
             onChange={handleChange}
             inputSize={'md'}
-            className={`items-center bg-white px-10 ${errors.password ? 'focus:boder-red-500! border-red-500' : ''}`}
+            className={`items-center bg-white px-10 ${errors.password ? 'border-red-500 focus:border-red-500!' : ''}`}
             placeholder="••••••••"
           />
           <div
