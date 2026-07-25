@@ -7,31 +7,46 @@ import type { LoginProps } from '../../../types/AuthTypes/login.type';
 import { loginSchema, type UserFormLoginValues } from '../schemas/login.schema';
 import { useLogin } from '../../../hooks/Auth/useLogin';
 import { useForm } from 'react-hook-form';
+import { handleServerFormErrors } from '../../../utils/handleServerFormErrors';
 
 function Login({ currentTab }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const { mutate: login, isPending } = useLogin();
+  const { mutate: login, isPending, error, isError } = useLogin();
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<UserFormLoginValues>({
     resolver: yupResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
-      acceptTerms: false,
+      acceptTerms: false, //rememberME
     },
   });
   const onSubmit = (data: UserFormLoginValues) => {
-    login(data);
+    login(data, {
+      onError: (error) => {
+        if (error.details) {
+          handleServerFormErrors(error, setError);
+        }
+      },
+    });
   };
+
+  if (currentTab !== 'login') return null;
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}
     >
+      {isError && (
+        <div className="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
+          {error.message}
+        </div>
+      )}
       <div className="mb-5">
         <span className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
           Email học tập

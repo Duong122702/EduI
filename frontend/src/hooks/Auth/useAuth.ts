@@ -15,7 +15,7 @@ export const loginAndFetchUserApi = async (payload: LoginPayload) => {
     secure: true,
     sameSite: 'strict',
   });
-  const userRes = await getProfile();
+  const userRes = await getProfile(accessToken);
   return {
     accessToken,
     user: userRes.data,

@@ -8,14 +8,11 @@ import Register from '../../features/auth/components/Register';
 
 function Auth() {
   const [currentTab, setCurrentTab] = useState<string | number>('login');
-  const [isSelect, setIsSelect] = useState<boolean>(true);
 
   const handleTabChange = (id: string | number) => {
     setCurrentTab(id);
   };
-  const handleRoleChange = () => {
-    setIsSelect(!isSelect);
-  };
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="m-0 grid min-h-175 w-full max-w-6xl grid-cols-1 overflow-hidden bg-white shadow-xl md:m-6 md:grid-cols-12 md:rounded-3xl">
@@ -64,11 +61,7 @@ function Auth() {
             {/* Login */}
             <Login currentTab={currentTab} />
             {/* Register */}
-            <Register
-              currentTab={currentTab}
-              isSelect={isSelect}
-              handleRoleChange={handleRoleChange}
-            />
+            <Register currentTab={currentTab} />
           </div>
         </div>
       </div>
