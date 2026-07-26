@@ -1,12 +1,13 @@
 from typing import Annotated
 from uuid import UUID
 
-from backend.src.app.core.database import get_db
-from backend.src.app.model.user_sessions import UserSessions
-from backend.src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 from fastapi import Depends
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.core.database import get_db
+from src.app.model.user_sessions import UserSessions
+from src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 
 
 class UserSessionCRUD:

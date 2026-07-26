@@ -4,7 +4,7 @@ from typing import Any
 import jwt
 from passlib.context import CryptContext  # type: ignore
 
-from app.core.config import settings  # type: ignore
+from src.app.core.config import settings  # type: ignore
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

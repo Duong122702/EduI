@@ -1,19 +1,6 @@
 import uuid
 from typing import Annotated
 
-from backend.src.app.api.deps import get_current_token
-from backend.src.app.constant.codes import UserCodes
-from backend.src.app.constant.messages import UserMessages
-from backend.src.app.core.database import get_db
-from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.core.security import verify_token
-from backend.src.app.schemas.response import APIResponse
-from backend.src.app.schemas.user.CreateUser import CreateUser
-from backend.src.app.schemas.user.response.GetUserResponse import GetUserResponse
-from backend.src.app.schemas.user.response.UserCreateResponse import UserCreateResponse
-from backend.src.app.schemas.user.UserLogin import UserLogin
-from backend.src.app.services.email import EmailService
-from backend.src.app.services.user_service import user_service
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -25,12 +12,26 @@ from fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.app.api.deps import get_current_token
+from src.app.constant.codes import UserCodes
+from src.app.constant.messages import UserMessages
+from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
+from src.app.core.security import verify_token
+from src.app.schemas.response import APIResponse
+from src.app.schemas.user.CreateUser import CreateUser
+from src.app.schemas.user.response.GetUserResponse import GetUserResponse
+from src.app.schemas.user.response.UserCreateResponse import UserCreateResponse
+from src.app.schemas.user.UserLogin import UserLogin
+from src.app.services.email import EmailService
+from src.app.services.user_service import user_service
+
 router = APIRouter()
 
 
 @router.post(
     "/register",
-    response_model=APIResponse(data=UserCreateResponse),
+    response_model=APIResponse[UserCreateResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user_routes(
@@ -53,7 +54,7 @@ async def register_user_routes(
     )
 
 
-@router.get("/verify_email/{token}", response_model=APIResponse())
+@router.get("/verify_email/{token}", response_model=APIResponse)
 async def verify_email(
     token: str, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> APIResponse:
@@ -63,7 +64,7 @@ async def verify_email(
 
 @router.post(
     "/login",
-    response_model=APIResponse(data=str),
+    response_model=APIResponse[str],
     status_code=status.HTTP_200_OK,
 )
 async def login_user_routes(
@@ -86,7 +87,7 @@ async def login_user_routes(
 
 @router.post(
     "/getProfile",
-    response_model=APIResponse(data=GetUserResponse),
+    response_model=APIResponse[GetUserResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_profile_routes(
@@ -117,7 +118,7 @@ async def get_profile_routes(
     return APIResponse(data=user_data)
 
 
-@router.post("/refresh", response_model=APIResponse(data=str))
+@router.post("/refresh", response_model=APIResponse[str])
 async def get_new_token_route(
     request: Request,
     response: Response,

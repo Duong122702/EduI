@@ -38,10 +38,7 @@ function Login({ currentTab }: LoginProps) {
 
   if (currentTab !== 'login') return null;
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className={`${currentTab === 'login' ? 'block' : 'hidden'} mt-8`}
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
       {isError && (
         <div className="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
           {error.message}

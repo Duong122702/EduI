@@ -29,7 +29,7 @@ function Header() {
             <NavItem href="#tutorials">Hướng dẫn</NavItem>
           </div>
           <div className="hidden items-center justify-center gap-4 md:flex">
-            <NavItem href="">Đăng nhập</NavItem>
+            <NavItem href="/auth">Đăng nhập</NavItem>
             <Link to="/auth">
               <Button
                 variant="dark"

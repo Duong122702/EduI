@@ -4,30 +4,30 @@ from typing import Annotated
 from uuid import UUID
 
 import jwt
-from backend.src.app.api.deps import verify_email_unique
-from backend.src.app.constant.codes import UserCodes, UserSessionCodes
-from backend.src.app.constant.messages import UserMessages, UserSessionMessages
-from backend.src.app.core.database import get_db
-from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.core.security import (
+from fastapi import Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.api.deps import verify_email_unique
+from src.app.constant.codes import UserCodes, UserSessionCodes
+from src.app.constant.messages import UserMessages, UserSessionMessages
+from src.app.core.config import settings
+from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
+from src.app.core.security import (
     create_access_token,
     create_refresh_token,
     create_verify_email_token,
     hashed_password,
     verify_refresh_token,
 )
-from backend.src.app.crud.crud_user import user_crud
-from backend.src.app.crud.crud_usersessions import UserSessionCRUD, user_session_crud
-from backend.src.app.model.user import User
-from backend.src.app.schemas.user.CreateUser import CreateUser
-from backend.src.app.schemas.user.RefreshSchema import RefreshSchema
-from backend.src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
-from backend.src.app.schemas.user.UserLogin import UserLogin
-from backend.src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
-from fastapi import Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.config import settings
+from src.app.crud.crud_user import user_crud
+from src.app.crud.crud_usersessions import UserSessionCRUD, user_session_crud
+from src.app.model.user import User
+from src.app.schemas.user.CreateUser import CreateUser
+from src.app.schemas.user.RefreshSchema import RefreshSchema
+from src.app.schemas.user.response.UserLoginResponse import UserLoginResponse
+from src.app.schemas.user.UserLogin import UserLogin
+from src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 
 
 class UserService:

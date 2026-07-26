@@ -1,6 +1,6 @@
 import resend
 
-from app.core.config import settings  # type: ignore
+from src.app.core.config import settings  # type: ignore
 
 resend.api_key = settings.RESEND_API_KEY
 

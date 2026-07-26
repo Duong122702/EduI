@@ -5,7 +5,7 @@ import type { RegisterResponse } from '../../schemas/response/registerResponse';
 
 export const registerApi = async (payload: RegisterPayload) => {
   return await axios.post<ApiResponse<RegisterResponse>>(
-    'auth/register',
+    `${import.meta.env.VITE_API_URL}/auth/register`,
     payload
   );
 };

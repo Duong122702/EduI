@@ -16,7 +16,7 @@ import { handleServerFormErrors } from '../../../utils/handleServerFormErrors';
 function Register({ currentTab }: RegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const {
-    mutate: registerUser,
+    mutate: registerApi,
     isPending,
     isSuccess,
     data: response,
@@ -42,7 +42,7 @@ function Register({ currentTab }: RegisterProps) {
   });
   const currentRole = watch('role');
   const onSubmit = (data: UserFormRegisterValues) => {
-    registerUser(data, {
+    registerApi(data, {
       onError: (err) => {
         if (err.details) {
           handleServerFormErrors(err, setError);
@@ -50,7 +50,7 @@ function Register({ currentTab }: RegisterProps) {
       },
     });
   };
-  if (currentTab !== 'register') return null;
+  if (currentTab !== 'regis') return null;
   if (isSuccess && response) {
     const registeredEmail = response.data.data.email;
 

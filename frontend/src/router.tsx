@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
     // errorElement: <NotFound />, // Tự động hiển thị trang này nếu URL sai hoặc code lỗi
     children: [
       {
-        path: '', // Trùng với đường dẫn cha "/"
+        index: true,
         element: <Home />,
       },
       {
@@ -46,7 +46,6 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/',
     element: <ProtectedRoute />, // Sử dụng ProtectedRoute làm wrapper
     children: [
       {

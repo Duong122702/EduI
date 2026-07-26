@@ -1,14 +1,15 @@
 from typing import Annotated
 from uuid import UUID
 
-from backend.src.app.core.database import get_db
-from backend.src.app.model.user import User
-from backend.src.app.schemas.user.CreateUser import CreateUser
-from backend.src.app.schemas.user.UpdateUser import UpdateUser
 from fastapi import Depends
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from src.app.core.database import get_db
+from src.app.model.user import User
+from src.app.schemas.user.CreateUser import CreateUser
+from src.app.schemas.user.UpdateUser import UpdateUser
 
 
 class UserCRUD:

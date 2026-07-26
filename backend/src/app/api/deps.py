@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from backend.src.app.core.database import get_db
-from backend.src.app.crud.crud_user import user_crud
-from backend.src.app.model.user import User
-from backend.src.app.schemas.user.CreateUser import CreateUser
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.core.database import get_db
+from src.app.crud.crud_user import user_crud
+from src.app.model.user import User
+from src.app.schemas.user.CreateUser import CreateUser
 
 security_scheme = HTTPBearer()
 

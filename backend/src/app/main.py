@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from src.app.api.v1.api import api_router
 from src.app.core.exceptions import CustomAPIException
 
 app = FastAPI()
@@ -12,6 +13,7 @@ origins = [
     "http://localhost:5173",  # URL mặc định của Vite
 ]
 
+app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -45,16 +47,3 @@ async def validation_exception_handle(request: Request, exc: RequestValidationEr
             },
         },
     )
-
-
-@app.get("/")
-def read_root() -> dict[str, str]:
-    return {"message": "Chào mừng bạn đến với FastAPI Backend!"}
-
-
-@app.get("/api/data")
-def get_data() -> dict[str, str | list[str]]:
-    return {
-        "status": "success",
-        "items": ["React", "TypeScript", "Tailwind", "FastAPI"],
-    }
