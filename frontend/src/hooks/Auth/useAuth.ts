@@ -8,16 +8,10 @@ import { getProfile } from '../../api/auth/getMe.api';
 
 export const loginAndFetchUserApi = async (payload: LoginPayload) => {
   const loginRes = await loginApi(payload);
-  const { accessToken, refreshToken } = loginRes.data.data;
-  // Trả về cả token và thông tin user cho bước xử lý tiếp theo
-  Cookies.set('refresh_token', refreshToken, {
-    expires: 30,
-    secure: true,
-    sameSite: 'strict',
-  });
-  const userRes = await getProfile(accessToken);
+  const { access_token } = loginRes.data.data;
+  const userRes = await getProfile(access_token);
   return {
-    accessToken,
+    access_token,
     user: userRes.data,
   };
 };

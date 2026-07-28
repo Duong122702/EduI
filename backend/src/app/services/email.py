@@ -10,7 +10,7 @@ class EmailService:
     def send_activation_email(
         to_email: str, fullname: str, activation_token: str
     ) -> None:
-        activation_link = f"{settings.DOMAIN}/verify_email/{activation_token}"
+        activation_link = f"{settings.DOMAIN}/auth/verify_email/{activation_token}"
         html_content = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
             <h2 style="color: #333;">Chào mừng {fullname}!</h2>

@@ -64,7 +64,7 @@ async def verify_email(
 
 @router.post(
     "/login",
-    response_model=APIResponse[str],
+    response_model=APIResponse[dict[str, str]],
     status_code=status.HTTP_200_OK,
 )
 async def login_user_routes(
@@ -82,11 +82,15 @@ async def login_user_routes(
             samesite="strict",
             max_age=30 * 24 * 3600,
         )
-    return APIResponse(data=login_response.access_token, message="Đăng nhập thành công")
+
+    return APIResponse(
+        data={"access_token": login_response.access_token},
+        message="Đăng nhập thành công",
+    )
 
 
-@router.post(
-    "/getProfile",
+@router.get(
+    "/me",
     response_model=APIResponse[GetUserResponse],
     status_code=status.HTTP_200_OK,
 )

@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from src.app.schemas.base import AppBaseModel
 
 
-class CreateUser(BaseModel):
+class CreateUser(AppBaseModel):
     full_name: str
     email: str
     password: str

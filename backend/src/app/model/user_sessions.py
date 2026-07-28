@@ -19,7 +19,7 @@ class UserSessions(Base):
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
     )
 
-    refresh_token: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    refresh_token: Mapped[str] = mapped_column(String, nullable=True, unique=True)
 
     # Dùng Optional[...] cho các trường nullable=True
     ip_address: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -42,11 +42,14 @@ class UserSessionCRUD:
         )
         await db.execute(stmt)
 
+    # by user id
     async def get_user_session_by_id(
         self, user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
     ) -> UserSessions | None:
         result = await db.execute(
-            select(UserSessions).filter(UserSessions.id == user_id)
+            select(UserSessions)
+            .filter(UserSessions.user_id == user_id, ~UserSessions.is_revoked)
+            .order_by(UserSessions.created_at.desc())
         )
         return result.scalars().first()
 

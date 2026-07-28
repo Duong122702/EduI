@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from src.app.schemas.base import AppBaseModel
 
 
-class UpdateUser(BaseModel):
+class UpdateUser(AppBaseModel):
     email: str | None
     full_name: str | None
     hashed_password: str | None

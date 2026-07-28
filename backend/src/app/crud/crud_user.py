@@ -19,8 +19,14 @@ class UserCRUD:
         hashed_password: str,
         db: Annotated[AsyncSession, Depends(get_db)],
     ) -> User:
+        role_value = (
+            user.role.lower() if hasattr(user.role, "value") else str(user.role).lower()
+        )
         db_user = User(
-            email=user.email, hashed_password=hashed_password, fullname=user.full_name
+            email=user.email,
+            hashed_password=hashed_password,
+            full_name=user.full_name,
+            role=role_value,
         )
         db.add(db_user)
         await db.commit()

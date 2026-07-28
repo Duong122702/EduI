@@ -18,6 +18,7 @@ from src.app.core.security import (
     create_refresh_token,
     create_verify_email_token,
     hashed_password,
+    verify_password,
     verify_refresh_token,
 )
 from src.app.crud.crud_user import user_crud
@@ -104,7 +105,7 @@ class UserService:
                 code=UserCodes.USER_NOT_VERIFIED,
                 message=UserMessages.USER_NOT_VERIFIED,
             )
-        if not hashed_password(user_data.password) == user.hashed_password:
+        if not verify_password(user_data.password, user.hashed_password):
             raise CustomAPIException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 code=UserCodes.INVALID_CREDENTIALS,
@@ -112,12 +113,14 @@ class UserService:
             )
         # Generate access token and refresh token
         access_token = create_access_token(subject=user.id)
+        new_refresh_token = None
         if isKeepLogin:
             new_refresh_token = create_refresh_token(subject=user.id)
+        session_expires_days = 30 if isKeepLogin else 1
         session_data = UserSessionCreate(
             user_id=user.id,
             refresh_token=new_refresh_token,
-            expires_at=datetime.now() + timedelta(days=30),
+            expires_at=datetime.now() + timedelta(days=session_expires_days),
         )
         crud = UserSessionCRUD()
         await crud.register_user_session(session_data=session_data, db=db)
@@ -149,6 +152,7 @@ class UserService:
             )
         user_session.user_agent = user_agent
         user_session.ip_address = ip_address
+        await db.commit()
         return user
 
     async def refresh_session(
