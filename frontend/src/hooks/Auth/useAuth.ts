@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 import type { LoginPayload } from '../../schemas/payload/loginPayload.type';
 import { loginApi } from '../../api/auth/login.api';
 import { getProfile } from '../../api/auth/getMe.api';

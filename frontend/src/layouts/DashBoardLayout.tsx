@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Logo from '../components/ui/Logo';
 import { useAuthStore } from '../store/authStore';
 import { CustomIcon } from '../components/ui/CustomIcon';
+import NavItem from './components/NavItem';
 
 export const DashBoardLayout = () => {
   const currentUser = useAuthStore((state) => state.user);
@@ -14,15 +15,28 @@ export const DashBoardLayout = () => {
           <div className="mb-8 flex items-center space-x-3">
             <Logo />
             <div>
-              <span className="block text-lg font-bold tracking-tight text-teal-950">
-                EduExam
-              </span>
               <span className="text-[10px] font-bold tracking-wider text-teal-600 uppercase">
                 {role}
               </span>
             </div>
           </div>
-          <nav className="space-y-1.5"></nav>
+          {role === 'TEACHER' ? (
+            <nav className="space-y-1.5">
+              <NavItem iconName="iconDashboard" title="Bảng điều khiển" />
+              <NavItem iconName="iconDocument" title="Quản lý đề thi & phòng" />
+              <NavItem iconName="iconDatabase" title="Ngân hàng câu hỏi" />
+              <NavItem iconName="iconGroup" title="Danh sách thí sinh" />
+              <NavItem iconName="iconUp" title="Kết quả & phổ điểm" />
+            </nav>
+          ) : (
+            /* Hiển thị cho các role khác (VD: STUDENT hoặc ADMIN) */
+            <nav className="space-y-1.5">
+              <NavItem iconName="iconDashboard" title="Bảng điều khiển" />
+              <NavItem iconName="iconCalender" title="Lịch thi lớp học" />
+              <NavItem iconName="iconWeight" title="Ngân hàng & ôn luyện" />
+              <NavItem iconName="iconClock" title="Lịch sử & Phổ điểm" />
+            </nav>
+          )}
         </div>
         <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
           <div className="flex items-center space-x-3">
