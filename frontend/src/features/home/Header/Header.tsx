@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '../../../components/ui/Button';
+import { Button } from '../../../components/ui/Button';
 import { CustomIcon } from '../../../components/ui/CustomIcon';
 import Logo from '../../../components/ui/Logo';
 

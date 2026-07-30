@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '../../components/ui/Button';
+import { Button } from '../../components/ui/Button';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { Input } from '../../components/ui/Input';
 import { featureHeroData } from '../../constants/featureHeroPaths';
@@ -13,12 +13,9 @@ import Footer from '../../features/home/Footer/Footer';
 import FlexibleTabs from '../../components/ui/FlexibleTabs';
 
 function Home() {
-  const [currentTab, setCurrentTab] = useState<string | number>('student');
+  const [currentTab, setCurrentTab] = useState<string>('student');
   const startIdx = currentTab === 'student' ? 0 : 3;
   const endIdx = currentTab === 'student' ? 3 : 6;
-  const handleTabChange = (id: string | number) => {
-    setCurrentTab(id);
-  };
   return (
     <>
       <Header />
@@ -39,16 +36,15 @@ function Home() {
             Tổ chức kỳ thi, làm bài kiểm tra và chấm điểm tự động dễ dàng trong
             5 phút. Nhanh chóng, ổn định và hoàn toàn miễn phí.
           </p>
-          <div className="align-center mx-auto mb-6 flex h-22 max-w-xl flex-col justify-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-xl shadow-teal-900/5 transition-all duration-200 md:flex-row">
+          <div className="align-center mx-auto mb-6 flex h-20 max-w-xl flex-col justify-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-xl shadow-teal-900/5 transition-all duration-200 md:flex-row">
             <Input
-              inputSize="lg"
               placeholder="NHẬP MÃ PHÒNG THI"
-              className="flex-3"
+              className="font-4xl flex-3 rounded-xl p-4"
             />
             <Button
               variant="orange"
               size="large"
-              className="flex-2 rounded-xl font-bold shadow-sm"
+              className="font-4xl flex-2 rounded-xl font-bold shadow-sm"
             >
               Vào thi ngay
               <CustomIcon
@@ -112,7 +108,7 @@ function Home() {
               { id: 'student', label: 'Dành cho học sinh' },
             ]}
             activeTabId={currentTab}
-            onChange={handleTabChange}
+            onChange={setCurrentTab}
             variant="pill"
             size="large"
             className=""

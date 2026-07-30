@@ -42,7 +42,7 @@ function Login({ currentTab }: LoginProps) {
   if (currentTab !== 'login') return null;
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-2">
         {isError && (
           <div className="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
             {error.message}
@@ -144,7 +144,7 @@ function Login({ currentTab }: LoginProps) {
         />
         <Button
           variant={'dark'}
-          className="w-full gap-2 rounded-2xl py-3 font-semibold shadow-xl"
+          className="mt-2 w-full cursor-pointer gap-2 rounded-2xl py-3 font-semibold shadow-xl"
           disabled={isPending}
         >
           {isPending ? 'Đang xử lý' : 'Đăng nhập ngay'}

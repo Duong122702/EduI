@@ -75,7 +75,7 @@ function Register({ currentTab }: RegisterProps) {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-2">
         {isError && (
           <div className="mb-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
             ⚠️ {error?.message || 'Đăng ký thất bại. Vui lòng thử lại!'}
@@ -158,17 +158,19 @@ function Register({ currentTab }: RegisterProps) {
               <FormLabel className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
                 Họ và tên
               </FormLabel>
-              <FormControl className="relative mt-2">
-                <CustomIcon
-                  name="iconAvatar"
-                  className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
-                />
-                <Input
-                  type="text"
-                  placeholder="Nguyễn Văn A"
-                  className="h-11 rounded-xl bg-white px-10"
-                  {...field}
-                />
+              <FormControl>
+                <div className="relative mt-2">
+                  <CustomIcon
+                    name="iconAvatar"
+                    className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Nguyễn Văn A"
+                    className="h-11 rounded-xl bg-white px-10"
+                    {...field}
+                  />
+                </div>
               </FormControl>
               <FormControl />
             </FormItem>
@@ -222,6 +224,17 @@ function Register({ currentTab }: RegisterProps) {
                     className="h-11 items-center rounded-xl bg-white px-10"
                     {...field}
                   />
+                  <div
+                    className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <CustomIcon
+                      name="iconEyes"
+                      className={`hover:text-primary ${
+                        showPassword ? 'text-primary' : 'text-gray-400'
+                      }`}
+                    />
+                  </div>
                 </div>
               </FormControl>
               <FormMessage />

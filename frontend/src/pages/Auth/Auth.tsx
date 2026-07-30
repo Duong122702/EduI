@@ -7,9 +7,9 @@ import Login from '../../features/auth/components/Login';
 import Register from '../../features/auth/components/Register';
 
 function Auth() {
-  const [currentTab, setCurrentTab] = useState<string | number>('login');
+  const [currentTab, setCurrentTab] = useState<string>('login');
 
-  const handleTabChange = (id: string | number) => {
+  const handleTabChange = (id: string) => {
     setCurrentTab(id);
   };
 
