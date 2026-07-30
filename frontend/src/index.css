@@ -5,8 +5,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  /* Cấu hình màu sắc */
+html {
+  @apply scroll-smooth
+}
+
+@theme inline {
+   /* Cấu hình màu sắc */
   --color-primary-light: #60a5fa;
   --color-primary: #00bfab;
   --color-primary-dark: #009689;
@@ -17,13 +21,8 @@
   --color-background: #0b4f4a;
   --color-button-orange: #ff6900;
   /* Cấu hình font chữ */
-  --font-sans: "Inter", sans-serif;
-}
-html {
-  @apply scroll-smooth
-}
+  /* --font-sans: "Inter", sans-serif; */
 
-@theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Figtree Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);

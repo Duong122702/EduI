@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import clsx from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import Button from './Button';
+
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const tabsContainerVariants = cva(' flex max-w-md p-1.5 ', {
   variants: {
@@ -32,37 +31,33 @@ const FlexibleTabs: React.FC<FlexibleTabsProps> = ({
   tabs,
   activeTabId,
   onChange,
-  size,
   variant = 'pill',
   className,
 }) => {
-  const buttonVariantMap: Record<'pill' | 'grayBox', 'tabPill' | 'tabGrayBox'> =
-    {
-      pill: 'tabPill',
-      grayBox: 'tabGrayBox',
-    };
-
-  const currentBtnVariant = buttonVariantMap[variant ?? 'pill'] || 'tabPill';
-  console.log(currentBtnVariant);
   return (
-    <div
-      className={twMerge(clsx(tabsContainerVariants({ variant }), className))}
+    <Tabs
+      value={String(activeTabId)}
+      onValueChange={onChange}
+      className={className}
     >
-      {tabs.map((tab) => {
-        const isActive = tab.id === activeTabId;
-        return (
-          <Button
+      <TabsList
+        className={
+          variant === 'pill'
+            ? 'rounded-full border border-gray-200 bg-white'
+            : 'w-full rounded-2xl bg-slate-200/70'
+        }
+      >
+        {tabs.map((tab) => (
+          <TabsTrigger
             key={tab.id}
-            variant={currentBtnVariant}
-            isActive={isActive}
-            size={size}
-            onClick={() => onChange(tab.id)}
+            value={String(tab.id)}
+            // Gắn class dựa trên variant tabPill / tabGrayBox bạn đã thêm ở Button
           >
             {tab.label}
-          </Button>
-        );
-      })}
-    </div>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 };
 
