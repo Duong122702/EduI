@@ -212,6 +212,7 @@ function Register({ currentTab }: RegisterProps) {
               <FormLabel className="text-xs leading-relaxed font-bold text-gray-500 uppercase">
                 Thiết lập mật khẩu
               </FormLabel>
+              {/* Form control receive only one element */}
               <FormControl>
                 <div className="relative mt-2">
                   <CustomIcon
@@ -281,7 +282,7 @@ function Register({ currentTab }: RegisterProps) {
         <Button
           type="submit"
           variant={'dark'}
-          className="w-full gap-2 rounded-2xl py-3 font-semibold shadow-xl"
+          className="w-full cursor-pointer gap-2 rounded-2xl py-3 font-semibold shadow-xl"
           disabled={isPending}
         >
           {isPending ? 'Đang xử lý' : 'Đăng ký tài khoản'}

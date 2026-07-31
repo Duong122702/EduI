@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   CustomIcon,
   type CustomIconName,
@@ -7,17 +7,24 @@ import {
 interface NavItemDashProps {
   iconName: CustomIconName;
   title: string;
+  to: string;
 }
 
-const NavItem: React.FC<NavItemDashProps> = ({ iconName, title }) => {
+const NavItem: React.FC<NavItemDashProps> = ({ iconName, title, to }) => {
   return (
-    <Link
-      to={''}
-      className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-900"
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+          isActive
+            ? 'text-primary bg-teal-50 font-semibold'
+            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+        }`
+      }
     >
       <CustomIcon name={iconName} className="h-5 w-5" />
       <span>{title}</span>
-    </Link>
+    </NavLink>
   );
 };
 

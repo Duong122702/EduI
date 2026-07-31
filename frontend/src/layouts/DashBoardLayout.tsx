@@ -22,19 +22,55 @@ export const DashBoardLayout = () => {
           </div>
           {role === 'TEACHER' ? (
             <nav className="space-y-1.5">
-              <NavItem iconName="iconDashboard" title="Bảng điều khiển" />
-              <NavItem iconName="iconDocument" title="Quản lý đề thi & phòng" />
-              <NavItem iconName="iconDatabase" title="Ngân hàng câu hỏi" />
-              <NavItem iconName="iconGroup" title="Danh sách thí sinh" />
-              <NavItem iconName="iconUp" title="Kết quả & phổ điểm" />
+              <NavItem
+                iconName="iconDashboard"
+                title="Bảng điều khiển"
+                to="/dashboard"
+              />
+              <NavItem
+                iconName="iconDocument"
+                title="Quản lý đề thi & phòng"
+                to="/dashboard/exams"
+              />
+              <NavItem
+                iconName="iconDatabase"
+                title="Ngân hàng câu hỏi"
+                to="/dashboard/questions"
+              />
+              <NavItem
+                iconName="iconGroup"
+                title="Danh sách thí sinh"
+                to="/dashboard/students"
+              />
+              <NavItem
+                iconName="iconUp"
+                title="Kết quả & phổ điểm"
+                to="/dashboard/results"
+              />
             </nav>
           ) : (
             /* Hiển thị cho các role khác (VD: STUDENT hoặc ADMIN) */
             <nav className="space-y-1.5">
-              <NavItem iconName="iconDashboard" title="Bảng điều khiển" />
-              <NavItem iconName="iconCalender" title="Lịch thi lớp học" />
-              <NavItem iconName="iconWeight" title="Ngân hàng & ôn luyện" />
-              <NavItem iconName="iconClock" title="Lịch sử & Phổ điểm" />
+              <NavItem
+                iconName="iconDashboard"
+                title="Bảng điều khiển"
+                to="/dashboard"
+              />
+              <NavItem
+                iconName="iconCalender"
+                title="Lịch thi lớp học"
+                to="/dashboard/schedule"
+              />
+              <NavItem
+                iconName="iconWeight"
+                title="Ngân hàng & ôn luyện"
+                to="/dashboard/practice"
+              />
+              <NavItem
+                iconName="iconClock"
+                title="Lịch sử & Phổ điểm"
+                to="/dashboard/history"
+              />
             </nav>
           )}
         </div>
