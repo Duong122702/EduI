@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import { useAuthStore } from './store/authStore';
 import Auth from './pages/Auth/Auth';
 import DashBoardLayout from './layouts/DashBoardLayout';
+import QuestionBank from './pages/Teacher/QuestionBank';
 
 const ProtectedRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -63,7 +64,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'questions', // Khớp với NavItem to="/dashboard/questions"
-            //element: <QuestionBank />,
+            element: <QuestionBank />,
           },
           {
             path: 'students', // Khớp với NavItem to="/dashboard/students"

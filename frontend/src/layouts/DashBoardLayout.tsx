@@ -10,7 +10,7 @@ export const DashBoardLayout = () => {
   const logout = useAuthStore((state) => state.logout);
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="flex w-full shrink-0 flex-col justify-center border-b border-slate-200 bg-white p-6 md:w-64 md:border-r md:border-b-0">
+      <aside className="flex w-full shrink-0 flex-col justify-between border-b border-slate-200 bg-white p-6 md:w-64 md:border-r md:border-b-0">
         <div>
           <div className="mb-8 flex items-center space-x-3">
             <Logo />
@@ -20,7 +20,7 @@ export const DashBoardLayout = () => {
               </span>
             </div>
           </div>
-          {role === 'TEACHER' ? (
+          {role?.toUpperCase() === 'TEACHER' ? (
             <nav className="space-y-1.5">
               <NavItem
                 iconName="iconDashboard"
@@ -99,7 +99,7 @@ export const DashBoardLayout = () => {
           </button>
         </div>
       </aside>
-      <main className="relative mx-auto w-full max-w-7xl flex-1 space-y-8 p-6 md:p-10">
+      <main className="relative w-full flex-1 p-6 md:p-10">
         <Outlet />
       </main>
     </div>
