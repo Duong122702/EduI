@@ -8,4 +8,5 @@ class AppBaseModel(BaseModel):
         alias_generator=to_camel,
         # 2. Cho phép nhận dữ liệu bằng BẤT KỲ tên nào (gửi camelCase hay snake_case backend cũng nhận hết)
         populate_by_name=True,
+        from_attributes=True,
     )

@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from backend.src.app.schemas.base import AppBaseModel
 
 
-class QuestionResponse(BaseModel):
+class QuestionResponse(AppBaseModel):
     id: UUID
     exam_id: UUID | None
     question_number: int

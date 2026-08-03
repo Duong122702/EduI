@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -25,3 +26,11 @@ async def get_current_token(
 ) -> str:
     token = credenticals.credentials
     return token
+
+
+async def get_user_role(
+    user_id: str, db: Annotated[AsyncSession, Depends(get_db)]
+) -> str | None:
+    uuid_user_id = UUID(user_id)
+    user = await user_crud.get_user_by_id(uuid_user_id, db)
+    return user.role if user else None
