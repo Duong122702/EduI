@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/get_all_questions",
+    "/get_all",
     response_model=APIResponse[tuple[list[QuestionResponse], int]],
     status_code=status.HTTP_200_OK,
 )
