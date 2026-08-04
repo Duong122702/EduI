@@ -17,9 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Calculator, CirclePlus, Pencil, Trash2 } from 'lucide-react';
+import { useQuestions } from '@/hooks/Question/useQuestion';
+import { CirclePlus, Pencil, Trash2 } from 'lucide-react';
+import { SubjectBadge } from './SubjectBadge';
 
 export const QuestionTable = () => {
+  const { isPending, data } = useQuestions();
   return (
     <>
       {/* 4. Danh sách câu hỏi & Bộ lọc */}
@@ -42,10 +45,13 @@ export const QuestionTable = () => {
                 <SelectValue placeholder="Tất cả môn học" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="all">Tất cả môn học</SelectItem>
-                <SelectItem value="math">Toán học</SelectItem>
-                <SelectItem value="english">Tiếng Anh</SelectItem>
-                <SelectItem value="it">Tin học</SelectItem>
+                {data?.data.data.question.map((question) => {
+                  return (
+                    <SelectItem key={question.id} value={question.subject}>
+                      {question.subject}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
 
@@ -55,10 +61,15 @@ export const QuestionTable = () => {
                 <SelectValue placeholder="Mọi độ khó" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="all">Mọi độ khó</SelectItem>
-                <SelectItem value="easy">Dễ</SelectItem>
-                <SelectItem value="medium">Trung bình</SelectItem>
-                <SelectItem value="hard">Khó</SelectItem>
+                {data?.data.data.question.map((question) => {
+                  return (
+                    question.level && (
+                      <SelectItem key={question.id} value={question.level}>
+                        {question.level}
+                      </SelectItem>
+                    )
+                  );
+                })}
               </SelectContent>
             </Select>
 
@@ -68,10 +79,18 @@ export const QuestionTable = () => {
                 <SelectValue placeholder="Mọi thể loại" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="all">Mọi thể loại</SelectItem>
-                <SelectItem value="mcq">Trắc nghiệm</SelectItem>
-                <SelectItem value="tf">Đúng / Sai</SelectItem>
-                <SelectItem value="essay">Tự luận</SelectItem>
+                {data?.data.data.question.map((question) => {
+                  return (
+                    question.question_type && (
+                      <SelectItem
+                        key={question.id}
+                        value={question.question_type}
+                      >
+                        {question.question_type}
+                      </SelectItem>
+                    )
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -106,214 +125,59 @@ export const QuestionTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {isPending && (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-4 text-center">
+                    Đang tải dữ liệu câu hỏi...
+                  </TableCell>
+                </TableRow>
+              )}
               {/* Row 1: Toán học - Tích phân */}
-              <TableRow className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                <TableCell className="py-4 pr-4 pl-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500">
-                      <Calculator className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-slate-900">Toán học</p>
-                      <Badge
-                        variant="outline"
-                        className="border-emerald-200/60 bg-emerald-50 text-[10px] font-bold text-emerald-600 hover:bg-emerald-50"
+              {data?.data.data.question.map((question) => (
+                <TableRow
+                  key={question.id}
+                  className="border-b border-slate-100 transition-colors hover:bg-slate-50/50"
+                >
+                  <TableCell className="py-4 pr-4 pl-2">
+                    <SubjectBadge
+                      subject={question.subject}
+                      topic={question.topic}
+                    />
+                  </TableCell>
+                  <TableCell className="px-4 py-4 font-medium text-slate-700">
+                    {question.content}
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-center font-medium text-slate-600">
+                    {question.question_type}
+                  </TableCell>
+                  <TableCell className="px-4 py-4 text-center">
+                    <Badge
+                      variant="secondary"
+                      className={`border-none bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100`}
+                    >
+                      {question.level}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="py-4 pr-2 pl-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                       >
-                        TÍCH PHÂN
-                      </Badge>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="px-4 py-4 font-medium text-slate-700">
-                  Tính tích phân hình phẳng giới hạn bởi đường cong $y = x^2$
-                  trên đoạn $[0, 2]$?
-                </TableCell>
-                <TableCell className="px-4 py-4 text-center font-medium text-slate-600">
-                  Trắc nghiệm
-                </TableCell>
-                <TableCell className="px-4 py-4 text-center">
-                  <Badge
-                    variant="secondary"
-                    className="border-none bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100"
-                  >
-                    Trung bình
-                  </Badge>
-                </TableCell>
-                <TableCell className="py-4 pr-2 pl-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-
-              {/* Row 2: Toán học - Đạo hàm */}
-              {/* <TableRow className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                <TableCell className="py-4 pl-2 pr-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500">
-                      <Calculator className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-slate-900">Toán học</p>
-                      <Badge
-                        variant="outline"
-                        className="border-emerald-200/60 bg-emerald-50 text-[10px] font-bold text-emerald-600 hover:bg-emerald-50"
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                       >
-                        ĐẠO HÀM
-                      </Badge>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell className="py-4 px-4 font-medium text-slate-700">
-                  Đạo hàm cấp 1 của hàm số $y = e^{2x}$ tại điểm $x = 0$ bằng bao nhiêu?
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center font-medium text-slate-600">
-                  Trắc nghiệm
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center">
-                  <Badge
-                    variant="secondary"
-                    className="border-none bg-rose-100/80 px-3 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100"
-                  >
-                    Khó
-                  </Badge>
-                </TableCell>
-                <TableCell className="py-4 pl-4 pr-2 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow> */}
-
-              {/* Row 3: Tiếng Anh - Grammar */}
-              {/* <TableRow className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                <TableCell className="py-4 pl-2 pr-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500">
-                      <Languages className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-slate-900">Tiếng Anh</p>
-                      <Badge
-                        variant="outline"
-                        className="border-emerald-200/60 bg-emerald-50 text-[10px] font-bold text-emerald-600 hover:bg-emerald-50"
-                      >
-                        GRAMMAR
-                      </Badge>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="py-4 px-4 font-medium text-slate-700">
-                  The correct preposition in the sentence &apos;She has been working here ________ 2018&apos; is &apos;since&apos;.
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center font-medium text-slate-600">
-                  Đúng / Sai
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center">
-                  <Badge
-                    variant="secondary"
-                    className="border-none bg-emerald-100/80 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
-                  >
-                    Dễ
-                  </Badge>
-                </TableCell>
-                <TableCell className="py-4 pl-4 pr-2 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow> */}
-
-              {/* Row 4: Tin học - Lập trình */}
-              {/* <TableRow className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                <TableCell className="py-4 pl-2 pr-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500">
-                      <Code2 className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-slate-900">Tin học</p>
-                      <Badge
-                        variant="outline"
-                        className="border-emerald-200/60 bg-emerald-50 text-[10px] font-bold text-emerald-600 hover:bg-emerald-50"
-                      >
-                        LẬP TRÌNH
-                      </Badge>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="py-4 px-4 font-medium text-slate-700">
-                  Hãy chỉ ra độ phức tạp thời gian (Big O) của thuật toán Tìm kiếm nhị phân?
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center font-medium text-slate-600">
-                  Tự luận
-                </TableCell>
-                <TableCell className="py-4 px-4 text-center">
-                  <Badge
-                    variant="secondary"
-                    className="border-none bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100"
-                  >
-                    Trung bình
-                  </Badge>
-                </TableCell>
-                <TableCell className="py-4 pl-4 pr-2 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow> */}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

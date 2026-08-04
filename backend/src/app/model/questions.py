@@ -20,10 +20,11 @@ class Questions(Base):
     question_type: Mapped[str] = mapped_column(String, nullable=False)
     options: Mapped[dict | None] = mapped_column(JSONB, nullable=False)
     correct_answer: Mapped[str] = mapped_column(String, nullable=False)
-    explaination: Mapped[str | None] = mapped_column(String, nullable=True)
+    explanation: Mapped[str | None] = mapped_column(String, nullable=True)
     score_weight: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
     topic: Mapped[str | None] = mapped_column(String, nullable=True)
     level: Mapped[str | None] = mapped_column(String, nullable=True)
+    subject: Mapped[str] = mapped_column(String, nullable=False)

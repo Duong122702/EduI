@@ -1,6 +1,6 @@
 import type { Question } from '@/Models/questions.model';
 
 export interface QuestionResponse {
-  question: Question;
+  question: Question[];
   total: number;
 }

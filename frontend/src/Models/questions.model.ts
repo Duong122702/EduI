@@ -11,4 +11,5 @@ export interface Question {
   created_at: string;
   topic?: string;
   level?: string;
+  subject: string;
 }

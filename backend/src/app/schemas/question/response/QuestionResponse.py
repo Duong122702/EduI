@@ -11,7 +11,8 @@ class QuestionResponse(AppBaseModel):
     question_type: str
     options: dict | None
     correct_answer: str
-    explaination: str | None
+    explanation: str | None
     score_weight: int
     topic: str | None
     level: str | None
+    subject: str
