@@ -9,4 +9,5 @@ class AppBaseModel(BaseModel):
         # 2. Cho phép nhận dữ liệu bằng BẤT KỲ tên nào (gửi camelCase hay snake_case backend cũng nhận hết)
         populate_by_name=True,
         from_attributes=True,
+        extra="ignore",
     )

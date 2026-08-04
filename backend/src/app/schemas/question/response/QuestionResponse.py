@@ -12,7 +12,7 @@ class QuestionResponse(AppBaseModel):
     options: dict | None
     correct_answer: str
     explanation: str | None
-    score_weight: int
+    score_weight: float
     topic: str | None
     level: str | None
     subject: str
