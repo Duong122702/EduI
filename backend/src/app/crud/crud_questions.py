@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from backend.src.app.core.database import get_db
-from backend.src.app.model.questions import Questions
-from backend.src.app.schemas.question.QuestionSchema import QuestionFilterParams
 from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.core.database import get_db
+from src.app.model.questions import Questions
+from src.app.schemas.question.QuestionSchema import QuestionFilterParams
 
 
 class QuestionCRUD:

@@ -1,7 +1,6 @@
-from backend.src.app.api.v1.endpoints import question_route
 from fastapi import APIRouter
 
-from src.app.api.v1.endpoints import auth
+from src.app.api.v1.endpoints import auth, question_route
 
 api_router = APIRouter()
 

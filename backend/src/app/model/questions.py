@@ -1,10 +1,11 @@
 import uuid
 from datetime import datetime
 
-from backend.src.app.core.database import Base
 from sqlalchemy import DateTime, Float, Integer, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
+
+from src.app.core.database import Base
 
 
 class Questions(Base):

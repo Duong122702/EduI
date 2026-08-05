@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from backend.src.app.schemas.base import AppBaseModel
+from src.app.schemas.base import AppBaseModel
 
 
 class QuestionResponse(AppBaseModel):

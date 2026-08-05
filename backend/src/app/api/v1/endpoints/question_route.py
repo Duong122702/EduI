@@ -1,25 +1,25 @@
 from typing import Annotated
 
-from backend.src.app.api.deps import get_current_token, get_user_role
-from backend.src.app.core.database import get_db
-from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.core.security import verify_token
-from backend.src.app.schemas.question.QuestionSchema import QuestionFilterParams
-from backend.src.app.schemas.question.response.QuestionListResponse import (
-    QuestionListResponse,
-)
-from backend.src.app.schemas.question.response.QuestionResponse import QuestionResponse
-from backend.src.app.schemas.response import APIResponse
-from backend.src.app.services.question_service import question_service
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.api.deps import get_current_token, get_user_role
+from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
+from src.app.core.security import verify_token
+from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.response.QuestionListResponse import (
+    QuestionListResponse,
+)
+from src.app.schemas.response import APIResponse
+from src.app.services.question_service import question_service
 
 router = APIRouter()
 
 
 @router.get(
     "/get_all",
-    response_model=APIResponse[tuple[list[QuestionResponse], int]],
+    response_model=APIResponse[QuestionListResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_all_questions_routes(
