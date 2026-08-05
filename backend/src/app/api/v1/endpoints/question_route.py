@@ -5,6 +5,9 @@ from backend.src.app.core.database import get_db
 from backend.src.app.core.exceptions import CustomAPIException
 from backend.src.app.core.security import verify_token
 from backend.src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from backend.src.app.schemas.question.response.QuestionListResponse import (
+    QuestionListResponse,
+)
 from backend.src.app.schemas.question.response.QuestionResponse import QuestionResponse
 from backend.src.app.schemas.response import APIResponse
 from backend.src.app.services.question_service import question_service
@@ -30,7 +33,7 @@ async def get_all_questions_routes(
         le=100,
         description="Số lượng câu hỏi trên mỗi trang (mặc định là 10)",
     ),
-) -> APIResponse[tuple[list[QuestionResponse], int]]:
+) -> APIResponse[QuestionListResponse]:
     user_id = verify_token(token)
     if not user_id:
         raise CustomAPIException(
@@ -49,5 +52,6 @@ async def get_all_questions_routes(
         db, page, page_size, filters=filter_params
     )
     return APIResponse(
-        data=(questions, total), message="Lấy danh sách câu hỏi thành công"
+        data=QuestionListResponse(questions=questions, total=total),
+        message="Lấy danh sách câu hỏi thành công",
     )

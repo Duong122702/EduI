@@ -8,7 +8,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class QuestionSerivce:
+class QuestionService:
     async def get_all_questions(
         self,
         db: Annotated[AsyncSession, Depends(get_db)],
@@ -26,4 +26,4 @@ class QuestionSerivce:
         return question_responses, total
 
 
-question_service = QuestionSerivce()
+question_service = QuestionService()
