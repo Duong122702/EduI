@@ -8,8 +8,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/Input';
+import AddQuestionSheet from '@/features/questionbank/components/AddQuestionSheet';
+import QuestionTable from '@/features/questionbank/components/QuestionTable';
+import { useState } from 'react';
 
 function QuestionBank() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="w-full space-y-6 p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -171,6 +175,11 @@ function QuestionBank() {
           </CardContent>
         </Card>
       </div>
+      <QuestionTable onClick={() => setIsOpen(true)} />
+      <AddQuestionSheet
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      ></AddQuestionSheet>
     </div>
   );
 }

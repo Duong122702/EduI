@@ -30,7 +30,11 @@ import { SubjectBadge } from './SubjectBadge';
 import { useEffect, useState } from 'react';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 
-export const QuestionTable = () => {
+interface AddSheetProp {
+  onClick: () => void;
+}
+
+export const QuestionTable = ({ onClick }: AddSheetProp) => {
   const [params, setParams] = useState<GetQuestionsParams>({
     page: 1,
     page_size: 10,
@@ -160,7 +164,10 @@ export const QuestionTable = () => {
           </div>
 
           {/* Button Thêm câu hỏi */}
-          <Button className="h-11 shrink-0 rounded-2xl bg-orange-500 px-5 font-bold text-white shadow-sm transition-all hover:bg-orange-600">
+          <Button
+            onClick={onClick}
+            className="h-11 shrink-0 rounded-2xl bg-orange-500 px-5 font-bold text-white shadow-sm transition-all hover:bg-orange-600"
+          >
             <CirclePlus className="mr-2 h-5 w-5" />
             Thêm câu hỏi mới
           </Button>
