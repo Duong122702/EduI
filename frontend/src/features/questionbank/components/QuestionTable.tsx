@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useQuestions } from '@/hooks/Question/useQuestion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -27,41 +26,26 @@ import {
   Trash2,
 } from 'lucide-react';
 import { SubjectBadge } from './SubjectBadge';
-import { useEffect, useState } from 'react';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
+import type { QuestionTableProps } from '@/types/QuestionType/questionTableProps.type';
+import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
 
-interface AddSheetProp {
-  onClick: () => void;
-}
-
-export const QuestionTable = ({ onClick }: AddSheetProp) => {
-  const [params, setParams] = useState<GetQuestionsParams>({
-    page: 1,
-    page_size: 10,
-    subject: '',
-    level: '',
-    question_type: '',
-    content: '',
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setParams((prev) => ({
-        ...prev,
-        content: searchTerm,
-        page: 1, // Reset về trang 1 khi tìm kiếm
-      }));
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-  const { isPending, data } = useQuestions();
+export const QuestionTable = ({
+  onClick,
+  data,
+  isPending,
+  params,
+  setParams,
+  searchTerm,
+  setSearchTerm,
+}: QuestionTableProps) => {
   const questions = data?.data?.data.question ?? [];
   const total = data?.data?.data?.total ?? 0;
 
   const totalPages = Math.ceil(total / (params.page_size || 10)) || 1;
 
+  const { uniqueLevels, uniqueSubjects, uniqueTypes } =
+    useQuestionOptions(questions);
   // Handler cập nhật Select Filter
   const handleFilterChange = (key: keyof GetQuestionsParams, value: string) => {
     setParams((prev) => ({
@@ -105,13 +89,11 @@ export const QuestionTable = ({ onClick }: AddSheetProp) => {
                 <SelectValue placeholder="Tất cả môn học" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                {data?.data.data.question.map((question) => {
-                  return (
-                    <SelectItem key={question.id} value={question.subject}>
-                      {question.subject}
-                    </SelectItem>
-                  );
-                })}
+                {uniqueSubjects.map((sub) => (
+                  <SelectItem key={sub} value={sub}>
+                    {sub}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -125,15 +107,11 @@ export const QuestionTable = ({ onClick }: AddSheetProp) => {
                 <SelectValue placeholder="Mọi độ khó" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                {data?.data.data.question.map((question) => {
-                  return (
-                    question.level && (
-                      <SelectItem key={question.id} value={question.level}>
-                        {question.level}
-                      </SelectItem>
-                    )
-                  );
-                })}
+                {uniqueLevels.map((lvl) => (
+                  <SelectItem key={lvl} value={lvl}>
+                    {lvl}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -147,18 +125,11 @@ export const QuestionTable = ({ onClick }: AddSheetProp) => {
                 <SelectValue placeholder="Mọi thể loại" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                {data?.data.data.question.map((question) => {
-                  return (
-                    question.question_type && (
-                      <SelectItem
-                        key={question.id}
-                        value={question.question_type}
-                      >
-                        {question.question_type}
-                      </SelectItem>
-                    )
-                  );
-                })}
+                {uniqueTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -10,10 +10,37 @@ import {
 import { Input } from '@/components/ui/Input';
 import AddQuestionSheet from '@/features/questionbank/components/AddQuestionSheet';
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
-import { useState } from 'react';
+import { useQuestions } from '@/hooks/Question/useQuestion';
+import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
+import { useEffect, useState } from 'react';
 
 function QuestionBank() {
   const [isOpen, setIsOpen] = useState(false);
+  const [params, setParams] = useState<GetQuestionsParams>({
+    page: 1,
+    page_size: 10,
+    subject: '',
+    level: '',
+    question_type: '',
+    content: '',
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Debounce tìm kiếm
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParams((prev) => ({
+        ...prev,
+        content: searchTerm,
+        page: 1,
+      }));
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const { isPending, data } = useQuestions(params);
+  const totalQuestions = data?.data?.data?.total ?? 0;
   return (
     <div className="w-full space-y-6 p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -46,7 +73,9 @@ function QuestionBank() {
               <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
                 TỔNG SỐ CÂU HỎI
               </p>
-              <h2 className="text-3xl font-extrabold text-slate-900">4</h2>
+              <h2 className="text-3xl font-extrabold text-slate-900">
+                {isPending ? '...' : totalQuestions}
+              </h2>
               <p className="text-xs text-slate-500">
                 Nạp nhiều nhất:{' '}
                 <span className="font-semibold text-slate-700">Toán học</span>
@@ -175,7 +204,15 @@ function QuestionBank() {
           </CardContent>
         </Card>
       </div>
-      <QuestionTable onClick={() => setIsOpen(true)} />
+      <QuestionTable
+        onClick={() => setIsOpen(true)}
+        data={data}
+        isPending={isPending}
+        params={params}
+        setParams={setParams}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
       <AddQuestionSheet
         open={isOpen}
         onOpenChange={setIsOpen}
