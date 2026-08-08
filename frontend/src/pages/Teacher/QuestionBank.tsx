@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/Input';
-import AddQuestionSheet from '@/features/questionbank/components/AddQuestionSheet';
+import AddQuestionSheet from '@/features/questionbank/components/AddQuestioSheet/AddQuestionSheet';
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
