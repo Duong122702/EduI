@@ -3,7 +3,7 @@ export interface Question {
   exam_id: string;
   question_number: number;
   content: string;
-  question_type: string;
+  questionType: string;
   options?: string[];
   correct_answer: string;
   explanation?: string;

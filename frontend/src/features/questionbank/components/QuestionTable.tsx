@@ -39,7 +39,7 @@ export const QuestionTable = ({
   searchTerm,
   setSearchTerm,
 }: QuestionTableProps) => {
-  const questions = data?.data?.data.question ?? [];
+  const questions = data?.data?.data.questions ?? [];
   const total = data?.data?.data?.total ?? 0;
 
   const totalPages = Math.ceil(total / (params.page_size || 10)) || 1;
@@ -175,7 +175,7 @@ export const QuestionTable = ({
                 </TableRow>
               )}
               {/* Row 1: Toán học - Tích phân */}
-              {data?.data.data.question.map((question) => (
+              {questions.map((question) => (
                 <TableRow
                   key={question.id}
                   className="border-b border-slate-100 transition-colors hover:bg-slate-50/50"
@@ -190,7 +190,7 @@ export const QuestionTable = ({
                     {question.content}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-center font-medium text-slate-600">
-                    {question.question_type}
+                    {question.questionType}
                   </TableCell>
                   <TableCell className="px-4 py-4 text-center">
                     <Badge

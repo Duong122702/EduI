@@ -38,7 +38,7 @@ export const SUBJECT_PATHS: Record<string, SubjectPaths> = {
     badgeStyle:
       'border-amber-200/60 bg-amber-50 text-amber-600 hover:bg-amber-50',
   },
-  Geography: {
+  'Địa lý': {
     icon: Globe,
     name: 'Địa lý',
     badgeStyle: 'border-cyan-200/60 bg-cyan-50 text-cyan-600 hover:bg-cyan-50',

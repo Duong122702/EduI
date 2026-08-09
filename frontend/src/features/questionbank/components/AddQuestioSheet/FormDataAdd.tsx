@@ -44,7 +44,7 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
               <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
                 Bộ môn học
               </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="bg-gray-50 text-sm">
                     <SelectValue placeholder="Chọn bộ môn" />
@@ -233,24 +233,24 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
                                   </div>
                                   <div className="flex items-center space-x-1.5 pl-1">
                                     <RadioGroupItem
-                                      value={key}
-                                      id={`option-${key}`}
+                                      value={`${key}_TRUE`}
+                                      id={`option-tf-${key}-true`}
                                       className="border-gray-300 text-emerald-600 focus:ring-emerald-500 data-[state=checked]:border-emerald-600 data-[state=checked]:text-emerald-600"
                                     >
                                       <Label
-                                        htmlFor={`option-${key}`}
+                                        htmlFor={`option-tf-${key}-true`}
                                         className="cursor-pointer text-xs font-bold tracking-wider text-gray-500 uppercase"
                                       >
                                         Đúng
                                       </Label>
                                     </RadioGroupItem>
                                     <RadioGroupItem
-                                      value={key}
-                                      id={`option-${key}`}
+                                      value={`${key}_FALSE`}
+                                      id={`option-tf-${key}-false`}
                                       className="border-gray-300 text-emerald-600 focus:ring-emerald-500 data-[state=checked]:border-emerald-600 data-[state=checked]:text-emerald-600"
                                     >
                                       <Label
-                                        htmlFor={`option-${key}`}
+                                        htmlFor={`option-tf-${key}-false`}
                                         className="cursor-pointer text-xs font-bold tracking-wider text-gray-500 uppercase"
                                       >
                                         Sai
@@ -276,13 +276,11 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
                             Danh sách các lựa chọn và đáp án đúng
                           </FormLabel>
                           <FormControl>
-                            <Label className="mb-3 text-base font-bold tracking-wider text-gray-400 uppercase">
-                              Từ khóa/Đáp án chính xác bắt buộc:
-                            </Label>
                             <Input
                               placeholder="Đáp án"
                               value={field.value}
                               onChange={field.onChange}
+                              className="bg-gray-50 text-sm"
                             />
                           </FormControl>
                         </FormItem>
@@ -314,11 +312,20 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
           control={form.control}
           name="explanation"
           render={({ field }) => (
-            <Textarea
-              placeholder="Hướng dẫn giải"
-              value={field.value}
-              onChange={field.onChange}
-            />
+            <FormItem>
+              <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
+                Hướng dẫn giải
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Nhập hướng dẫn giải..."
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  className="bg-gray-50 text-sm"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
       </form>

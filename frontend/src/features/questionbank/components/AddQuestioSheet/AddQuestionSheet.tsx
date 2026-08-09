@@ -25,7 +25,7 @@ function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
   const form = useForm<QuestionFormAddValue>({
     resolver: yupResolver(addFormSchema),
     defaultValues: {
-      subject: 'Toán',
+      subject: '',
       topic: '',
       level: 'Dễ',
       type: 'Trắc nghiệm',

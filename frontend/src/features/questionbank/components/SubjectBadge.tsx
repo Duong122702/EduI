@@ -21,7 +21,7 @@ export const SubjectBadge = ({ subject, topic }: SubjectBadgeProps) => {
         <IconComponent className="h-5 w-5" />
       </div>
       <div className="space-y-1">
-        <p className="font-bold text-slate-900">{config.name}</p>
+        <p className="px-2 font-bold text-slate-600">{config.name}</p>
         {topic && (
           <Badge
             variant="outline"
