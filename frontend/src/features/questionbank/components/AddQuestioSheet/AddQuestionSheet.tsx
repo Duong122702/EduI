@@ -49,7 +49,7 @@ function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
       {/* Nội dung Sheet trượt từ bên phải ra (side="right") */}
       <SheetContent
         side="right"
-        className="w-112.5 overflow-y-auto p-4 sm:max-w-125"
+        className="w-full overflow-y-auto p-4 sm:max-w-125"
       >
         <SheetHeader className="border-b pb-4 text-left">
           <SheetTitle className="text-lg font-bold tracking-wide text-gray-800 uppercase">
@@ -65,15 +65,15 @@ function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
         {/* Footer chứa nút thao tác */}
         <SheetFooter className="flex gap-2 border-t pt-4">
           <SheetClose asChild>
-            <Button
-              variant="outline"
-              className="w-full"
-              form="add-question-form"
-            >
+            <Button variant="outline" className="w-full">
               Hủy bỏ
             </Button>
           </SheetClose>
-          <Button className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
+          <Button
+            type="submit"
+            className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+            form="add-question-form"
+          >
             Lưu vào ngân hàng
           </Button>
         </SheetFooter>

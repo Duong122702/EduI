@@ -116,7 +116,7 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
+              <FormLabel className="w-full text-xs font-bold tracking-wider text-gray-600 uppercase">
                 Thể loại câu hỏi
               </FormLabel>
               <FormControl>
