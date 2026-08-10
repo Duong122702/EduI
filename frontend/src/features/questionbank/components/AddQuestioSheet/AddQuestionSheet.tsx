@@ -65,13 +65,13 @@ function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
         {/* Footer chứa nút thao tác */}
         <SheetFooter className="flex gap-2 border-t pt-4">
           <SheetClose asChild>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-1/2">
               Hủy bỏ
             </Button>
           </SheetClose>
           <Button
             type="submit"
-            className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+            className="w-1/2 bg-emerald-600 text-white hover:bg-emerald-700"
             form="add-question-form"
           >
             Lưu vào ngân hàng

@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { levelColorMap } from '@/constants/levelColor';
 import type { QuestionFormAddValue } from '@/features/questionbank/Schemas/AddFormSchema';
 import type { UseFormReturn } from 'react-hook-form';
 
@@ -94,22 +95,26 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
                 Độ khó câu hỏi
               </FormLabel>
               <FormControl>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {['Nhận biết', 'Thông hiểu', 'Vận dụng', 'Vận dụng cao'].map(
-                    (item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => field.onChange(item)}
-                        className={`rounded-lg border py-2 text-xs font-medium transition-all ${
-                          field.value === item
-                            ? 'border-emerald-400 bg-emerald-50 font-semibold text-emerald-700'
-                            : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    )
+                    (item) => {
+                      const isSelected = field.value === item;
+                      const activeClass = levelColorMap[item];
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => field.onChange(item)}
+                          className={`rounded-lg border py-2 text-xs font-medium transition-all ${
+                            isSelected
+                              ? `${activeClass} font-semibold shadow-sm`
+                              : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          {item}
+                        </button>
+                      );
+                    }
                   )}
                 </div>
               </FormControl>
