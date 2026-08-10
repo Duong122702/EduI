@@ -46,14 +46,20 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-gray-50 text-sm">
+                  <SelectTrigger className="w-full bg-gray-50 text-xs">
                     <SelectValue placeholder="Chọn bộ môn" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Toán học">Toán học</SelectItem>
-                  <SelectItem value="Vật lý">Vật lý</SelectItem>
-                  <SelectItem value="Hóa học">Hóa học</SelectItem>
+                  <SelectItem className="text-xs" value="Toán học">
+                    Toán học
+                  </SelectItem>
+                  <SelectItem className="text-xs" value="Vật lý">
+                    Vật lý
+                  </SelectItem>
+                  <SelectItem className="text-xs" value="Hóa học">
+                    Hóa học
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -71,7 +77,7 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
               <FormControl>
                 <Input
                   placeholder="Ví dụ: Đạo hàm, Tích phân..."
-                  className="bg-gray-50 text-sm"
+                  className="rounded-xl bg-gray-50 text-xs focus-visible:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-300/50"
                   {...field}
                 />
               </FormControl>
@@ -116,14 +122,18 @@ export const FormDataAdd = ({ form, onSubmit, options }: FormDataAddProps) => {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="w-full text-xs font-bold tracking-wider text-gray-600 uppercase">
+              <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
                 Thể loại câu hỏi
               </FormLabel>
               <FormControl>
                 <Tabs value={field.value} onValueChange={field.onChange}>
-                  <TabsList className="">
+                  <TabsList className="bg-transparent">
                     {['Trắc nghiệm', 'Đúng/Sai', 'Trả lời ngắn'].map((item) => (
-                      <TabsTrigger key={item} value={item}>
+                      <TabsTrigger
+                        key={item}
+                        value={item}
+                        className="w-1/3 text-xs font-bold data-[state=active]:border data-[state=active]:border-teal-400 data-[state=active]:bg-teal-200/30 data-[state=active]:text-teal-800"
+                      >
                         {item}
                       </TabsTrigger>
                     ))}
