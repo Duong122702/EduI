@@ -216,6 +216,7 @@ function QuestionBank() {
       <AddQuestionSheet
         open={isOpen}
         onOpenChange={setIsOpen}
+        questions={data?.data.data.questions}
       ></AddQuestionSheet>
     </div>
   );

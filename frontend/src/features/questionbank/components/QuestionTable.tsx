@@ -68,9 +68,9 @@ export const QuestionTable = ({
       <Card className="rounded-3xl border-slate-100 bg-white p-6 shadow-sm">
         {/* Thanh công cụ lọc & Tìm kiếm (Sử dụng Shadcn Input, Select, Button) */}
         <div className="flex gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-3">
+          <div className="flex flex-1 flex-wrap items-center gap-3">
             {/* Tìm kiếm */}
-            <div className="relative w-full min-w-65">
+            <div className="relative w-1/3 min-w-65">
               <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={searchTerm}
@@ -83,7 +83,6 @@ export const QuestionTable = ({
             <div className="flex gap-3">
               {/* Select Môn học */}
               <Select
-                defaultValue="all"
                 value={params.subject}
                 onValueChange={(val) => handleFilterChange('subject', val)}
               >
@@ -135,16 +134,15 @@ export const QuestionTable = ({
                 </SelectContent>
               </Select>
             </div>
+            {/* Button Thêm câu hỏi */}
+            <Button
+              onClick={onClick}
+              className="h-11 shrink-0 rounded-2xl bg-orange-500 px-5 font-bold text-white shadow-sm transition-all hover:bg-orange-600"
+            >
+              <CirclePlus className="mr-2 h-5 w-5" />
+              Thêm câu hỏi mới
+            </Button>
           </div>
-
-          {/* Button Thêm câu hỏi */}
-          <Button
-            onClick={onClick}
-            className="h-11 shrink-0 rounded-2xl bg-orange-500 px-5 font-bold text-white shadow-sm transition-all hover:bg-orange-600"
-          >
-            <CirclePlus className="mr-2 h-5 w-5" />
-            Thêm câu hỏi mới
-          </Button>
         </div>
 
         {/* Bảng danh sách câu hỏi (Sử dụng Shadcn Table) */}

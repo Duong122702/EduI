@@ -15,13 +15,15 @@ import {
 } from '../../Schemas/AddFormSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormDataAdd from './FormDataAdd';
+import type { Question } from '@/Models/questions.model';
 
 interface OpenProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  questions?: Question[];
 }
 
-function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
+function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
   const form = useForm<QuestionFormAddValue>({
     resolver: yupResolver(addFormSchema),
     defaultValues: {
@@ -61,7 +63,12 @@ function AddQuestionSheet({ open, onOpenChange }: OpenProps) {
         </SheetHeader>
 
         {/* Form nhập liệu */}
-        <FormDataAdd form={form} onSubmit={onSubmit} options={options} />
+        <FormDataAdd
+          form={form}
+          onSubmit={onSubmit}
+          options={options}
+          questions={questions}
+        />
         {/* Footer chứa nút thao tác */}
         <SheetFooter className="flex gap-2 border-t pt-4">
           <SheetClose asChild>
