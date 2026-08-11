@@ -32,7 +32,7 @@ export const useQuestionOptions = (questions: Question[] = []) => {
       Array.from(
         new Set(
           questions
-            .map((q) => q.question_type)
+            .map((q) => q.questionType)
             .filter((type): type is string => Boolean(type))
         )
       ),

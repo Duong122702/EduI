@@ -29,6 +29,7 @@ import { SubjectBadge } from './SubjectBadge';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 import type { QuestionTableProps } from '@/types/QuestionType/questionTableProps.type';
 import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
+import { levelColorMap } from '@/constants/levelColor';
 
 export const QuestionTable = ({
   onClick,
@@ -66,72 +67,74 @@ export const QuestionTable = ({
       {/* 4. Danh sách câu hỏi & Bộ lọc */}
       <Card className="rounded-3xl border-slate-100 bg-white p-6 shadow-sm">
         {/* Thanh công cụ lọc & Tìm kiếm (Sử dụng Shadcn Input, Select, Button) */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-3">
+        <div className="flex gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="grid w-full grid-cols-1 items-center gap-3 sm:grid-cols-3">
             {/* Tìm kiếm */}
-            <div className="relative min-w-65 flex-1">
+            <div className="relative w-full min-w-65">
               <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Tìm kiếm nội dung câu hỏi..."
-                className="h-11 rounded-2xl border-slate-200 bg-slate-50/50 pl-11 text-sm placeholder:text-slate-400 focus-visible:ring-emerald-500"
+                className="h-11 truncate rounded-2xl border-slate-200 bg-slate-50/50 pl-11 text-sm placeholder:text-slate-400 focus-visible:ring-emerald-500"
               />
             </div>
 
-            {/* Select Môn học */}
-            <Select
-              defaultValue="all"
-              value={params.subject}
-              onValueChange={(val) => handleFilterChange('subject', val)}
-            >
-              <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
-                <SelectValue placeholder="Tất cả môn học" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {uniqueSubjects.map((sub) => (
-                  <SelectItem key={sub} value={sub}>
-                    {sub}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-3">
+              {/* Select Môn học */}
+              <Select
+                defaultValue="all"
+                value={params.subject}
+                onValueChange={(val) => handleFilterChange('subject', val)}
+              >
+                <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
+                  <SelectValue placeholder="Tất cả môn học" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {uniqueSubjects.map((sub) => (
+                    <SelectItem key={sub} value={sub}>
+                      {sub}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {/* Select Độ khó */}
-            <Select
-              defaultValue="all"
-              value={params.level || 'all'}
-              onValueChange={(val) => handleFilterChange('level', val)}
-            >
-              <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
-                <SelectValue placeholder="Mọi độ khó" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {uniqueLevels.map((lvl) => (
-                  <SelectItem key={lvl} value={lvl}>
-                    {lvl}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {/* Select Độ khó */}
+              <Select
+                value={params.level || ''}
+                onValueChange={(val) => handleFilterChange('level', val)}
+              >
+                <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
+                  <SelectValue placeholder="Mọi độ khó" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {uniqueLevels.map((lvl) => (
+                    <SelectItem key={lvl} value={lvl}>
+                      {lvl}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            {/* Select Thể loại */}
-            <Select
-              defaultValue="all"
-              value={params.question_type || 'all'}
-              onValueChange={(val) => handleFilterChange('question_type', val)}
-            >
-              <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
-                <SelectValue placeholder="Mọi thể loại" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {uniqueTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {/* Select Thể loại */}
+              <Select
+                value={params.question_type || ''}
+                onValueChange={(val) =>
+                  handleFilterChange('question_type', val)
+                }
+              >
+                <SelectTrigger className="h-11 min-w-37.5 rounded-2xl border-slate-200 bg-slate-50/50 px-4 text-xs font-medium text-slate-600 focus:ring-emerald-500">
+                  <SelectValue placeholder="Mọi thể loại" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {uniqueTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Button Thêm câu hỏi */}
@@ -195,9 +198,14 @@ export const QuestionTable = ({
                   <TableCell className="px-4 py-4 text-center">
                     <Badge
                       variant="secondary"
-                      className={`border-none bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100`}
+                      className={`inline-flex max-w-28 items-center justify-center border px-3 py-1 text-xs font-semibold ${
+                        (question.level && levelColorMap[question.level]) ||
+                        'border-slate-300 bg-slate-50 text-slate-600'
+                      }`}
                     >
-                      {question.level || 'Chưa xếp loại'}
+                      <span className="truncate">
+                        {question.level || 'Chưa xếp loại'}
+                      </span>
                     </Badge>
                   </TableCell>
                   <TableCell className="py-4 pr-2 pl-4 text-right">
