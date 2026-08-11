@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from backend.src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -51,3 +52,19 @@ class QuestionCRUD:
         questions = data_result.scalars().all()
 
         return list(questions), total
+
+    async def add_question_crud(
+        self, db: Annotated[AsyncSession, Depends(get_db)], data: QuestionCreateSchema
+    ):
+        db_question = Questions(
+            subject=data.subject,
+            topic=data.topic,
+            content=data.content,
+            question_number=data.question_number,
+            score_weight=data.score_weight,
+            level=data.level,
+            question_type=data.question_type,
+        )
+        db.add(db_question)
+        await db.commit()
+        await db.refresh(db_question)

@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from backend.src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,6 +26,11 @@ class QuestionService:
             QuestionResponse.model_validate(question) for question in questions
         ]
         return question_responses, total
+
+    async def create_question(
+        self, db: Annotated[AsyncSession, Depends(get_db)], data: QuestionCreateSchema
+    ):
+        await QuestionCRUD().add_question_crud(db=db, data=data)
 
 
 question_service = QuestionService()
