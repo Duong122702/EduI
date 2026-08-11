@@ -16,6 +16,8 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import FormDataAdd from './FormDataAdd';
 import type { Question } from '@/Models/questions.model';
+import { useAddQuestion } from '@/hooks/Question/useAddQuestion';
+import { Loader2 } from 'lucide-react';
 
 interface OpenProps {
   open: boolean;
@@ -42,8 +44,14 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
     },
   });
 
+  const { mutate: addQuestion, isPending } = useAddQuestion();
   const onSubmit = (data: QuestionFormAddValue) => {
-    console.log('data', data);
+    addQuestion(data, {
+      onSuccess: () => {
+        form.reset();
+        onOpenChange(false);
+      },
+    });
   };
   const options = form.watch('options') as Record<string, string>;
   return (
@@ -80,8 +88,18 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
             type="submit"
             className="w-1/2 bg-emerald-600 text-white hover:bg-emerald-700"
             form="add-question-form"
+            disabled={isPending}
           >
-            Lưu vào ngân hàng
+            {isPending ? (
+              <span>
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang lưu...
+                </span>
+              </span>
+            ) : (
+              'Lưu vào ngân hàng'
+            )}
           </Button>
         </SheetFooter>
       </SheetContent>
