@@ -30,6 +30,7 @@ import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.
 import type { QuestionTableProps } from '@/types/QuestionType/questionTableProps.type';
 import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
 import { levelColorMap } from '@/constants/levelColor';
+import { MathViewerKaTeX } from '@/components/ui/MathViewerKaTeX';
 
 export const QuestionTable = ({
   onClick,
@@ -188,7 +189,7 @@ export const QuestionTable = ({
                     />
                   </TableCell>
                   <TableCell className="px-4 py-4 font-medium text-slate-700">
-                    {question.content}
+                    <MathViewerKaTeX value={question.content} />
                   </TableCell>
                   <TableCell className="px-4 py-4 text-center font-medium text-slate-600">
                     {question.questionType}

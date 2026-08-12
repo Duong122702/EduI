@@ -15,24 +15,24 @@ interface SubjectPaths {
 }
 
 export const SUBJECT_PATHS: Record<string, SubjectPaths> = {
-  Math: {
+  'Toán học': {
     icon: Calculator,
     name: 'Toán học',
     badgeStyle:
       'border-emerald-200/60 bg-emerald-50 text-emerald-600 hover:bg-emerald-50',
   },
-  Physics: {
+  'Vật lý': {
     icon: Atom,
     name: 'Vật lý',
     badgeStyle:
       'border-purple-200/60 bg-purple-50 text-purple-600 hover:bg-purple-50',
   },
-  Chemistry: {
+  'Hóa học': {
     icon: FlaskConical,
     name: 'Hóa học',
     badgeStyle: 'border-blue-200/60 bg-blue-50 text-blue-600 hover:bg-blue-50',
   },
-  Literature: {
+  'Ngữ Văn': {
     icon: BookOpen,
     name: 'Ngữ văn',
     badgeStyle:
