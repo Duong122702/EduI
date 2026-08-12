@@ -64,6 +64,7 @@ class QuestionCRUD:
             score_weight=data.score_weight,
             level=data.level,
             question_type=data.question_type,
+            correct_answer=data.correct_answer,
         )
         db.add(db_question)
         await db.commit()

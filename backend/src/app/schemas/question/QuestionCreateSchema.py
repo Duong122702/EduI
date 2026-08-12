@@ -11,3 +11,4 @@ class QuestionCreateSchema(AppBaseModel):
     score_weight: float = Field(description="Số điểm cho câu hỏi")
     level: str = Field(description="Độ khó câu hỏi")
     question_type: str = Field(description="Kiểu câu hỏi")
+    correct_answer: str = Field(description="Đáp án đúng")

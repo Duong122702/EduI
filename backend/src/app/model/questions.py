@@ -19,7 +19,7 @@ class Questions(Base):
     question_number: Mapped[int] = mapped_column(Integer, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
     question_type: Mapped[str] = mapped_column(String, nullable=False)
-    options: Mapped[dict | None] = mapped_column(JSONB, nullable=False)
+    options: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     correct_answer: Mapped[str] = mapped_column(String, nullable=False)
     explanation: Mapped[str | None] = mapped_column(String, nullable=True)
     score_weight: Mapped[float] = mapped_column(Float, nullable=False)
