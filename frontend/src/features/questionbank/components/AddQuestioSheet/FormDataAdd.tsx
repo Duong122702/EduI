@@ -203,7 +203,7 @@ export const FormDataAdd = ({
         />
         <FormField
           control={form.control}
-          name="type"
+          name="questionType"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
@@ -419,6 +419,45 @@ export const FormDataAdd = ({
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="questionNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
+                Nhập số thứ tự câu:
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  className="rounded-xl bg-gray-50 text-xs focus-visible:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-300/50"
+                  placeholder="Nhập số thứ tự câu"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="scoreWeight"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
+                Nhập điểm cho câu hỏi:
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Nhập điểm cho câu hỏi:"
+                  className="rounded-xl bg-gray-50 text-xs focus-visible:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-300/50"
+                  {...field}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

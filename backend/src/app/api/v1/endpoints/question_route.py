@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from backend.src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +7,7 @@ from src.app.api.deps import get_current_token, get_user_role
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import verify_token
+from src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
 from src.app.schemas.question.response.QuestionListResponse import (
     QuestionListResponse,

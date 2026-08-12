@@ -32,7 +32,7 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
       subject: '',
       topic: '',
       level: 'Dễ',
-      type: 'Trắc nghiệm',
+      questionType: 'Trắc nghiệm',
       content: '',
       correct_answer: '',
       options: {
@@ -41,6 +41,9 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
         C: '',
         D: '',
       },
+      explanation: '',
+      questionNumber: 1,
+      scoreWeight: 0.25,
     },
   });
 

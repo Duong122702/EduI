@@ -33,7 +33,7 @@ function Header() {
             <Link to="/auth">
               <Button
                 variant="dark"
-                size="medium"
+                size="lg"
                 className="rounded-full shadow-sm"
               >
                 {' '}
@@ -42,7 +42,7 @@ function Header() {
             </Link>
           </div>
           <div className="flex items-center md:hidden">
-            <Button size={'small'} onClick={handleOpen}>
+            <Button size={'sm'} onClick={handleOpen}>
               {isOpen ? (
                 <CustomIcon name="iconClose" className="h-6 w-6" />
               ) : (
@@ -70,11 +70,7 @@ function Header() {
           </div>
           <div className="mx-6 flex flex-col items-start gap-4 pt-2 pb-6">
             {/* <NavItem href="">Đăng nhập</NavItem> */}
-            <Button
-              variant="dark"
-              size="medium"
-              className="rounded-full shadow-sm"
-            >
+            <Button variant="dark" size="lg" className="rounded-full shadow-sm">
               {' '}
               Đăng ký
             </Button>

@@ -4,7 +4,7 @@ import type { ApiResponse } from '@/schemas/response/apiResponse';
 
 export const addQuestionApi = async (questionData: QuestionFormAddValue) => {
   return await axiosClient.post<ApiResponse<string>>(
-    '/question/add',
+    '/questions/add',
     questionData
   );
 };

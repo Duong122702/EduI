@@ -1,5 +1,6 @@
-from backend.src.app.schemas.base import AppBaseModel
 from pydantic import Field
+
+from src.app.schemas.base import AppBaseModel
 
 
 class QuestionCreateSchema(AppBaseModel):

@@ -43,7 +43,7 @@ function Home() {
             />
             <Button
               variant="orange"
-              size="large"
+              size="lg"
               className="font-4xl flex-2 rounded-xl font-bold shadow-sm"
             >
               Vào thi ngay
@@ -141,7 +141,7 @@ function Home() {
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
             <Button
               variant={'orange'}
-              size="extralarge"
+              size="xl"
               className="gap-2 rounded-full font-bold"
             >
               Trải nghiệm miễn phí ngay
@@ -149,7 +149,7 @@ function Home() {
             </Button>
             <Button
               variant={'dark'}
-              size="extralarge"
+              size="xl"
               className="rounded-full font-bold"
             >
               Tạo đề thi ngay
