@@ -12,3 +12,4 @@ class QuestionCreateSchema(AppBaseModel):
     level: str = Field(description="Độ khó câu hỏi")
     question_type: str = Field(description="Kiểu câu hỏi")
     correct_answer: str = Field(description="Đáp án đúng")
+    image_url: str | None = Field(None, description="Ảnh cho câu hỏi")

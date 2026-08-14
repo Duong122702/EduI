@@ -16,3 +16,4 @@ class QuestionResponse(AppBaseModel):
     topic: str | None
     level: str | None
     subject: str
+    image_url: str | None

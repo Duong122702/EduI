@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends
+from backend.src.app.utils.storage import upload_file_to_supabase
+from fastapi import Depends, UploadFile
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -54,18 +55,15 @@ class QuestionCRUD:
         return list(questions), total
 
     async def add_question_crud(
-        self, db: Annotated[AsyncSession, Depends(get_db)], data: QuestionCreateSchema
+        self,
+        db: Annotated[AsyncSession, Depends(get_db)],
+        data: QuestionCreateSchema,
+        image_file: UploadFile | None = None,
     ):
-        db_question = Questions(
-            subject=data.subject,
-            topic=data.topic,
-            content=data.content,
-            question_number=data.question_number,
-            score_weight=data.score_weight,
-            level=data.level,
-            question_type=data.question_type,
-            correct_answer=data.correct_answer,
-        )
+        if image_file:
+            image_url = await upload_file_to_supabase(image_file)
+
+        db_question = QuestionCreateSchema(**data.__dict__, image_url=image_url)
         db.add(db_question)
         await db.commit()
         await db.refresh(db_question)

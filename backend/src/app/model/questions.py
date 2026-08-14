@@ -29,3 +29,4 @@ class Questions(Base):
     topic: Mapped[str | None] = mapped_column(String, nullable=True)
     level: Mapped[str | None] = mapped_column(String, nullable=True)
     subject: Mapped[str] = mapped_column(String, nullable=False)
+    image_url: Mapped[str | None] = mapped_column(String, nullable=True)
