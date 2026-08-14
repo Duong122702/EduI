@@ -12,6 +12,7 @@ import AddQuestionSheet from '@/features/questionbank/components/AddQuestioSheet
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
+import { Database } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 function QuestionBank() {
@@ -39,7 +40,7 @@ function QuestionBank() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { isPending, data } = useQuestions(params);
+  const { isPending, data, most_subject_data } = useQuestions(params);
   const totalQuestions = data?.data?.data?.total ?? 0;
   return (
     <div className="w-full space-y-6 p-6">
@@ -78,11 +79,13 @@ function QuestionBank() {
               </h2>
               <p className="text-xs text-slate-500">
                 Nạp nhiều nhất:{' '}
-                <span className="font-semibold text-slate-700">Toán học</span>
+                <span className="font-semibold text-slate-700">
+                  {most_subject_data?.data.data.subject}
+                </span>
               </p>
             </div>
             <div className="rounded-xl bg-teal-50 p-3 text-teal-600">
-              {/* <Database className="h-6 w-6" /> */}
+              <Database className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
