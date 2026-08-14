@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
 from src.app.crud.crud_questions import QuestionCRUD
-from src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionResponse import QuestionResponse
 
 
@@ -28,9 +28,18 @@ class QuestionService:
         return question_responses, total
 
     async def create_question(
-        self, db: Annotated[AsyncSession, Depends(get_db)], data: QuestionCreateSchema
+        self,
+        db: Annotated[AsyncSession, Depends(get_db)],
+        data: QuestionCreateSchema,
+        question_image: UploadFile | None = None,
+        option_images: dict[str, UploadFile | None] | None = None,
     ):
-        await QuestionCRUD().add_question_crud(db=db, data=data)
+        return await QuestionCRUD().add_question_crud(
+            db=db,
+            data=data,
+            question_image=question_image,
+            option_images=option_images,
+        )
 
 
 question_service = QuestionService()

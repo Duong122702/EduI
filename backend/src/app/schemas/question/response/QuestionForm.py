@@ -13,6 +13,12 @@ class QuestionCreateSchema:
     question_type: str = Form(..., description="Loại câu hỏi")
     correct_answer: str = Form(..., description="Đáp án đúng")
     topic: str | None = Form(None, description="Chủ đề/Chương")
+    explanation: str | None = Form(None, description="Giải thích")
+
+    option_A_content: str | None = Form(None, description="Nội dung đáp án A")
+    option_B_content: str | None = Form(None, description="Nội dung đáp án B")
+    option_C_content: str | None = Form(None, description="Nội dung đáp án C")
+    option_D_content: str | None = Form(None, description="Nội dung đáp án D")
 
     def to_dict(self) -> dict:
         return asdict(self)

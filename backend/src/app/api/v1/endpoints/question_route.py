@@ -1,14 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.deps import get_current_token, get_user_role
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import verify_token
-from src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionListResponse import (
     QuestionListResponse,
 )
@@ -63,6 +63,13 @@ async def add_question_route(
     token: Annotated[str, Depends(get_current_token)],
     db: Annotated[AsyncSession, Depends(get_db)],
     data: QuestionCreateSchema,
+    # 1. Nhận file ảnh câu hỏi
+    question_image: UploadFile | None = None,
+    # 2. Nhận file ảnh của từng option
+    option_A_image: UploadFile | None = None,
+    option_B_image: UploadFile | None = None,
+    option_C_image: UploadFile | None = None,
+    option_D_image: UploadFile | None = None,
 ):
     user_id = verify_token(token)
     if not user_id:
@@ -78,5 +85,17 @@ async def add_question_route(
             code="FORBIDDEN",
             message="Bạn không có quyền truy cập vào tài nguyên này",
         )
-    await question_service.create_question(db, data)
+    # Gom các file ảnh option thành dictionary để truyền gọn gàng
+    option_images = {
+        "A": option_A_image,
+        "B": option_B_image,
+        "C": option_C_image,
+        "D": option_D_image,
+    }
+    await question_service.create_question(
+        db,
+        data,
+        question_image=question_image,
+        option_images=option_images,
+    )
     return APIResponse(message="Tạo câu hỏi thành công")

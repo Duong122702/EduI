@@ -1,14 +1,15 @@
+import asyncio
 from typing import Annotated
 
-from backend.src.app.utils.storage import upload_file_to_supabase
 from fastapi import Depends, UploadFile
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
 from src.app.model.questions import Questions
-from src.app.schemas.question.QuestionCreateSchema import QuestionCreateSchema
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
+from src.app.utils.storage import upload_file_to_supabase
 
 
 class QuestionCRUD:
@@ -58,12 +59,58 @@ class QuestionCRUD:
         self,
         db: Annotated[AsyncSession, Depends(get_db)],
         data: QuestionCreateSchema,
-        image_file: UploadFile | None = None,
+        question_image: UploadFile | None = None,
+        option_images: dict[str, UploadFile | None] | None = None,
     ):
-        if image_file:
-            image_url = await upload_file_to_supabase(image_file)
+        # 1. Upload ảnh câu hỏi chính (nếu có)
+        question_image_url: str | None = None
+        if question_image and question_image.filename:
+            question_image_url = await upload_file_to_supabase(question_image)
+            # 2. Xử lý đóng gói & upload ảnh cho các Option (A, B, C, D)
 
-        db_question = QuestionCreateSchema(**data.__dict__, image_url=image_url)
+        # Map nội dung text từ schema
+        option_contents = {
+            "A": data.option_A_content,
+            "B": data.option_B_content,
+            "C": data.option_C_content,
+            "D": data.option_D_content,
+        }
+
+        async def process_option(key: str):
+            content = option_contents.get(key)
+            img_file = option_images.get(key) if option_images else None
+
+            img_url = None
+            if img_file and img_file.filename:
+                img_url = await upload_file_to_supabase(img_file)
+
+            # Chỉ lưu option nếu có text hoặc có ảnh đính kèm
+            if content or img_url:
+                return key, {
+                    "content": content or "",
+                    "image_url": img_url,
+                }
+            return key, None
+
+        # Chạy upload song song các ảnh của option
+        keys = ["A", "B", "C", "D"]
+        results = await asyncio.gather(*(process_option(k) for k in keys))
+        options_data = {key: val for key, val in results if val is not None}
+        db_question = Questions(
+            subject=data.subject,
+            content=data.content,
+            question_number=data.question_number,
+            score_weight=data.score_weight,
+            level=data.level,
+            question_type=data.question_type,
+            correct_answer=data.correct_answer,
+            topic=data.topic,
+            explanation=data.explanation,
+            image_url=question_image_url,
+            options=options_data,
+        )
         db.add(db_question)
         await db.commit()
         await db.refresh(db_question)
+
+        return db_question
