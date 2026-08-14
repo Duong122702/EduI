@@ -31,15 +31,16 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
     defaultValues: {
       subject: '',
       topic: '',
-      level: 'Dễ',
+      level: 'Nhận biết',
       questionType: 'Trắc nghiệm',
       content: '',
+      question_image_file: null,
       correct_answer: '',
       options: {
-        A: '',
-        B: '',
-        C: '',
-        D: '',
+        A: { content: '', image_file: null },
+        B: { content: '', image_file: null },
+        C: { content: '', image_file: null },
+        D: { content: '', image_file: null },
       },
       explanation: '',
       questionNumber: 1,
@@ -56,7 +57,7 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
       },
     });
   };
-  const options = form.watch('options') as Record<string, string>;
+  const options = form.watch('options');
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       {/* Nội dung Sheet trượt từ bên phải ra (side="right") */}
