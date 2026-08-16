@@ -12,7 +12,8 @@ import AddQuestionSheet from '@/features/questionbank/components/AddQuestioSheet
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
-import { Database } from 'lucide-react';
+import { getListLevelQuestion } from '@/utils/getListLevelQuestion';
+import { BarChart3, Database, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 function QuestionBank() {
@@ -42,6 +43,9 @@ function QuestionBank() {
 
   const { isPending, data, most_subject_data } = useQuestions(params);
   const totalQuestions = data?.data?.data?.total ?? 0;
+  const questions = data?.data.data.questions ?? [];
+  const { easyQuestions, hardQuestions, normalQuestions, veryHardQuestions } =
+    getListLevelQuestion({ questions });
   return (
     <div className="w-full space-y-6 p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -95,34 +99,40 @@ function QuestionBank() {
           <CardContent className="flex items-start justify-between p-6">
             <div className="space-y-3">
               <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-                PHÂN BỎ ĐỘ KHÓ
+                PHÂN BỐ ĐỘ KHÓ
               </p>
               <div className="flex flex-wrap gap-1.5">
                 <Badge
                   variant="secondary"
-                  className="bg-emerald-100/70 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                  className="bg-sky-100/70 text-xs font-semibold text-emerald-700 hover:bg-sky-100"
                 >
-                  Dễ: 520
+                  Nhận biết: {easyQuestions}
+                </Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-emerald-100/70 text-xs font-semibold text-sky-700 hover:bg-emerald-100"
+                >
+                  Thông hiểu: {normalQuestions}
                 </Badge>
                 <Badge
                   variant="secondary"
                   className="bg-amber-100/70 text-xs font-semibold text-amber-700 hover:bg-amber-100"
                 >
-                  TB: 480
+                  Vận dụng: {hardQuestions}
                 </Badge>
                 <Badge
                   variant="secondary"
                   className="bg-rose-100/70 text-xs font-semibold text-rose-700 hover:bg-rose-100"
                 >
-                  Khó: 245
+                  Vận dụng cao: {veryHardQuestions}
                 </Badge>
               </div>
-              <p className="text-xs text-slate-500">
-                Tỷ lệ phân cấp chuẩn 4-4-2
-              </p>
+              {/* <p className="text-xs text-slate-500">
+                Tỷ lệ phân bổ ma trận đề (4 - 3 - 2 - 1)
+              </p> */}
             </div>
             <div className="rounded-xl bg-amber-50 p-3 text-amber-500">
-              {/* <BarChart3 className="h-6 w-6" /> */}
+              <BarChart3 className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
@@ -140,7 +150,7 @@ function QuestionBank() {
               </p>
             </div>
             <div className="rounded-xl bg-purple-50 p-3 text-purple-500">
-              {/* <Package className="h-6 w-6" /> */}
+              <Package className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
