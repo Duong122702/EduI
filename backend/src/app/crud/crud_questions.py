@@ -27,8 +27,6 @@ class QuestionCRUD:
         skip = (page - 1) * page_size
 
         if filters:
-            if filters.exam_id is not None:
-                query = query.where(Questions.exam_id == filters.exam_id)
             if filters.subject is not None:
                 query = query.where(Questions.subject.ilike(f"%{filters.subject}%"))
             if filters.topic is not None:

@@ -1,12 +1,9 @@
-from uuid import UUID
-
 from pydantic import Field
 
 from src.app.schemas.base import AppBaseModel
 
 
 class QuestionFilterParams(AppBaseModel):
-    exam_id: UUID | None = Field(None, description="Lọc theo Id của đề thi")
     subject: str | None = Field(None, description="Lọc theo môn học")
     topic: str | None = Field(None, description="Lọc theo chủ đề")
     content: str | None = Field(None, description="Lọc theo nội dung câu hỏi")

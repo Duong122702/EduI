@@ -5,7 +5,6 @@ from src.app.schemas.base import AppBaseModel
 
 class QuestionResponse(AppBaseModel):
     id: UUID
-    exam_id: UUID | None
     question_number: int
     content: str
     question_type: str
