@@ -6,7 +6,6 @@ export interface QuestionOptionItem {
 
 export interface Question {
   id: string;
-  exam_id: string;
   question_number: number;
   content: string;
   questionType: 'Trắc nghiệm' | 'Đúng/Sai' | 'Trả lời ngắn' | string;

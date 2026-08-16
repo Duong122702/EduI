@@ -1,5 +1,4 @@
 export interface QuestionFilterParams {
-  exam_id?: string;
   subject?: string;
   topic?: string;
   level?: string;
