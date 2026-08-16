@@ -1,5 +1,8 @@
 from typing import Annotated
 
+from backend.src.app.schemas.question.response.MostSubjectResponse import (
+    MostSubjectResponse,
+)
 from fastapi import Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,6 +43,12 @@ class QuestionService:
             question_image=question_image,
             option_images=option_images,
         )
+
+    async def get_most_subject(
+        self,
+        db: Annotated[AsyncSession, Depends(get_db)],
+    ) -> MostSubjectResponse | None:
+        return await QuestionCRUD().get_most_subject_crud(db=db)
 
 
 question_service = QuestionService()

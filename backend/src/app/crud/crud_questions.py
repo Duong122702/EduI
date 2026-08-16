@@ -1,8 +1,11 @@
 import asyncio
 from typing import Annotated
 
+from backend.src.app.schemas.question.response.MostSubjectResponse import (
+    MostSubjectResponse,
+)
 from fastapi import Depends, UploadFile
-from sqlalchemy import func, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
@@ -114,3 +117,24 @@ class QuestionCRUD:
         await db.refresh(db_question)
 
         return db_question
+
+    async def get_most_subject_crud(
+        self,
+        db: Annotated[AsyncSession, Depends(get_db)],
+    ) -> MostSubjectResponse | None:
+        stmt = (
+            select(Questions.subject, func.count().label("total_subjects"))
+            .group_by(Questions.subject)
+            .order_by(desc("total_subjects"), Questions.subject.asc())
+            .limit(1)
+        )
+        result = await db.execute(stmt)
+        row = result.first()
+        if not row:
+            return None  # Hợp lệ vì return type cho phép None
+
+        # Khởi tạo đối tượng MostSubjectResponse thay vì trả về dict
+        return MostSubjectResponse(
+            subject=row.subject,
+            count=row.total_subjects,  # Tên field khớp với schema của bạn
+        )

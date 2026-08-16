@@ -1,5 +1,8 @@
 from typing import Annotated
 
+from backend.src.app.schemas.question.response.MostSubjectResponse import (
+    MostSubjectResponse,
+)
 from fastapi import APIRouter, Depends, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -99,3 +102,38 @@ async def add_question_route(
         option_images=option_images,
     )
     return APIResponse(message="Tạo câu hỏi thành công")
+
+
+@router.get(
+    "/getMostSubject",
+    response_model=APIResponse[MostSubjectResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_most_subject_route(
+    self,
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> APIResponse[MostSubjectResponse]:
+    user_id = verify_token(token)
+    if not user_id:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ hoặc đã hết hạn",
+        )
+    user_role = await get_user_role(user_id, db)
+    if user_role != "teacher":
+        raise CustomAPIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
+            message="Bạn không có quyền truy cập vào tài nguyên này",
+        )
+    subject = await question_service.get_most_subject(db)
+    if subject is None:
+        raise CustomAPIException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            code="NOTFOUND",
+            message="Không tìm thấy câu hỏi",
+        )
+    result = MostSubjectResponse(subject=subject.subject, count=subject.count)
+    return APIResponse(data=result, message="Lấy môn học nhiều nhất thành công")
