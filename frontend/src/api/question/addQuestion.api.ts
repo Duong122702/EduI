@@ -3,11 +3,12 @@ import axiosClient from '../config/axiosClient';
 import type { ApiResponse } from '@/schemas/response/apiResponse';
 
 export const addQuestionApi = async (questionData: QuestionFormAddValue) => {
+  console.log('questionData options:', questionData.options);
   const formData = new FormData();
   // 1. Thêm các trường thông tin cơ bản
   formData.append('subject', questionData.subject);
   formData.append('level', questionData.level || 'Nhận biết');
-  formData.append('questionType', questionData.questionType);
+  formData.append('question_type', questionData.questionType);
   formData.append('content', questionData.content);
   formData.append('correct_answer', questionData.correct_answer);
 
@@ -22,7 +23,7 @@ export const addQuestionApi = async (questionData: QuestionFormAddValue) => {
     formData.append('explanation', questionData.explanation);
   }
   if (questionData.sourceLabel !== undefined) {
-    formData.append('question_number', String(questionData.sourceLabel));
+    formData.append('source_label', String(questionData.sourceLabel));
   }
   if (questionData.scoreWeight !== undefined) {
     formData.append('score_weight', String(questionData.scoreWeight));

@@ -5,7 +5,7 @@ from src.app.schemas.base import AppBaseModel
 
 class QuestionResponse(AppBaseModel):
     id: UUID
-    question_number: int
+    source_label: str | None
     content: str
     question_type: str
     options: dict | None

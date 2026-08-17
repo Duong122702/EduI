@@ -1,8 +1,5 @@
 from typing import Annotated
 
-from backend.src.app.schemas.question.response.MostSubjectResponse import (
-    MostSubjectResponse,
-)
 from fastapi import APIRouter, Depends, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +8,9 @@ from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import verify_token
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.response.MostSubjectResponse import (
+    MostSubjectResponse,
+)
 from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionListResponse import (
     QuestionListResponse,
@@ -65,7 +65,7 @@ async def get_all_questions_routes(
 async def add_question_route(
     token: Annotated[str, Depends(get_current_token)],
     db: Annotated[AsyncSession, Depends(get_db)],
-    data: QuestionCreateSchema,
+    data: Annotated[QuestionCreateSchema, Depends()],
     # 1. Nhận file ảnh câu hỏi
     question_image: UploadFile | None = None,
     # 2. Nhận file ảnh của từng option
@@ -110,7 +110,6 @@ async def add_question_route(
     status_code=status.HTTP_200_OK,
 )
 async def get_most_subject_route(
-    self,
     token: Annotated[str, Depends(get_current_token)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> APIResponse[MostSubjectResponse]:

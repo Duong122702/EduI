@@ -225,10 +225,13 @@ export const FormDataAdd = ({
     );
   };
 
+  const onError = (errors: any) => {
+    console.log('Form Validation Errors: ', errors);
+  };
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, onError)}
         className="space-y-5 py-4"
         id="add-question-form"
       >

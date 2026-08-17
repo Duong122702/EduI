@@ -25,16 +25,10 @@ const fileSchema = Yup.mixed<File>()
     }
   );
 
-const singleOptionSchema = Yup.object()
-  .shape({
-    content: Yup.string().optional(),
-    image_file: fileSchema,
-  })
-  .test(
-    'require-content-or-image',
-    'Lựa chọn phải có ít nhất nội dung chữ hoặc hình ảnh',
-    (value) => Boolean(value?.content?.trim() || value?.image_file)
-  );
+const singleOptionSchema = Yup.object().shape({
+  content: Yup.string().optional(),
+  image_file: fileSchema,
+});
 
 export const addFormSchema = Yup.object().shape({
   subject: Yup.string().required('Vui lòng chọn bộ môn'),
