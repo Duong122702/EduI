@@ -72,6 +72,34 @@ async def upload_file_to_supabase(
         ) from None
 
 
+# Thêm vào src/app/utils/storage.py[cite: 2]
+async def upload_bytes_to_supabase(
+    file_bytes: bytes,
+    file_ext: str,
+    bucket_name: str = "question_images",
+    folder: str | None = None,
+) -> str | None:
+    if not file_bytes:
+        return None
+    try:
+        filename = f"{uuid.uuid4()}.{file_ext}"
+        clean_folder = folder.strip("/") if folder else ""
+        storage_path = f"{clean_folder}/{filename}" if clean_folder else filename
+
+        content_type = f"image/{file_ext}" if file_ext != "jpg" else "image/jpeg"
+
+        await asyncio.to_thread(
+            supabase.storage.from_(bucket_name).upload,
+            path=storage_path,
+            file=file_bytes,
+            file_options={"content-type": content_type},
+        )
+        return supabase.storage.from_(bucket_name).get_public_url(storage_path)
+    except Exception as e:
+        print(f"Lỗi upload byte lên Supabase: {e}")
+        return None
+
+
 async def delete_file_from_supabase(
     file_url: str, bucket_name: str = "question_images"
 ) -> bool:

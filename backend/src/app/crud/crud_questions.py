@@ -134,3 +134,27 @@ class QuestionCRUD:
             subject=row.subject,
             count=row.total_subjects,  # Tên field khớp với schema của bạn
         )
+
+    async def add_multiple_questions_crud(
+        self, db: Annotated[AsyncSession, Depends()], question_data: list[dict]
+    ):
+        db_questions = []
+        for q_data in question_data:
+            db_question = Questions(
+                subject=q_data["subject"],
+                content=q_data["content"],
+                level=q_data["level"],
+                question_type=q_data.get("question_type", "Trắc nghiệm"),
+                correct_answer=q_data["correct_answer"],
+                options=q_data["options"],
+                image_url=q_data.get("image_url"),
+                score_weight=q_data.get("score_weight", 0.25),
+                explanation=q_data.get("explanation", ""),
+                source_label=q_data.get("source_label"),
+                topic=q_data.get("topic"),
+            )
+            db_questions.append(db_question)
+        if db_questions:
+            db.add_all(db_questions)
+            await db.commit()
+        return len(db_questions)

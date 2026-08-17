@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.deps import get_current_token, get_user_role
@@ -136,3 +136,37 @@ async def get_most_subject_route(
         )
     result = MostSubjectResponse(subject=subject.subject, count=subject.count)
     return APIResponse(data=result, message="Lấy môn học nhiều nhất thành công")
+
+
+@router.post(
+    "/import-pdf", response_model=APIResponse, status_code=status.HTTP_201_CREATED
+)
+async def import_questions_from_pdf_route(
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    file: Annotated[UploadFile, File(description="File PDF đề thi")],
+    subject: str = Form(..., description="Môn học áp dụng cho toàn bộ file"),
+    level: str = Form("Nhận biết", description="Mức độ"),
+):
+    user_id = verify_token(token)
+    if not user_id:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ",
+        )
+
+    user_role = await get_user_role(user_id, db)
+    if user_role != "teacher":
+        raise CustomAPIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
+            message="Bạn không có quyền thực hiện hành động này",
+        )
+    file_bytes = await file.read()
+    success_count, total_count = await question_service.import_questions_from_pdf(
+        db, file_bytes, subject, level
+    )
+    return APIResponse(
+        message=f"Import thành công {success_count}/{total_count} câu hỏi."
+    )
