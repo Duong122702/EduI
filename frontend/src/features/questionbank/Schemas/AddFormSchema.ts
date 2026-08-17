@@ -54,7 +54,7 @@ export const addFormSchema = Yup.object().shape({
     D: singleOptionSchema,
   }).optional(),
   explanation: Yup.string().optional(),
-  questionNumber: Yup.number().optional(),
+  sourceLabel: Yup.string().optional(),
   scoreWeight: Yup.number().required('Vui lòng nhập số điểm'),
 });
 

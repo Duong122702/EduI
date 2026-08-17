@@ -1,6 +1,6 @@
 // src/hooks/question/useQuestions.ts
 import { getAllQuestions } from '@/api/question/getAll.api';
-import { getMostSubject } from '@/api/question/getmostSubject.api';
+import { getMostSubject } from '@/api/question/getMostSubject.api';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 

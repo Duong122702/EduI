@@ -6,7 +6,7 @@ export interface QuestionOptionItem {
 
 export interface Question {
   id: string;
-  question_number: number;
+  sourceLabel?: string;
   content: string;
   questionType: 'Trắc nghiệm' | 'Đúng/Sai' | 'Trả lời ngắn' | string;
   image_url?: string;

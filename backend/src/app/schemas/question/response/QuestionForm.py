@@ -7,7 +7,7 @@ from fastapi import Form
 class QuestionCreateSchema:
     subject: str = Form(..., description="Môn học")
     content: str = Form(..., description="Nội dung câu hỏi")
-    question_number: int = Form(..., description="Số thứ tự câu hỏi")
+    source_label: str | None = Form(None, description="Số thứ tự câu hỏi")
     score_weight: float = Form(..., description="Hệ số điểm")
     level: str = Form(..., description="Độ khó")
     question_type: str = Form(..., description="Loại câu hỏi")

@@ -43,7 +43,7 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
         D: { content: '', image_file: null },
       },
       explanation: '',
-      questionNumber: 1,
+      sourceLabel: '',
       scoreWeight: 0.25,
     },
   });

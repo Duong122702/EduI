@@ -4,7 +4,7 @@ export interface QuestionFilterParams {
   level?: string;
   question_type?: string;
   content?: string;
-  question_number?: number;
+  source_label?: string;
   score_weight?: number;
 }
 

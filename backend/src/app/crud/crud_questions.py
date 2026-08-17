@@ -37,10 +37,8 @@ class QuestionCRUD:
                 query = query.where(Questions.question_type == filters.question_type)
             if filters.content is not None:
                 query = query.where(Questions.content.ilike(f"%{filters.content}%"))
-            if filters.question_number is not None:
-                query = query.where(
-                    Questions.question_number == filters.question_number
-                )
+            if filters.source_label is not None:
+                query = query.where(Questions.source_label == filters.source_label)
             if filters.score_weight is not None:
                 query = query.where(Questions.score_weight == filters.score_weight)
 
@@ -100,7 +98,7 @@ class QuestionCRUD:
         db_question = Questions(
             subject=data.subject,
             content=data.content,
-            question_number=data.question_number,
+            source_label=data.source_label,
             score_weight=data.score_weight,
             level=data.level,
             question_type=data.question_type,

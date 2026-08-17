@@ -158,36 +158,12 @@ function QuestionBank() {
 
       {/* 3. Hàng Công Cụ: AI Generation & Excel Import */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Card Trợ lý AI Sinh đề (Chiếm 7/12 cột trên màn hình lớn) */}
-        <Card className="relative overflow-hidden rounded-3xl border-none bg-[#0a3830] p-2 text-white shadow-md lg:col-span-7">
-          <CardHeader className="space-y-3 pb-2">
-            <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-700/50 bg-emerald-900/60 px-3 py-1 text-xs font-semibold text-emerald-200">
-                {/* <Sparkles className="h-3.5 w-3.5 text-amber-400" /> */}
-                TRỢ LÝ AI SINH ĐỀ
-              </span>
-            </div>
-            <CardTitle className="text-2xl font-extrabold text-white">
-              Tạo câu hỏi tự động bằng AI
-            </CardTitle>
-            <CardDescription className="text-sm leading-relaxed text-emerald-100/70">
-              Nhập chủ đề khoa học (ví dụ: &quot;Nguyên hàm&quot;, &quot;Thì
-              hiện tại hoàn thành&quot;) hoặc dán một đoạn văn bản/tài liệu để
-              AI phân tích và tự động soạn thảo câu hỏi.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Input
-                placeholder="Ví dụ: Tạo 3 câu hỏi trắc nghiệm về đạo hàm hàm hợp $e^{u}$..."
-                className="h-11 rounded-xl border-emerald-800/80 bg-[#05241f] text-sm text-white placeholder:text-emerald-200/40 focus-visible:ring-emerald-500"
-              />
-              <Button className="h-11 shrink-0 rounded-xl bg-orange-500 px-6 font-bold text-white shadow-md transition-all hover:bg-orange-600">
-                {/* <Sparkles className="mr-2 h-4 w-4" /> */}
-                AI Sinh đề
-              </Button>
-            </div>
-          </CardContent>
+        <Card className="flex min-h-55 items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-100 p-6 text-gray-500 shadow-sm lg:col-span-7 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-base font-semibold tracking-wide">
+              Đang phát triển...
+            </span>
+          </div>
         </Card>
 
         {/* Card Nhập Excel (Chiếm 5/12 cột trên màn hình lớn) */}

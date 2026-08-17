@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Integer, String, func
+from sqlalchemy import DateTime, Float, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,7 +13,7 @@ class Questions(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
     )
-    question_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    source_label: Mapped[str] = mapped_column(String, nullable=True)
     content: Mapped[str] = mapped_column(String, nullable=False)
     question_type: Mapped[str] = mapped_column(String, nullable=False)
     options: Mapped[dict | None] = mapped_column(JSONB, nullable=True)

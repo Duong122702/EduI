@@ -604,17 +604,17 @@ export const FormDataAdd = ({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
-            name="questionNumber"
+            name="sourceLabel"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-bold tracking-wider text-gray-600 uppercase">
-                  Số thứ tự câu:
+                  Tên đề và số thứ tự câu gốc:
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
+                    type="text"
                     className="rounded-xl bg-gray-50 text-xs focus-visible:border-teal-500 focus-visible:ring-2 focus-visible:ring-teal-300/50"
-                    placeholder="VD: 1"
+                    placeholder="Tên đề - Số thứ tự câu"
                     {...field}
                   />
                 </FormControl>

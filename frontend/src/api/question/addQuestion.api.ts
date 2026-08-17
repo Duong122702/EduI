@@ -21,8 +21,8 @@ export const addQuestionApi = async (questionData: QuestionFormAddValue) => {
   if (questionData.explanation) {
     formData.append('explanation', questionData.explanation);
   }
-  if (questionData.questionNumber !== undefined) {
-    formData.append('question_number', String(questionData.questionNumber));
+  if (questionData.sourceLabel !== undefined) {
+    formData.append('question_number', String(questionData.sourceLabel));
   }
   if (questionData.scoreWeight !== undefined) {
     formData.append('score_weight', String(questionData.scoreWeight));
