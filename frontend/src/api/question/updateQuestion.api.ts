@@ -1,0 +1,48 @@
+import type { QuestionFormAddValue } from '@/features/questionbank/Schemas/AddFormSchema';
+import axiosClient from '../config/axiosClient';
+import type { ApiResponse } from '@/schemas/response/apiResponse';
+
+export const updateQuestionApi = async (
+  id: string,
+  questionData: QuestionFormAddValue
+) => {
+  const formData = new FormData();
+
+  formData.append('subject', questionData.subject);
+  formData.append('level', questionData.level || 'Nhận biết');
+  formData.append('question_type', questionData.questionType);
+  formData.append('content', questionData.content);
+  formData.append('correct_answer', questionData.correct_answer);
+
+  if (questionData.question_image_file instanceof File) {
+    formData.append('question_image', questionData.question_image_file);
+  }
+  if (questionData.topic) formData.append('topic', questionData.topic);
+  if (questionData.explanation)
+    formData.append('explanation', questionData.explanation);
+  if (questionData.sourceLabel !== undefined)
+    formData.append('source_label', String(questionData.sourceLabel));
+  if (questionData.scoreWeight !== undefined)
+    formData.append('score_weight', String(questionData.scoreWeight));
+
+  if (questionData.options) {
+    (['A', 'B', 'C', 'D'] as const).forEach((key) => {
+      const option = questionData.options?.[key];
+      if (option) {
+        if (option.content)
+          formData.append(`option_${key}_content`, option.content);
+        if (option.image_file instanceof File)
+          formData.append(`option_${key}_image`, option.image_file);
+      }
+    });
+  }
+
+  // Sử dụng PUT hoặc POST tùy thuộc vào cấu hình Backend của bạn
+  return await axiosClient.put<ApiResponse<string>>(
+    `/questions/${id}`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
+  );
+};

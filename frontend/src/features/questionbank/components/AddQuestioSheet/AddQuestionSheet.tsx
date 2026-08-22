@@ -18,44 +18,112 @@ import FormDataAdd from './FormDataAdd';
 import type { Question } from '@/Models/questions.model';
 import { useAddQuestion } from '@/hooks/Question/useAddQuestion';
 import { Loader2 } from 'lucide-react';
+import { useUpdateQuestion } from '@/hooks/Question/useUpdateQuestion';
+import { useEffect } from 'react';
 
 interface OpenProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   questions?: Question[];
+  editData?: Question | null;
 }
 
-function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
+const defaultFormValues: QuestionFormAddValue = {
+  subject: '',
+  topic: '',
+  level: 'Nhận biết',
+  questionType: 'Trắc nghiệm',
+  content: '',
+  question_image_file: null,
+  correct_answer: '',
+  explanation: '',
+  sourceLabel: '',
+  scoreWeight: 0.25,
+  options: {
+    A: { content: '', image_file: null },
+    B: { content: '', image_file: null },
+    C: { content: '', image_file: null },
+    D: { content: '', image_file: null },
+  },
+};
+
+function AddQuestionSheet({
+  open,
+  onOpenChange,
+  questions,
+  editData,
+}: OpenProps) {
   const form = useForm<QuestionFormAddValue>({
     resolver: yupResolver(addFormSchema),
-    defaultValues: {
-      subject: '',
-      topic: '',
-      level: 'Nhận biết',
-      questionType: 'Trắc nghiệm',
-      content: '',
-      question_image_file: null,
-      correct_answer: '',
-      options: {
-        A: { content: '', image_file: null },
-        B: { content: '', image_file: null },
-        C: { content: '', image_file: null },
-        D: { content: '', image_file: null },
-      },
-      explanation: '',
-      sourceLabel: '',
-      scoreWeight: 0.25,
-    },
+    defaultValues: defaultFormValues,
   });
 
-  const { mutate: addQuestion, isPending } = useAddQuestion();
+  const { mutate: addQuestion, isPending: isAdding } = useAddQuestion();
+  const { mutate: updateQuestion, isPending: isUpdating } = useUpdateQuestion();
+
+  const isPending = isAdding || isUpdating;
+
+  useEffect(() => {
+    if (open) {
+      if (editData) {
+        form.reset({
+          subject: editData.subject || '',
+          topic: editData.topic || '',
+          level: editData.level || 'Nhận biết',
+          questionType: editData.questionType || 'Trắc nghiệm',
+          content: editData.content || '',
+          correct_answer: editData.correct_answer || '',
+          explanation: editData.explanation || '',
+          sourceLabel: editData.sourceLabel || '',
+          scoreWeight: editData.score_weight || 0.25,
+          question_image_file: null, // Ảnh cũ giữ nguyên trên backend nếu không chọn file mới
+          options: {
+            A: {
+              content:
+                editData.options?.find((o) => o.key === 'A')?.content || '',
+              image_file: null,
+            },
+            B: {
+              content:
+                editData.options?.find((o) => o.key === 'B')?.content || '',
+              image_file: null,
+            },
+            C: {
+              content:
+                editData.options?.find((o) => o.key === 'C')?.content || '',
+              image_file: null,
+            },
+            D: {
+              content:
+                editData.options?.find((o) => o.key === 'D')?.content || '',
+              image_file: null,
+            },
+          },
+        });
+      } else {
+        form.reset(defaultFormValues);
+      }
+    }
+  }, [open, editData, form]);
+
   const onSubmit = (data: QuestionFormAddValue) => {
-    addQuestion(data, {
-      onSuccess: () => {
-        form.reset();
-        onOpenChange(false);
-      },
-    });
+    if (editData) {
+      updateQuestion(
+        { id: editData.id, data },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+          },
+        }
+      );
+    } else {
+      addQuestion(data, {
+        onSuccess: () => {
+          form.reset();
+          onOpenChange(false);
+        },
+      });
+    }
   };
   const options = form.watch('options');
   return (
@@ -67,7 +135,7 @@ function AddQuestionSheet({ open, onOpenChange, questions }: OpenProps) {
       >
         <SheetHeader className="border-b pb-4 text-left">
           <SheetTitle className="text-lg font-bold tracking-wide text-gray-800 uppercase">
-            Thêm câu hỏi mới
+            {editData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
           </SheetTitle>
           <SheetDescription className="text-xs text-gray-500">
             Thiết lập tham số và nội dung đáp án chuẩn.

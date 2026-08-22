@@ -1,4 +1,5 @@
 import type { useQuestions } from '@/hooks/Question/useQuestion';
+import type { Question } from '@/Models/questions.model';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 
 export interface QuestionTableProps {
@@ -9,4 +10,5 @@ export interface QuestionTableProps {
   setParams: React.Dispatch<React.SetStateAction<GetQuestionsParams>>;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  onEdit: (question: Question) => void;
 }

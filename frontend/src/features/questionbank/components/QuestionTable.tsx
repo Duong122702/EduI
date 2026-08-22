@@ -31,6 +31,7 @@ import type { QuestionTableProps } from '@/types/QuestionType/questionTableProps
 import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
 import { levelColorMap } from '@/constants/levelColor';
 import { MathViewerKaTeX } from '@/components/ui/MathViewerKaTeX';
+import { useDeleteQuestion } from '@/hooks/Question/useDeleteQuestion';
 
 export const QuestionTable = ({
   onClick,
@@ -40,6 +41,7 @@ export const QuestionTable = ({
   setParams,
   searchTerm,
   setSearchTerm,
+  onEdit,
 }: QuestionTableProps) => {
   const questions = data?.data?.data.questions ?? [];
   const total = data?.data?.data?.total ?? 0;
@@ -48,6 +50,7 @@ export const QuestionTable = ({
 
   const { uniqueLevels, uniqueSubjects, uniqueTypes } =
     useQuestionOptions(questions);
+  const { mutate: deleteQuestion } = useDeleteQuestion();
   // Handler cập nhật Select Filter
   const handleFilterChange = (key: keyof GetQuestionsParams, value: string) => {
     setParams((prev) => ({
@@ -55,6 +58,12 @@ export const QuestionTable = ({
       [key]: value === 'all' ? '' : value,
       page: 1, // Reset về trang 1 khi đổi bộ lọc
     }));
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa câu hỏi này không?')) {
+      deleteQuestion(id);
+    }
   };
 
   // Handler chuyển trang
@@ -213,6 +222,7 @@ export const QuestionTable = ({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        onClick={() => onEdit(question)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -220,6 +230,7 @@ export const QuestionTable = ({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                        onClick={() => handleDelete(question.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

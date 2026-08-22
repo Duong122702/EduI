@@ -15,7 +15,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Input } from '@/components/ui/Input';
 import {
   Popover,
   PopoverContent,
@@ -27,6 +26,7 @@ import { useImportPdf } from '@/hooks/Question/useImportPdf';
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
 import { cn } from '@/lib/utils';
+import type { Question } from '@/Models/questions.model';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 import { getListLevelQuestion } from '@/utils/getListLevelQuestion';
 import { Label } from '@radix-ui/react-label';
@@ -44,6 +44,7 @@ import { useEffect, useRef, useState } from 'react';
 
 function QuestionBank() {
   const [isOpen, setIsOpen] = useState(false);
+  const [editQuestion, setEditQuestion] = useState<Question | null>(null);
   const [params, setParams] = useState<GetQuestionsParams>({
     page: 1,
     page_size: 10,
@@ -365,18 +366,29 @@ function QuestionBank() {
         </Card>
       </div>
       <QuestionTable
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setIsOpen(true);
+          setEditQuestion(null);
+        }}
         data={data}
         isPending={isPending}
         params={params}
         setParams={setParams}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        onEdit={(question) => {
+          setEditQuestion(question);
+          setIsOpen(true);
+        }}
       />
       <AddQuestionSheet
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={(value) => {
+          setIsOpen(value);
+          if (!value) setEditQuestion(null);
+        }}
         questions={data?.data.data.questions}
+        editData={editQuestion}
       ></AddQuestionSheet>
     </div>
   );
