@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
@@ -7,39 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import AddQuestionSheet from '@/features/questionbank/components/AddQuestioSheet/AddQuestionSheet';
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
 import { useImportPdf } from '@/hooks/Question/useImportPdf';
 import { useQuestions } from '@/hooks/Question/useQuestion';
-import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
-import { cn } from '@/lib/utils';
 import type { Question } from '@/Models/questions.model';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 import { getListLevelQuestion } from '@/utils/getListLevelQuestion';
-import { Label } from '@radix-ui/react-label';
-import {
-  BarChart3,
-  Check,
-  ChevronsUpDown,
-  Database,
-  FileText,
-  Loader2,
-  Package,
-  Plus,
-} from 'lucide-react';
+import { BarChart3, Database, FileText, Loader2, Package } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 function QuestionBank() {
@@ -54,10 +28,6 @@ function QuestionBank() {
     content: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
-
-  const [importSubject, setImportSubject] = useState<string>('');
-  const [subjectOpen, setSubjectOpen] = useState(false);
-  const [subjectSearch, setSubjectSearch] = useState('');
 
   const { mutate: importPdf, isPending: isImporting } = useImportPdf();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,21 +51,13 @@ function QuestionBank() {
   const { easyQuestions, hardQuestions, normalQuestions, veryHardQuestions } =
     getListLevelQuestion({ questions });
 
-  const { uniqueSubjects } = useQuestionOptions(questions);
-
   // --- HÀM XỬ LÝ UPLOAD PDF ---
   const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!importSubject) {
-      alert('Vui lòng chọn môn học trước khi import PDF!');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
     // Gọi API kèm theo subject đã chọn
-    importPdf({ file, subject: importSubject, level: 'Nhận biết' });
+    importPdf(file);
 
     // Reset thẻ input file
     if (fileInputRef.current) {
@@ -234,88 +196,6 @@ function QuestionBank() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 pt-2">
-            {/* Popover Chọn Môn Học (Giống form thêm câu hỏi) */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold tracking-wider text-gray-600 uppercase">
-                Áp dụng cho môn học
-              </Label>
-              <Popover open={subjectOpen} onOpenChange={setSubjectOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={subjectOpen}
-                    className={cn(
-                      'w-full justify-between bg-gray-50 text-xs font-normal',
-                      !importSubject && 'text-muted-foreground'
-                    )}
-                  >
-                    {importSubject || 'Chọn hoặc nhập môn học...'}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-[--radix-popover-trigger-width] p-0"
-                  align="start"
-                >
-                  <Command>
-                    <CommandInput
-                      placeholder="Tìm hoặc thêm mới..."
-                      value={subjectSearch}
-                      onValueChange={setSubjectSearch}
-                      className="text-xs"
-                    />
-                    <CommandList>
-                      <CommandEmpty className="p-1">
-                        {subjectSearch.trim() ? (
-                          <button
-                            type="button"
-                            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-50"
-                            onClick={() => {
-                              setImportSubject(subjectSearch.trim());
-                              setSubjectOpen(false);
-                              setSubjectSearch('');
-                            }}
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                            Thêm môn: "{subjectSearch.trim()}"
-                          </button>
-                        ) : (
-                          <p className="py-2 text-center text-xs text-gray-500">
-                            Không tìm thấy môn học
-                          </p>
-                        )}
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {uniqueSubjects.map((sub) => (
-                          <CommandItem
-                            key={sub}
-                            value={sub}
-                            onSelect={() => {
-                              setImportSubject(sub);
-                              setSubjectOpen(false);
-                              setSubjectSearch('');
-                            }}
-                            className="text-xs"
-                          >
-                            <Check
-                              className={cn(
-                                'mr-2 h-3.5 w-3.5',
-                                importSubject === sub
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              )}
-                            />
-                            {sub}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
             {/* Khu vực Tải lên PDF */}
             <div>
               <input
@@ -327,32 +207,22 @@ function QuestionBank() {
               />
               <div
                 onClick={() => {
-                  if (!importSubject) {
-                    alert('Vui lòng chọn môn học trước khi import!');
-                    return;
-                  }
                   if (!isImporting) fileInputRef.current?.click();
                 }}
                 className={`group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors ${
-                  !importSubject
-                    ? 'cursor-not-allowed border-slate-200 bg-slate-50/30'
-                    : isImporting
-                      ? 'cursor-wait border-emerald-200 bg-emerald-50/50'
-                      : 'cursor-pointer border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50'
+                  isImporting
+                    ? 'cursor-wait border-emerald-200 bg-emerald-50/50'
+                    : 'cursor-pointer border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50'
                 }`}
               >
                 <div className="mb-3 rounded-full border border-slate-100 bg-white p-3 shadow-sm transition-transform group-hover:scale-110">
                   {isImporting ? (
                     <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                   ) : (
-                    <FileText
-                      className={`h-6 w-6 transition-colors ${importSubject ? 'text-emerald-500 group-hover:text-emerald-600' : 'text-slate-400'}`}
-                    />
+                    <FileText className="h-6 w-6 text-emerald-500 transition-colors group-hover:text-emerald-600" />
                   )}
                 </div>
-                <p
-                  className={`text-xs font-bold ${importSubject ? 'text-emerald-700' : 'text-slate-500'}`}
-                >
+                <p className="text-xs font-bold text-emerald-700">
                   {isImporting
                     ? 'Đang xử lý PDF...'
                     : 'Tải lên tệp PDF từ máy tính'}

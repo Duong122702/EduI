@@ -6,15 +6,7 @@ export const useImportPdf = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      file,
-      subject,
-      level,
-    }: {
-      file: File;
-      subject: string;
-      level: string;
-    }) => importQuestionsFromPdfApi(file, subject, level),
+    mutationFn: (file: File) => importQuestionsFromPdfApi(file),
     onSuccess: () => {
       // Refresh lại danh sách câu hỏi trong bảng
       queryClient.invalidateQueries({ queryKey: ['questions'] });
