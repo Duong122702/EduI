@@ -1,12 +1,12 @@
+import json
 from typing import Annotated
 
-from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.utils.pdf_parser import parse_pdf_to_questions
-from backend.src.app.utils.storage import upload_bytes_to_supabase
+from backend.src.app.services.ai_agents.pipeline import execute_exam_agent_pipeline
 from fastapi import Depends, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
 from src.app.crud.crud_questions import QuestionCRUD
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
 from src.app.schemas.question.response.MostSubjectResponse import (
@@ -14,6 +14,8 @@ from src.app.schemas.question.response.MostSubjectResponse import (
 )
 from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionResponse import QuestionResponse
+from src.app.utils.pdf_parser import extract_text_with_image_placeholders
+from src.app.utils.storage import upload_bytes_to_supabase
 
 
 class QuestionService:
@@ -60,51 +62,75 @@ class QuestionService:
         subject: str,
         level: str,
     ) -> tuple[int, int]:
-        parsed_questions = parse_pdf_to_questions(file_bytes)
-        if not parsed_questions:
+        raw_text, images_dict = extract_text_with_image_placeholders(file_bytes)
+        if not raw_text.strip():
             raise CustomAPIException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 code="BAD_REQUEST",
                 message="Không tìm thấy câu hỏi nào hoặc sai format.",
             )
         # 2. Xử lý upload ảnh và chuẩn bị dữ liệu
+        exam_meta, parsed_questions = await execute_exam_agent_pipeline(raw_text)
+        if not parsed_questions:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BAD_REQUEST",
+                message="Không thể bóc tách câu hỏi từ tài liệu",
+            )
         questions_to_insert = []
+        detected_subject = exam_meta.get("subject") or subject
         for q_data in parsed_questions:
             try:
                 # Upload ảnh câu hỏi
                 q_img_url = None
-                if q_data.get("question_image"):
+                q_placeholder = q_data.get("question_image_placeholder")
+                if q_placeholder and q_placeholder in images_dict:
+                    img_info = images_dict[q_placeholder]
                     q_img_url = await upload_bytes_to_supabase(
-                        q_data["question_image"]["bytes"],
-                        q_data["question_image"]["ext"],
+                        img_info["bytes"], img_info["ext"]
                     )
 
                 # Upload ảnh đáp án
                 options_data = {}
+                raw_options = q_data.get("options") or {}
                 for key in ["A", "B", "C", "D"]:
-                    opt = q_data["options"][key]
+                    opt = raw_options.get(key, {})
+                    opt_content = (
+                        opt.get("content", "") if isinstance(opt, dict) else str(opt)
+                    )
+                    opt_placeholder = (
+                        opt.get("image_placeholder")
+                        if isinstance(opt, dict)
+                        else str(opt)
+                    )
+
                     opt_img_url = None
-                    if opt.get("image"):
+                    if opt_placeholder and opt_placeholder in images_dict:
+                        opt_img_info = images_dict[opt_placeholder]
                         opt_img_url = await upload_bytes_to_supabase(
-                            opt["image"]["bytes"], opt["image"]["ext"]
+                            opt_img_info["bytes"], opt_img_info["ext"]
                         )
                     options_data[key] = {
-                        "content": opt["content"],
+                        "content": opt_content,
                         "image_url": opt_img_url,
                     }
-
+                correct_ans = q_data.get("correct_answer")
+                if isinstance(correct_ans, dict):
+                    correct_ans = json.dumps(correct_ans, ensure_ascii=False)
                 # Chuẩn bị Dictionary dữ liệu
                 questions_to_insert.append(
                     {
-                        "subject": subject,
-                        "content": q_data["content"],
-                        "level": level,
-                        "question_type": "Trắc nghiệm",
-                        "correct_answer": q_data["correct_answer"],
+                        "subject": detected_subject,
+                        "content": q_data.get("content", ""),
+                        "level": q_data.get("level") or level,
+                        "question_type": q_data.get("question_type", "Trắc nghiệm"),
+                        "correct_answer": str(correct_ans or "A"),
                         "options": options_data,
                         "image_url": q_img_url,
-                        "score_weight": 0.25,
+                        "source_label": q_data.get("source_label", ""),
+                        "score_weight": q_data.get("score_weight", 0.25),
                         "explanation": q_data.get("explanation", ""),
+                        "topic": q_data.get("topic", None),
                     }
                 )
             except Exception as e:
