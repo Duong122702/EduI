@@ -32,6 +32,7 @@ import { useQuestionOptions } from '@/hooks/Question/useQuestionOptions';
 import { levelColorMap } from '@/constants/levelColor';
 import { MathViewerKaTeX } from '@/components/ui/MathViewerKaTeX';
 import { useDeleteQuestion } from '@/hooks/Question/useDeleteQuestion';
+import { ConfirmPopover } from '@/components/shared/confirmPopover';
 
 export const QuestionTable = ({
   onClick,
@@ -61,9 +62,7 @@ export const QuestionTable = ({
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa câu hỏi này không?')) {
-      deleteQuestion(id);
-    }
+    deleteQuestion(id);
   };
 
   // Handler chuyển trang
@@ -226,14 +225,23 @@ export const QuestionTable = ({
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                        onClick={() => handleDelete(question.id)}
+                      <ConfirmPopover
+                        title="Delete this question?"
+                        description="This action cannot be undone"
+                        onConfirm={() => handleDelete(question.id)}
+                        confirmText="Yes, delete"
+                        confirmVariant="destructive"
+                        cancelText="No"
+                        side="left"
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </ConfirmPopover>
                     </div>
                   </TableCell>
                 </TableRow>

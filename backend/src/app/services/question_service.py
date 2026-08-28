@@ -1,7 +1,6 @@
 import json
 from typing import Annotated
 
-from backend.src.app.services.ai_agents.pipeline import execute_exam_agent_pipeline
 from fastapi import Depends, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +13,7 @@ from src.app.schemas.question.response.MostSubjectResponse import (
 )
 from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionResponse import QuestionResponse
+from src.app.services.ai_agents.pipeline import execute_exam_agent_pipeline
 from src.app.utils.pdf_parser import extract_text_with_image_placeholders
 from src.app.utils.storage import upload_bytes_to_supabase
 
