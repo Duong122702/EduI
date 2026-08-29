@@ -2,6 +2,7 @@ import json
 from typing import Annotated
 from uuid import UUID
 
+from backend.src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from fastapi import Depends, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -163,6 +164,19 @@ class QuestionService:
                 message="Id không tồn tại",
             )
         await QuestionCRUD().delete_question_by_id(id=question_id, db=db)
+
+    async def update_question(
+        self,
+        db: AsyncSession,
+        id: str,
+        data: QuestionUpdateSchema,
+        question_image: UploadFile | None = None,
+        option_images: dict[str, UploadFile | None] | None = None,
+    ):
+        question_id = UUID(id)
+        return await QuestionCRUD().update_question_crud(
+            db, question_id, data, question_image, option_images
+        )
 
 
 question_service = QuestionService()

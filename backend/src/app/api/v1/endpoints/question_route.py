@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from backend.src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -197,3 +198,51 @@ async def delete_question_route(
         )
     await question_service.delete_question(db, id)
     return APIResponse(message="Xóa thành công câu hỏi")
+
+
+@router.put("/{question_id}")  # Thay đổi method thành PUT hoặc PATCH
+async def update_question_route(
+    question_id: str,  # Thêm tham số ID trên URL
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    data: Annotated[QuestionUpdateSchema, Depends()],
+    # Ảnh truyền lên hoàn toàn có thể là None
+    question_image: UploadFile | None = None,
+    option_A_image: UploadFile | None = None,
+    option_B_image: UploadFile | None = None,
+    option_C_image: UploadFile | None = None,
+    option_D_image: UploadFile | None = None,
+):
+    user_id = verify_token(token)
+    if not user_id:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ hoặc đã hết hạn",
+        )
+
+    user_role = await get_user_role(user_id, db)
+    if user_role != "teacher":
+        raise CustomAPIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
+            message="Bạn không có quyền cập nhật tài nguyên này",
+        )
+
+    # Gom các file ảnh option thành dictionary
+    option_images = {
+        "A": option_A_image,
+        "B": option_B_image,
+        "C": option_C_image,
+        "D": option_D_image,
+    }
+
+    await question_service.update_question(
+        db=db,
+        id=question_id,
+        data=data,
+        question_image=question_image,
+        option_images=option_images,
+    )
+
+    return APIResponse(message="Cập nhật câu hỏi thành công")

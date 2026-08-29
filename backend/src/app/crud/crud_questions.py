@@ -1,17 +1,19 @@
 import asyncio
 from uuid import UUID
 
-from fastapi import UploadFile
+from fastapi import UploadFile, status
 from sqlalchemy import delete, desc, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.app.core.exceptions import CustomAPIException
 from src.app.model.questions import Questions
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from src.app.schemas.question.response.MostSubjectResponse import (
     MostSubjectResponse,
 )
 from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
-from src.app.utils.storage import upload_file_to_supabase
+from src.app.utils.storage import delete_file_from_supabase, upload_file_to_supabase
 
 
 class QuestionCRUD:
@@ -166,3 +168,94 @@ class QuestionCRUD:
     async def delete_question_by_id(self, db: AsyncSession, id: UUID):
         await db.execute(delete(Questions).where(Questions.id == id))
         await db.commit()
+
+    async def update_question_crud(
+        self,
+        db: AsyncSession,
+        question_id: UUID,
+        data: QuestionUpdateSchema,
+        question_image: UploadFile | None = None,
+        option_images: dict[str, UploadFile | None] | None = None,
+    ):
+        result = await db.execute(select(Questions).where(Questions.id == question_id))
+        db_question = result.scalar_one()
+
+        if not db_question:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code="NOT_FOUND",
+                message="Không tìm thấy câu hỏi",
+            )
+        if question_image and question_image.filename:
+            old_image_url = db_question.image_url
+            new_image_url = await upload_file_to_supabase(question_image)
+            db_question.image_url = new_image_url
+            if old_image_url:
+                await delete_file_from_supabase(
+                    old_image_url, bucket_name="question_images"
+                )
+
+        existing_options = db_question.options or {}
+
+        option_contents = {
+            "A": data.option_A_content,
+            "B": data.option_B_content,
+            "C": data.option_C_content,
+            "D": data.option_D_content,
+        }
+
+        async def process_update_option(key: str):
+            new_content = option_contents.get(key)
+            new_img_file = option_images.get(key) if option_images else None
+
+            # Lấy state hiện tại của option này trong DB
+            current_opt = existing_options.get(key, {"content": "", "image_url": None})
+
+            updated_content = current_opt.get("content", "")
+            updated_image_url = current_opt.get("image_url")
+
+            # Cập nhật content nếu có gửi lên text mới
+            if new_content is not None:
+                updated_content = new_content
+
+            # Cập nhật ảnh nếu có gửi lên file mới
+            if new_img_file and new_img_file.filename:
+                updated_image_url = await upload_file_to_supabase(new_img_file)
+
+            # Trả về data đã được cập nhật
+            if updated_content or updated_image_url:
+                return key, {
+                    "content": updated_content,
+                    "image_url": updated_image_url,
+                }
+            return key, None
+
+        # Chạy song song quá trình upload ảnh options
+        keys = ["A", "B", "C", "D"]
+        results = await asyncio.gather(*(process_update_option(k) for k in keys))
+
+        # Cập nhật lại trường options
+        updated_options_data = {key: val for key, val in results if val is not None}
+        db_question.options = updated_options_data
+
+        # 4. Cập nhật các trường text khác (chỉ cập nhật những trường được gửi lên khác None)
+        # Lấy dữ liệu update dạng dict, loại bỏ những trường chưa được set
+        update_data = data.model_dump(exclude_unset=True)
+
+        # Bỏ qua các trường option text vì đã xử lý ở trên
+        for opt_key in [
+            "option_A_content",
+            "option_B_content",
+            "option_C_content",
+            "option_D_content",
+        ]:
+            update_data.pop(opt_key, None)
+
+        for field, value in update_data.items():
+            setattr(db_question, field, value)
+
+        # 5. Lưu vào DB
+        await db.commit()
+        await db.refresh(db_question)
+
+        return db_question
