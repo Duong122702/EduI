@@ -1,11 +1,15 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Float, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.database import Base
+
+if TYPE_CHECKING:
+    from src.app.model.question_exams import QuestionExam
 
 
 class Questions(Base):
@@ -27,3 +31,9 @@ class Questions(Base):
     level: Mapped[str | None] = mapped_column(String, nullable=True)
     subject: Mapped[str] = mapped_column(String, nullable=False)
     image_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    question_exams: Mapped[list[QuestionExam]] = relationship(
+        "QuestionExam",
+        back_populates="question",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

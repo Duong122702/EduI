@@ -170,3 +170,30 @@ async def import_questions_from_pdf_route(
     return APIResponse(
         message=f"Import thành công {success_count}/{total_count} câu hỏi."
     )
+
+
+@router.delete(
+    "/delete/{id}", response_model=APIResponse, status_code=status.HTTP_200_OK
+)
+async def delete_question_route(
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    id: str,
+):
+    user_id = verify_token(token)
+    if not user_id:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ",
+        )
+
+    user_role = await get_user_role(user_id, db)
+    if user_role != "teacher":
+        raise CustomAPIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
+            message="Bạn không có quyền thực hiện hành động này",
+        )
+    await question_service.delete_question(db, id)
+    return APIResponse(message="Xóa thành công câu hỏi")

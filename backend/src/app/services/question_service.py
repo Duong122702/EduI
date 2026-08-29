@@ -1,10 +1,10 @@
 import json
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.crud.crud_questions import QuestionCRUD
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
@@ -21,7 +21,7 @@ from src.app.utils.storage import upload_bytes_to_supabase
 class QuestionService:
     async def get_all_questions(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
         page: int = 1,
         page_size: int = 10,
         filters: QuestionFilterParams | None = None,
@@ -37,7 +37,7 @@ class QuestionService:
 
     async def create_question(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
         data: QuestionCreateSchema,
         question_image: UploadFile | None = None,
         option_images: dict[str, UploadFile | None] | None = None,
@@ -51,7 +51,7 @@ class QuestionService:
 
     async def get_most_subject(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> MostSubjectResponse | None:
         return await QuestionCRUD().get_most_subject_crud(db=db)
 
@@ -150,6 +150,19 @@ class QuestionService:
         )
 
         return success_count, len(parsed_questions)
+
+    async def delete_question(self, db: AsyncSession, id: str):
+        question_id = UUID(id)
+        isExist = await QuestionCRUD().check_exist_question_by_id_crud(
+            id=question_id, db=db
+        )
+        if not isExist:
+            raise CustomAPIException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code="ID_NOT_FOUND",
+                message="Id không tồn tại",
+            )
+        await QuestionCRUD().delete_question_by_id(id=question_id, db=db)
 
 
 question_service = QuestionService()

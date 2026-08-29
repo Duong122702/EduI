@@ -1,11 +1,10 @@
 import asyncio
-from typing import Annotated
+from uuid import UUID
 
-from fastapi import Depends, UploadFile
-from sqlalchemy import desc, func, select
+from fastapi import UploadFile
+from sqlalchemy import delete, desc, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.core.database import get_db
 from src.app.model.questions import Questions
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
 from src.app.schemas.question.response.MostSubjectResponse import (
@@ -18,7 +17,7 @@ from src.app.utils.storage import upload_file_to_supabase
 class QuestionCRUD:
     async def get_all_questions(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
         page: int = 1,
         page_size: int = 10,
         filters: QuestionFilterParams | None = None,
@@ -56,7 +55,7 @@ class QuestionCRUD:
 
     async def add_question_crud(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
         data: QuestionCreateSchema,
         question_image: UploadFile | None = None,
         option_images: dict[str, UploadFile | None] | None = None,
@@ -116,7 +115,7 @@ class QuestionCRUD:
 
     async def get_most_subject_crud(
         self,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> MostSubjectResponse | None:
         stmt = (
             select(Questions.subject, func.count().label("total_subjects"))
@@ -136,7 +135,7 @@ class QuestionCRUD:
         )
 
     async def add_multiple_questions_crud(
-        self, db: Annotated[AsyncSession, Depends()], question_data: list[dict]
+        self, db: AsyncSession, question_data: list[dict]
     ):
         db_questions = []
         for q_data in question_data:
@@ -158,3 +157,12 @@ class QuestionCRUD:
             db.add_all(db_questions)
             await db.commit()
         return len(db_questions)
+
+    async def check_exist_question_by_id_crud(self, db: AsyncSession, id: UUID):
+        stmt = select(exists().where(Questions.id == id))
+        result = await db.scalar(stmt)
+        return result
+
+    async def delete_question_by_id(self, db: AsyncSession, id: UUID):
+        await db.execute(delete(Questions).where(Questions.id == id))
+        await db.commit()
