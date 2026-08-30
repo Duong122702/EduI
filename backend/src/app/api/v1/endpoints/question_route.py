@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from backend.src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +8,7 @@ from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import verify_token
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from src.app.schemas.question.response.MostSubjectResponse import (
     MostSubjectResponse,
 )
@@ -173,9 +173,7 @@ async def import_questions_from_pdf_route(
     )
 
 
-@router.delete(
-    "/delete/{id}", response_model=APIResponse, status_code=status.HTTP_200_OK
-)
+@router.delete("/{id}", response_model=APIResponse, status_code=status.HTTP_200_OK)
 async def delete_question_route(
     token: Annotated[str, Depends(get_current_token)],
     db: Annotated[AsyncSession, Depends(get_db)],

@@ -34,21 +34,15 @@ class UserCRUD:
 
         return db_user
 
-    async def get_user_by_email(
-        self, email: str, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> User | None:
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> User | None:
         result = await db.execute(select(User).filter(User.email == email))
         return result.scalars().first()
 
-    async def get_user_by_id(
-        self, id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> User | None:
+    async def get_user_by_id(self, id: UUID, db: AsyncSession) -> User | None:
         result = await db.execute(select(User).filter(User.id == id))
         return result.scalars().first()
 
-    async def get_user_by_user_id(
-        self, user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> User | None:
+    async def get_user_by_user_id(self, user_id: UUID, db: AsyncSession) -> User | None:
         result = await db.execute(select(User).filter(User.id == user_id))
         return result.scalars().first()
 
@@ -56,7 +50,7 @@ class UserCRUD:
         self,
         user_id: UUID,
         user_data: UpdateUser,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> User | None:
         db_user = await db.execute(select(User).filter(User.id == user_id))
         result = db_user.scalars().first()
@@ -69,9 +63,7 @@ class UserCRUD:
         await db.refresh(result)
         return result
 
-    async def active_user(
-        self, user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> None:
+    async def active_user(self, user_id: UUID, db: AsyncSession) -> None:
         stmt = update(User).where(User.id == user_id).values(is_verified=True)
         await db.execute(stmt)
         await db.commit()

@@ -10,9 +10,12 @@ from fastapi.routing import APIRoute
 
 from src.app.api.v1.api import api_router
 from src.app.core.exceptions import CustomAPIException
+from src.app.model import Base
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("fastapi_logger")
+# In ra số lượng bảng đã được đăng ký thành công để Linter không xóa import
+print(f"Loaded {len(Base.metadata.tables)} database tables.")
 
 
 # 2. Định nghĩa Custom Route Handler để bắt Response

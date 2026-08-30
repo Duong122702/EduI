@@ -2,13 +2,13 @@ import json
 from typing import Annotated
 from uuid import UUID
 
-from backend.src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from fastapi import Depends, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.exceptions import CustomAPIException
 from src.app.crud.crud_questions import QuestionCRUD
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
+from src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from src.app.schemas.question.response.MostSubjectResponse import (
     MostSubjectResponse,
 )

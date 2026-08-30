@@ -1,17 +1,15 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Annotated
 from uuid import UUID
 
 import jwt
-from fastapi import Depends, status
+from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.deps import verify_email_unique
 from src.app.constant.codes import UserCodes, UserSessionCodes
 from src.app.constant.messages import UserMessages, UserSessionMessages
 from src.app.core.config import settings
-from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import (
     create_access_token,
@@ -32,9 +30,7 @@ from src.app.schemas.user_session.UserSessionCreate import UserSessionCreate
 
 
 class UserService:
-    async def register_user(
-        self, user_data: CreateUser, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> str:
+    async def register_user(self, user_data: CreateUser, db: AsyncSession) -> str:
         existing_user = await verify_email_unique(user_data, db)
         if existing_user:
             raise CustomAPIException(
@@ -49,9 +45,7 @@ class UserService:
         )
         return verify_token
 
-    async def verify_email(
-        self, token: str, db: Annotated[AsyncSession, Depends(get_db)]
-    ) -> None:
+    async def verify_email(self, token: str, db: AsyncSession) -> None:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
             user_id_str: str | None = payload.get("sub")
@@ -90,7 +84,7 @@ class UserService:
         self,
         user_data: UserLogin,
         isKeepLogin: bool | None,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> UserLoginResponse:
         user = await user_crud.get_user_by_email(user_data.email, db)
         if not user:
@@ -134,7 +128,7 @@ class UserService:
         user_id: UUID,
         ip_address: str,
         user_agent: str,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> User:
         user = await user_crud.get_user_by_id(user_id, db)
         if user is None:
@@ -160,7 +154,7 @@ class UserService:
         refresh_token: str,
         ip_address: str,
         user_agent: str,
-        db: Annotated[AsyncSession, Depends(get_db)],
+        db: AsyncSession,
     ) -> RefreshSchema:
         # 1. Giải mã JWT và xác thực cơ bản
         user_id = verify_refresh_token(refresh_token)
