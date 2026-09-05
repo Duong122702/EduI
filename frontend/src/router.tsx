@@ -1,16 +1,25 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import Home from './pages/Home';
-import { useAuthStore } from './store/authStore';
+import { useAuthStore, type UserRole } from './store/authStore';
 import Auth from './pages/Auth/Auth';
 import DashBoardLayout from './layouts/DashBoardLayout';
 import QuestionBank from './pages/Teacher/QuestionBank';
+import { ExamRoom } from './pages/Teacher/ExamRoom';
 
-const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  allowedRoles?: UserRole[]; // Danh sách role được phép truy cập
+}
+
+const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const role = useAuthStore((state) => state.user?.role);
 
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
+  }
+  if (allowedRoles && (!role || !allowedRoles.includes(role))) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;
@@ -60,7 +69,7 @@ export const router = createBrowserRouter([
           // các Route dành cho Giảng viên (TEACHER)
           {
             path: 'exams', // Khớp với NavItem to="/dashboard/exams"
-            //element: <ExamManagement />,
+            element: <ExamRoom />,
           },
           {
             path: 'questions', // Khớp với NavItem to="/dashboard/questions"
