@@ -1,7 +1,34 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { ExamRoomTable } from '@/features/examroom/components/ExamRoomTable';
+import { useExams } from '@/hooks/Exam/useExam';
+import type { ExamParamPayload } from '@/schemas/payload/examParamPayload.type';
 import { CirclePlay, FileStack } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export const ExamRoom = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [params, setParams] = useState<ExamParamPayload>({
+    page: 1,
+    page_size: 10,
+    title: '',
+    status: '',
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParams((prevParams) => ({
+        ...prevParams,
+        search: searchQuery,
+      }));
+    }, 400); // 400ms delay
+
+    return () => clearTimeout(timer); // Cleanup the timer on unmount or when searchQuery/activeTab changes
+  }, [searchQuery]);
+
+  const { data, isPending } = useExams(params);
+  const totalExams = data?.total || 0;
+  const exams = data?.exams || [];
+
   return (
     <div className="w-full space-y-6 p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -92,6 +119,17 @@ export const ExamRoom = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+      <div>
+        <ExamRoomTable
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          params={params}
+          setParams={setParams}
+          exams={exams}
+          totalExams={totalExams}
+          isPending={isPending}
+        />
       </div>
     </div>
   );
