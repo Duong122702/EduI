@@ -12,7 +12,7 @@ class DataResponse(AppBaseModel):
     created_at: str
     status: str
     subject: str
-    exam_room_code: list[str | None] = []
+    room_codes: list[str | None] = []
 
 
 class ExamResponse(AppBaseModel):
