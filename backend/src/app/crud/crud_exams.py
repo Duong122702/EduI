@@ -1,5 +1,6 @@
 from backend.src.app.model.exam_rooms import ExamRoom
 from backend.src.app.model.exams import Exam
+from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
 from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
 from backend.src.app.schemas.exam.response.exam_response import DataResponse
 from sqlalchemy import func, select
@@ -52,3 +53,17 @@ class ExamCRUD:
             exams_list.append(exam_obj)
 
         return exams_list, total
+
+    async def create_exams(self, db: AsyncSession, data: CreateExamSchema) -> Exam:
+        new_exam = Exam(
+            title=data.title,
+            description=data.description,
+            duration=data.duration,
+            created_by=data.created_by,
+            status=data.status,
+            subject_id=data.subject_id,
+        )
+        db.add(new_exam)
+        await db.commit()
+        await db.refresh(new_exam)
+        return new_exam

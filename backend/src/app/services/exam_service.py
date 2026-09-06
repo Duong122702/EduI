@@ -1,4 +1,6 @@
 from backend.src.app.crud.crud_exams import ExamCRUD
+from backend.src.app.model.exams import Exam
+from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
 from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
 from backend.src.app.schemas.exam.response.exam_response import ExamResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +18,10 @@ class ExamService:
             db, params=params, page=page, page_size=page_size
         )
         return ExamResponse(data=exams_list, total=total)
+
+    async def create_exams(self, db: AsyncSession, data: CreateExamSchema) -> Exam:
+        new_exam = await ExamCRUD().create_exams(db, data)
+        return new_exam
 
 
 exam_service = ExamService()
