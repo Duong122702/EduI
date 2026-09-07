@@ -23,5 +23,10 @@ class ExamService:
         new_exam = await ExamCRUD().create_exams(db, data)
         return new_exam
 
+    async def add_question_to_exam(
+        self, db: AsyncSession, exam_question_data: list[dict]
+    ) -> None:
+        await ExamCRUD().add_questions_to_exam(db, exam_question_data)
+
 
 exam_service = ExamService()

@@ -259,3 +259,10 @@ class QuestionCRUD:
         await db.refresh(db_question)
 
         return db_question
+
+    async def get_questions_by_questions_ids(
+        self, db: AsyncSession, question_ids: list[str]
+    ):
+        stmt = select(Questions).where(Questions.id.in_(question_ids))
+        result = await db.execute(stmt)
+        return result.scalars().all()

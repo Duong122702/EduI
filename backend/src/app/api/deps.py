@@ -1,6 +1,8 @@
 from typing import Annotated
 from uuid import UUID
 
+from backend.src.app.crud.crud_questions import QuestionCRUD
+from backend.src.app.model.questions import Questions
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,3 +36,10 @@ async def get_user_role(
     uuid_user_id = UUID(user_id)
     user = await user_crud.get_user_by_id(uuid_user_id, db)
     return user.role if user else None
+
+
+async def get_questions_by_questions_ids(
+    question_ids: list[str], db: Annotated[AsyncSession, Depends(get_db)]
+) -> list[Questions]:
+    questions = await QuestionCRUD().get_questions_by_questions_ids(db, question_ids)
+    return list(questions)

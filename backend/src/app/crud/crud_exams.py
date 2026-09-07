@@ -1,5 +1,6 @@
 from backend.src.app.model.exam_rooms import ExamRoom
 from backend.src.app.model.exams import Exam
+from backend.src.app.model.question_exams import QuestionExam
 from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
 from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
 from backend.src.app.schemas.exam.response.exam_response import DataResponse
@@ -61,9 +62,24 @@ class ExamCRUD:
             duration=data.duration,
             created_by=data.created_by,
             status=data.status,
-            subject_id=data.subject_id,
+            subject=data.subject,
         )
         db.add(new_exam)
         await db.commit()
         await db.refresh(new_exam)
         return new_exam
+
+    async def add_questions_to_exam(
+        self, db: AsyncSession, exam_question_data: list[dict]
+    ):
+        new_question_exams = []
+        for item in exam_question_data:
+            new_question_exam = QuestionExam(
+                exam_id=item["exam_id"],
+                question_id=item["question_id"],
+                question_type=item["question_type"],
+            )
+            new_question_exams.append(new_question_exam)
+        db.add_all(new_question_exams)
+        await db.commit()
+        return None
