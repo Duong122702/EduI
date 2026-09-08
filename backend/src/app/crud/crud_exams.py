@@ -55,6 +55,10 @@ class ExamCRUD:
 
         return exams_list, total
 
+    async def get_exam_by_id(self, db: AsyncSession, exam_id: str) -> Exam | None:
+        exam = await db.get(Exam, exam_id)
+        return exam
+
     async def create_exams(self, db: AsyncSession, data: CreateExamSchema) -> Exam:
         new_exam = Exam(
             title=data.title,

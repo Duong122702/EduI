@@ -19,6 +19,10 @@ class ExamService:
         )
         return ExamResponse(data=exams_list, total=total)
 
+    async def get_exam_by_id(self, db: AsyncSession, exam_id: str) -> Exam | None:
+        exam = await ExamCRUD().get_exam_by_id(db, exam_id)
+        return exam
+
     async def create_exams(self, db: AsyncSession, data: CreateExamSchema) -> Exam:
         new_exam = await ExamCRUD().create_exams(db, data)
         return new_exam
