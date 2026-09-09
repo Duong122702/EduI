@@ -30,7 +30,7 @@ export const DashBoardLayout = () => {
               <NavItem
                 iconName="iconDocument"
                 title="Quản lý đề thi & phòng"
-                to="/dashboard/exams"
+                to="/exams"
               />
               <NavItem
                 iconName="iconDatabase"
