@@ -1,6 +1,6 @@
 import random
 
-from backend.src.app.constant.subject_rules import SUBJECT_RULES, QuestionType, Subject
+from src.app.constant.subject_rules import SUBJECT_RULES, QuestionType, Subject
 
 
 def get_index_pool_for_subject(subject: str) -> dict[QuestionType, list[int]]:

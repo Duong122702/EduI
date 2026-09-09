@@ -1,6 +1,6 @@
 import uuid
 
-from backend.src.app.schemas.base import AppBaseModel
+from src.app.schemas.base import AppBaseModel
 
 
 class DataResponse(AppBaseModel):

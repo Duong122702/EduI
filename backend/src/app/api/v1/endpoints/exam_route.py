@@ -2,23 +2,24 @@ from collections import Counter
 from typing import Annotated
 from uuid import UUID
 
-from backend.src.app.api.deps import (
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.api.deps import (
     get_current_token,
     get_questions_by_questions_ids,
     get_user_role,
 )
-from backend.src.app.constant.subject_rules import SUBJECT_RULES, QuestionType, Subject
-from backend.src.app.core.database import get_db
-from backend.src.app.core.exceptions import CustomAPIException
-from backend.src.app.core.security import verify_token
-from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
-from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
-from backend.src.app.schemas.exam.response.exam_response import ExamResponse
-from backend.src.app.schemas.response import APIResponse
-from backend.src.app.services.exam_service import exam_service
-from backend.src.app.utils.index_pool import get_index_pool_for_subject
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from src.app.constant.subject_rules import SUBJECT_RULES, QuestionType, Subject
+from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
+from src.app.core.security import verify_token
+from src.app.schemas.exam.create_exam_schema import CreateExamSchema
+from src.app.schemas.exam.exam_schema import ExamSchemaFilter
+from src.app.schemas.exam.response.exam_response import ExamResponse
+from src.app.schemas.response import APIResponse
+from src.app.services.exam_service import exam_service
+from src.app.utils.index_pool import get_index_pool_for_subject
 
 router = APIRouter()
 

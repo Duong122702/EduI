@@ -1,9 +1,10 @@
 import uuid
 
-from backend.src.app.core.database import Base
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.app.core.database import Base
 
 
 class Exam(Base):

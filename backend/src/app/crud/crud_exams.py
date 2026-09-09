@@ -1,11 +1,12 @@
-from backend.src.app.model.exam_rooms import ExamRoom
-from backend.src.app.model.exams import Exam
-from backend.src.app.model.question_exams import QuestionExam
-from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
-from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
-from backend.src.app.schemas.exam.response.exam_response import DataResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.model.exam_rooms import ExamRoom
+from src.app.model.exams import Exam
+from src.app.model.question_exams import QuestionExam
+from src.app.schemas.exam.create_exam_schema import CreateExamSchema
+from src.app.schemas.exam.exam_schema import ExamSchemaFilter
+from src.app.schemas.exam.response.exam_response import DataResponse
 
 
 class ExamCRUD:

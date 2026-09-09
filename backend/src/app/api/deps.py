@@ -1,14 +1,14 @@
 from typing import Annotated
 from uuid import UUID
 
-from backend.src.app.crud.crud_questions import QuestionCRUD
-from backend.src.app.model.questions import Questions
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
+from src.app.crud.crud_questions import QuestionCRUD
 from src.app.crud.crud_user import user_crud
+from src.app.model.questions import Questions
 from src.app.model.user import User
 from src.app.schemas.user.CreateUser import CreateUser
 

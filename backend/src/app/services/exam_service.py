@@ -1,9 +1,10 @@
-from backend.src.app.crud.crud_exams import ExamCRUD
-from backend.src.app.model.exams import Exam
-from backend.src.app.schemas.exam.create_exam_schema import CreateExamSchema
-from backend.src.app.schemas.exam.exam_schema import ExamSchemaFilter
-from backend.src.app.schemas.exam.response.exam_response import ExamResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.app.crud.crud_exams import ExamCRUD
+from src.app.model.exams import Exam
+from src.app.schemas.exam.create_exam_schema import CreateExamSchema
+from src.app.schemas.exam.exam_schema import ExamSchemaFilter
+from src.app.schemas.exam.response.exam_response import ExamResponse
 
 
 class ExamService:
