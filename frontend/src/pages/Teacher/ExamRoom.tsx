@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ExamRoomTable } from '@/features/examroom/components/ExamRoomTable';
 import { useExams } from '@/hooks/Exam/useExam';
 import type { ExamParamPayload } from '@/schemas/payload/examParamPayload.type';
-import { CirclePlay, FileStack } from 'lucide-react';
+import { CirclePlay, FileCheck, FileStack } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export const ExamRoom = () => {
@@ -114,8 +114,8 @@ export const ExamRoom = () => {
                 </span>
               </p>
             </div>
-            <div className="rounded-xl bg-amber-50 p-3 text-teal-500">
-              <FileStack className="h-6 w-6" />
+            <div className="rounded-xl bg-teal-50 p-3 text-teal-500">
+              <FileCheck className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>

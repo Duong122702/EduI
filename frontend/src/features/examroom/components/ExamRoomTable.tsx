@@ -52,7 +52,7 @@ export const ExamRoomTable = ({
     <>
       <Card className="rounded-2xl border-slate-100 bg-white p-6 shadow-sm">
         <div className="flex gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-3">
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
             <div className="relative w-1/3 min-w-65">
               <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
@@ -65,7 +65,7 @@ export const ExamRoomTable = ({
               />
             </div>
             {/* Tabs */}
-            <div className="flex">
+            <div className="flex w-1/3">
               <Tabs
                 defaultValue="all"
                 value={params.status || 'all'}
@@ -80,9 +80,9 @@ export const ExamRoomTable = ({
                       value={item}
                       className="w-1/3 text-xs font-bold data-[state=active]:border data-[state=active]:border-teal-400 data-[state=active]:bg-teal-200/30 data-[state=active]:text-teal-800"
                     >
-                      {item === 'all' && 'Tất cả đề thi'}
-                      {item === 'Chốt đề' && 'Đề thi đang hoạt động'}
-                      {item === 'Bản nháp' && 'Đề thi không hoạt động'}
+                      {item === 'all' && 'Tất cả'}
+                      {item === 'Chốt đề' && 'Đề hoàn thành'}
+                      {item === 'Bản nháp' && 'Đề nháp'}
                     </TabsTrigger>
                   ))}
                 </TabsList>
