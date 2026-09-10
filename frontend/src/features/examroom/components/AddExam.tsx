@@ -37,6 +37,12 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { ListQuestionExam } from './ListQuestionExam';
+
+interface AddExamProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 const defaultFormValues: addExamFormSchemaType = {
   title: '',
@@ -47,20 +53,20 @@ const defaultFormValues: addExamFormSchemaType = {
   question_ids: [],
 };
 
-export const AddExam = () => {
+export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
   const form = useForm<addExamFormSchemaType>({
     resolver: yupResolver(addExamFormSchema),
     defaultValues: defaultFormValues,
   });
-  const [questionCount, setQuestionCount] = useState(0);
   return (
-    <div className="w-full space-y-6 p-6">
+    <div className={`w-full space-y-6 p-6 ${isOpen ? 'block' : 'hidden'}`}>
       <div className="flex flex-col gap-4 border-b border-slate-300 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-3">
           <Button
             variant={'dark'}
             size={'lg'}
             className="rounded-lg p-2 text-slate-400 hover:text-slate-900"
+            onClick={() => setIsOpen(false)}
           >
             <ChevronLeft />
           </Button>
@@ -79,9 +85,9 @@ export const AddExam = () => {
           Lưu đề thi
         </Button>
       </div>
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+      <div className="">
         <Form {...form}>
-          <form className="">
+          <form className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
             <div className="space-y-6 rounded-lg border border-slate-300 bg-white p-6 shadow-sm lg:col-span-4">
               <div className="flex items-center font-bold tracking-wider uppercase">
                 <SlidersVertical className="mr-2 h-4 w-4 text-slate-400" />
@@ -216,11 +222,11 @@ export const AddExam = () => {
                               <CommandGroup>
                                 {[
                                   'Toán',
-                                  'Lý',
-                                  'Hóa',
-                                  'Sinh',
-                                  'Sử',
-                                  'Địa',
+                                  'Vật lý',
+                                  'Hóa học',
+                                  'Sinh học',
+                                  'Lịch sử',
+                                  'Địa lý',
                                   'Tiếng anh',
                                 ].map((sub) => (
                                   <CommandItem
@@ -252,12 +258,27 @@ export const AddExam = () => {
               />
             </div>
             <div className="space-y-4 lg:col-span-8">
-              <div className="flex items-center gap-3 rounded-2xl border-b border-slate-300 bg-white px-4 py-2 shadow-sm">
-                <CircleQuestionMark />
-                <span className="text-sm font-medium text-gray-700">
-                  Danh sách câu hỏi: {questionCount}
-                </span>
-              </div>
+              <FormField
+                control={form.control}
+                name="question_ids"
+                render={({ field }) => (
+                  <div>
+                    <div className="flex items-center gap-3 rounded-2xl border-b border-slate-300 bg-white px-4 py-3 shadow-sm">
+                      <CircleQuestionMark />
+                      <span className="text-sm font-medium text-gray-700">
+                        Danh sách câu hỏi: {field.value?.length || 0}
+                      </span>
+                    </div>
+                    <div className="rounded-xl border-slate-400 p-3 shadow-sm">
+                      <ListQuestionExam
+                        selectedIds={(field.value as string[]) || []}
+                        onUpdateIds={field.onChange}
+                        subject={form.getValues('subject')}
+                      />
+                    </div>
+                  </div>
+                )}
+              />
             </div>
           </form>
         </Form>

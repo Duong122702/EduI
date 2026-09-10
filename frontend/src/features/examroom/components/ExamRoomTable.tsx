@@ -31,6 +31,7 @@ interface ExamRoomTableProps {
   exams: Exam[];
   totalExams: number;
   isPending: boolean;
+  setIsAddExamOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ExamRoomTable = ({
@@ -41,6 +42,7 @@ export const ExamRoomTable = ({
   isPending,
   params,
   setParams,
+  setIsAddExamOpen,
 }: ExamRoomTableProps) => {
   const totalPages = Math.ceil(totalExams / (params.page_size || 10)) || 1;
   const handleChangePage = (newPage: number) => {
@@ -89,7 +91,7 @@ export const ExamRoomTable = ({
               </Tabs>
             </div>
             <Button
-              onClick={() => {}}
+              onClick={() => setIsAddExamOpen(true)}
               className="h-11 shrink-0 rounded-2xl bg-orange-500 px-5 font-bold text-white shadow-sm transition-all hover:bg-orange-600"
             >
               <CirclePlus className="mr-2 h-5 w-5" />
