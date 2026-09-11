@@ -59,6 +59,7 @@ export const TypeFormField = ({ form }: TypeFormFieldProps) => {
                           {(['A', 'B', 'C', 'D'] as const).map((key) => (
                             <RenderOptionItem
                               key={key}
+                              optionKey={key}
                               isTrueFalse={false}
                               form={form}
                             />
@@ -90,6 +91,7 @@ export const TypeFormField = ({ form }: TypeFormFieldProps) => {
                           {(['A', 'B', 'C', 'D'] as const).map((key) => (
                             <RenderOptionItem
                               key={key}
+                              optionKey={key}
                               isTrueFalse={true}
                               form={form}
                             />

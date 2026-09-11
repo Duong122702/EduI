@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import 'mathlive';
 import type { MathfieldElement } from 'mathlive';
 
-// Khai báo kiểu dữ liệu cho <math-field> chuẩn React 18/19
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -43,11 +42,9 @@ export function MathInput({ value, onChange }: MathInputProps) {
     const mf = mfRef.current;
     if (!mf) return;
 
-    // 1. Cấu hình tính năng trên ô nhập
     mf.smartFence = true;
-    mf.mathVirtualKeyboardPolicy = 'auto'; // 'auto' tự mở khi focus, 'manual' hiện nút bấm mở bàn phím
+    mf.mathVirtualKeyboardPolicy = 'auto';
 
-    // 2. Cấu hình các bộ bàn phím ảo toàn cục
     if (typeof window !== 'undefined' && window.mathVirtualKeyboard) {
       window.mathVirtualKeyboard.layouts = [
         'numeric',
@@ -62,11 +59,24 @@ export function MathInput({ value, onChange }: MathInputProps) {
       onChange(latexOutput);
     };
 
+    // --- FIX ENTER SUBMIT FORM ---
+    // Chặn sự kiện phím Enter trực tiếp từ core của math-field
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Chặn xuống dòng / submit form
+        e.stopPropagation(); // Ngăn sự kiện nổi bọt lên <form>
+      }
+    };
+
     mf.addEventListener('input', handleInput);
-    return () => mf.removeEventListener('input', handleInput);
+    mf.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      mf.removeEventListener('input', handleInput);
+      mf.removeEventListener('keydown', handleKeyDown);
+    };
   }, [onChange]);
 
-  // Cập nhật giá trị nếu value từ bên ngoài Form thay đổi
   useEffect(() => {
     const mf = mfRef.current;
     if (mf && mf.getValue('latex-expanded') !== value) {
@@ -75,7 +85,17 @@ export function MathInput({ value, onChange }: MathInputProps) {
   }, [value]);
 
   return (
-    <div className="border-input bg-background ring-offset-background focus-within:ring-ring relative min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-offset-2">
+    <div
+      className="border-input bg-background ring-offset-background focus-within:ring-ring relative min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-offset-2"
+      // --- FIX NÚT ENTER ---
+      // Ngăn nút Enter làm submit form gây đóng form/sidebar
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+    >
       <math-field
         ref={mfRef}
         style={

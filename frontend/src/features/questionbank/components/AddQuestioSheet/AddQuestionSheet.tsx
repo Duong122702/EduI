@@ -125,11 +125,37 @@ function AddQuestionSheet({
       });
     }
   };
+  // THÊM ĐOẠN NÀY VÀO TRONG COMPONENT AddQuestionSheet
+  const handleKeepSheetOpen = (e: Event) => {
+    // Radix UI bọc event thật vào trong thuộc tính e.detail.originalEvent
+    const originalEvent = (e as any).detail?.originalEvent;
+    if (!originalEvent) return;
+
+    // Phải dùng composedPath() để nhìn xuyên qua Shadow DOM của MathLive
+    const path =
+      typeof originalEvent.composedPath === 'function'
+        ? originalEvent.composedPath()
+        : [];
+
+    // Kiểm tra xem cú click/focus có rơi vào virtual keyboard không
+    const isMathKeyboard = path.some(
+      (el: any) => el?.tagName?.toLowerCase() === 'math-virtual-keyboard'
+    );
+
+    if (isMathKeyboard) {
+      // e.preventDefault() ở đây không chặn event của trình duyệt,
+      // mà nó nói với Radix UI rằng: "Tôi đã xử lý vụ này rồi, anh đừng đóng form nữa!"
+      e.preventDefault();
+    }
+  };
   const options = form.watch('options');
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       {/* Nội dung Sheet trượt từ bên phải ra (side="right") */}
       <SheetContent
+        onPointerDownOutside={handleKeepSheetOpen}
+        onInteractOutside={handleKeepSheetOpen}
+        onFocusOutside={handleKeepSheetOpen}
         side="right"
         className="w-full overflow-y-auto p-4 sm:max-w-125"
       >
