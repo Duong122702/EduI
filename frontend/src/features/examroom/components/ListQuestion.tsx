@@ -10,6 +10,7 @@ import {
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import type { Question } from '@/Models/questions.model';
 import { Check } from 'lucide-react';
+import { ContentRenderer } from './ContentRenderer';
 
 interface ListQuestionProps {
   open: boolean;
@@ -89,7 +90,11 @@ export const ListQuestion = ({
                       className="mr-2 h-8 w-8 rounded object-cover"
                     />
                   )}
-                  <span>{question.content}</span>
+                  <ContentRenderer
+                    content={question.content}
+                    block={true}
+                    imageUrl={question.image_url}
+                  />
 
                   {isSelected && <Check className="h-4 w-4 text-gray-400" />}
                 </CommandItem>

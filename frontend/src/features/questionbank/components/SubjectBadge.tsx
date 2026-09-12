@@ -18,7 +18,7 @@ export const SubjectBadge = ({ subject, topic }: SubjectBadgeProps) => {
   return (
     <div className="flex items-center gap-3">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-500">
-        <IconComponent className="h-5 w-5" />
+        <IconComponent className={cn('h-5 w-5', config.iconColor)} />
       </div>
       <div className="space-y-1">
         <p className="px-2 font-bold text-slate-600">{config.name}</p>

@@ -65,7 +65,7 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
           <Button
             variant={'dark'}
             size={'lg'}
-            className="rounded-lg p-2 text-slate-400 hover:text-slate-900"
+            className="cursor-pointer rounded-lg px-3 text-white hover:opacity-80"
             onClick={() => setIsOpen(false)}
           >
             <ChevronLeft />
@@ -273,7 +273,7 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
                       <ListQuestionExam
                         selectedIds={(field.value as string[]) || []}
                         onUpdateIds={field.onChange}
-                        subject={form.getValues('subject')}
+                        subject={form.watch('subject')}
                       />
                     </div>
                   </div>

@@ -9,6 +9,8 @@ import type { Question } from '@/Models/questions.model';
 import { Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ListQuestion } from './ListQuestion';
+import { ContentRenderer } from './ContentRenderer';
+import { SubjectBadge } from '@/features/questionbank/components/SubjectBadge';
 
 interface ListQuestionExamProps {
   selectedIds?: string[]; // Mảng ID câu hỏi từ form
@@ -98,40 +100,26 @@ export const ListQuestionExam = ({
             </Button>
           </div>
           <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-            <Card className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md">
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                <div className="flex flex-wrap gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="border-transparent bg-transparent text-base text-slate-900"
-                  >
-                    'topic'
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
-                  >
-                    'level'
-                  </Badge>
-                </div>
-                <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
-              </CardHeader>
-              <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                <p className="text-foreground text-base leading-relaxed sm:text-lg">
-                  'content'
-                </p>
-
-                {/* {imageUrl && (
-          <div className="relative w-full flex justify-center mt-2">
-            <img 
-              src={imageUrl} 
-              alt="Hình ảnh minh họa" 
-              className="max-w-full max-h-64 object-contain rounded-md border border-border shadow-sm"
-            />
-          </div>
-        )} */}
-              </CardContent>
-            </Card>
+            {multipleChoiceQuestions?.map((question) => (
+              <Card
+                key={question.id}
+                className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
+              >
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+                  <div className="flex flex-wrap gap-2">
+                    <SubjectBadge subject={subject} topic={question.topic} />
+                  </div>
+                  <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
+                  <ContentRenderer
+                    content={question.content}
+                    block={true}
+                    imageUrl={question.image_url}
+                  />
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
         {/* Danh sách câu hỏi đúng sai */}
@@ -153,40 +141,37 @@ export const ListQuestionExam = ({
               </Button>
             </div>
             <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-              <Card className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md">
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="border-transparent bg-transparent text-base text-slate-900"
-                    >
-                      'topic'
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
-                    >
-                      'level'
-                    </Badge>
-                  </div>
-                  <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                  <p className="text-foreground text-base leading-relaxed sm:text-lg">
-                    'content'
-                  </p>
-
-                  {/* {imageUrl && (
-          <div className="relative w-full flex justify-center mt-2">
-            <img 
-              src={imageUrl} 
-              alt="Hình ảnh minh họa" 
-              className="max-w-full max-h-64 object-contain rounded-md border border-border shadow-sm"
-            />
-          </div>
-        )} */}
-                </CardContent>
-              </Card>
+              {trueFalseQuestions?.map((question) => (
+                <Card
+                  key={question.id}
+                  className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
+                >
+                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge
+                        variant="secondary"
+                        className="border-transparent bg-transparent text-base text-slate-900"
+                      >
+                        {question.topic}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
+                      >
+                        {question.level}
+                      </Badge>
+                    </div>
+                    <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
+                    <ContentRenderer
+                      content={question.content}
+                      block={true}
+                      imageUrl={question.image_url}
+                    />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
@@ -210,40 +195,37 @@ export const ListQuestionExam = ({
               </Button>
             </div>
             <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-              <Card className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md">
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="border-transparent bg-transparent text-base text-slate-900"
-                    >
-                      'topic'
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
-                    >
-                      'level'
-                    </Badge>
-                  </div>
-                  <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                  <p className="text-foreground text-base leading-relaxed sm:text-lg">
-                    'content'
-                  </p>
-
-                  {/* {imageUrl && (
-          <div className="relative w-full flex justify-center mt-2">
-            <img 
-              src={imageUrl} 
-              alt="Hình ảnh minh họa" 
-              className="max-w-full max-h-64 object-contain rounded-md border border-border shadow-sm"
-            />
-          </div>
-        )} */}
-                </CardContent>
-              </Card>
+              {shortAnswerQuestions?.map((question) => (
+                <Card
+                  key={question.id}
+                  className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
+                >
+                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge
+                        variant="secondary"
+                        className="border-transparent bg-transparent text-base text-slate-900"
+                      >
+                        {question.topic}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
+                      >
+                        {question.level}
+                      </Badge>
+                    </div>
+                    <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
+                    <ContentRenderer
+                      content={question.content}
+                      block={true}
+                      imageUrl={question.image_url}
+                    />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
