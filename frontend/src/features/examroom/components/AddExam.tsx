@@ -38,6 +38,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { ListQuestionExam } from './ListQuestionExam';
+import { useAddExam } from '@/hooks/Exam/useAddExam';
 
 interface AddExamProps {
   isOpen: boolean;
@@ -58,6 +59,16 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
     resolver: yupResolver(addExamFormSchema),
     defaultValues: defaultFormValues,
   });
+  const { mutate: addExam, isPending } = useAddExam();
+
+  const onSubmit = (data: addExamFormSchemaType) => {
+    addExam(data, {
+      onSuccess: () => {
+        setIsOpen(false);
+        form.reset();
+      },
+    });
+  };
   return (
     <div className={`w-full space-y-6 p-6 ${isOpen ? 'block' : 'hidden'}`}>
       <div className="flex flex-col gap-4 border-b border-slate-300 pb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -80,14 +91,21 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
         <Button
           variant={'orange'}
           size={'lg'}
+          form="add-exam-form"
+          type="submit"
           className="rounded-lg px-4 py-2 text-lg font-semibold text-white"
+          disabled={isPending}
         >
           Lưu đề thi
         </Button>
       </div>
       <div className="">
         <Form {...form}>
-          <form className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+          <form
+            id="add-exam-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12"
+          >
             <div className="space-y-6 rounded-lg border border-slate-300 bg-white p-6 shadow-sm lg:col-span-4">
               <div className="flex items-center font-bold tracking-wider uppercase">
                 <SlidersVertical className="mr-2 h-4 w-4 text-slate-400" />

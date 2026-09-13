@@ -79,6 +79,14 @@ export const ListQuestionExam = ({
     }
   };
 
+  const handleDeleteQuestion = (questionId: string) => {
+    const currentQuestions = getCurrentSelectedQuestions();
+    const updatedQuestions = currentQuestions.filter(
+      (q) => q.id !== questionId
+    );
+    const setQuestions = getCurrentSetSelectedQuestions();
+    setQuestions(updatedQuestions);
+  };
   return (
     <>
       <div className="lg:col-spans-8 space-y-4">
@@ -109,7 +117,10 @@ export const ListQuestionExam = ({
                   <div className="flex flex-wrap gap-2">
                     <SubjectBadge subject={subject} topic={question.topic} />
                   </div>
-                  <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                  <Trash
+                    className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
+                    onClick={() => handleDeleteQuestion(question.id)}
+                  />
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
                   <ContentRenderer
@@ -161,7 +172,10 @@ export const ListQuestionExam = ({
                         {question.level}
                       </Badge>
                     </div>
-                    <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                    <Trash
+                      className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
+                      onClick={() => handleDeleteQuestion(question.id)}
+                    />
                   </CardHeader>
                   <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
                     <ContentRenderer
@@ -215,7 +229,10 @@ export const ListQuestionExam = ({
                         {question.level}
                       </Badge>
                     </div>
-                    <Trash className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600" />
+                    <Trash
+                      onClick={() => handleDeleteQuestion(question.id)}
+                      className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
+                    />
                   </CardHeader>
                   <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
                     <ContentRenderer
