@@ -60,8 +60,6 @@ class QuestionService:
         self,
         db: Annotated[AsyncSession, Depends()],
         file_bytes: bytes,
-        subject: str,
-        level: str,
     ) -> tuple[int, int]:
         raw_text, images_dict = extract_text_with_image_placeholders(file_bytes)
         if not raw_text.strip():
@@ -79,9 +77,18 @@ class QuestionService:
                 message="Không thể bóc tách câu hỏi từ tài liệu",
             )
         questions_to_insert = []
-        detected_subject = exam_meta.get("subject") or subject
+        detected_subject = exam_meta.get("subject")
+        if not detected_subject:
+            raise CustomAPIException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BAD_REQUEST",
+                message="Không xác định được môn học từ tài liệu",
+            )
+
         for q_data in parsed_questions:
             try:
+                is_passage = q_data.get("is_passage") is True
+
                 # Upload ảnh câu hỏi
                 q_img_url = None
                 q_placeholder = q_data.get("question_image_placeholder")
@@ -93,28 +100,31 @@ class QuestionService:
 
                 # Upload ảnh đáp án
                 options_data = {}
-                raw_options = q_data.get("options") or {}
-                for key in ["A", "B", "C", "D"]:
-                    opt = raw_options.get(key, {})
-                    opt_content = (
-                        opt.get("content", "") if isinstance(opt, dict) else str(opt)
-                    )
-                    opt_placeholder = (
-                        opt.get("image_placeholder")
-                        if isinstance(opt, dict)
-                        else str(opt)
-                    )
-
-                    opt_img_url = None
-                    if opt_placeholder and opt_placeholder in images_dict:
-                        opt_img_info = images_dict[opt_placeholder]
-                        opt_img_url = await upload_bytes_to_supabase(
-                            opt_img_info["bytes"], opt_img_info["ext"]
+                if not is_passage:
+                    raw_options = q_data.get("options") or {}
+                    for key in ["A", "B", "C", "D"]:
+                        opt = raw_options.get(key) or raw_options.get(key.lower(), {})
+                        opt_content = (
+                            opt.get("content", "")
+                            if isinstance(opt, dict)
+                            else str(opt)
                         )
-                    options_data[key] = {
-                        "content": opt_content,
-                        "image_url": opt_img_url,
-                    }
+                        opt_placeholder = (
+                            opt.get("image_placeholder")
+                            if isinstance(opt, dict)
+                            else None
+                        )
+
+                        opt_img_url = None
+                        if opt_placeholder and opt_placeholder in images_dict:
+                            opt_img_info = images_dict[opt_placeholder]
+                            opt_img_url = await upload_bytes_to_supabase(
+                                opt_img_info["bytes"], opt_img_info["ext"]
+                            )
+                        options_data[key] = {
+                            "content": opt_content,
+                            "image_url": opt_img_url,
+                        }
                 correct_ans = q_data.get("correct_answer")
                 if isinstance(correct_ans, dict):
                     correct_ans = json.dumps(correct_ans, ensure_ascii=False)
@@ -123,15 +133,21 @@ class QuestionService:
                     {
                         "subject": detected_subject,
                         "content": q_data.get("content", ""),
-                        "level": q_data.get("level") or level,
+                        "level": q_data.get("level"),
                         "question_type": q_data.get("question_type", "Trắc nghiệm"),
-                        "correct_answer": str(correct_ans or "A"),
-                        "options": options_data,
+                        "correct_answer": str(correct_ans or ""),
+                        "options": options_data or None,
                         "image_url": q_img_url,
                         "source_label": q_data.get("source_label", ""),
-                        "score_weight": q_data.get("score_weight", 0.25),
+                        "score_weight": q_data.get("score_weight")
+                        or q_data.get("score")
+                        or 0,
                         "explanation": q_data.get("explanation", ""),
                         "topic": q_data.get("topic", None),
+                        "is_passage": is_passage,
+                        "temp_id": q_data.get("temp_id"),
+                        "temp_parent_id": q_data.get("temp_parent_id"),
+                        "parent_id": q_data.get("parent_id"),
                     }
                 )
             except Exception as e:

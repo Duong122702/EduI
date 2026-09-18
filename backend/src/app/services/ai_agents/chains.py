@@ -38,7 +38,7 @@ async def call_gemini_with_retry(
                 model=model,
                 contents=contents,
                 config=types.GenerateContentConfig(
-                    response_mime_type="application/json", temperature=0.1
+                    response_mime_type="application/json", temperature=0.2
                 ),
             )
             return _clean_and_parse_json(response.text)

@@ -162,26 +162,73 @@ class QuestionCRUD:
     async def add_multiple_questions_crud(
         self, db: AsyncSession, question_data: list[dict]
     ):
-        db_questions = []
+        passage_questions = []
+        temp_id_to_db_id = {}
+
+        # Passage phải được insert trước để câu hỏi con có thể tham chiếu UUID thật.
         for q_data in question_data:
+            if not q_data.get("is_passage"):
+                continue
             db_question = Questions(
                 subject=q_data["subject"],
                 content=q_data["content"],
-                level=q_data["level"],
+                level=q_data.get("level"),
                 question_type=q_data.get("question_type", "Trắc nghiệm"),
-                correct_answer=q_data["correct_answer"],
-                options=q_data["options"],
+                correct_answer=q_data.get("correct_answer", ""),
+                options=None,
+                image_url=q_data.get("image_url"),
+                score_weight=q_data.get("score_weight", 0),
+                explanation=q_data.get("explanation", ""),
+                source_label=q_data.get("source_label"),
+                topic=q_data.get("topic"),
+            )
+            passage_questions.append(db_question)
+
+        if passage_questions:
+            db.add_all(passage_questions)
+            await db.flush()
+
+        passage_index = 0
+        for q_data in question_data:
+            if not q_data.get("is_passage"):
+                continue
+            temp_id = q_data.get("temp_id")
+            if temp_id:
+                temp_id_to_db_id[temp_id] = passage_questions[passage_index].id
+            passage_index += 1
+
+        question_rows = []
+        for q_data in question_data:
+            if q_data.get("is_passage"):
+                continue
+            temp_parent_id = q_data.get("temp_parent_id")
+            parent_id = q_data.get("parent_id")
+            if temp_parent_id:
+                parent_id = temp_id_to_db_id.get(temp_parent_id)
+            if temp_parent_id and parent_id is None:
+                raise ValueError(f"Không tìm thấy passage cha: {temp_parent_id}")
+
+            db_question = Questions(
+                subject=q_data["subject"],
+                content=q_data["content"],
+                level=q_data.get("level"),
+                question_type=q_data.get("question_type", "Trắc nghiệm"),
+                correct_answer=q_data.get("correct_answer", ""),
+                options=q_data.get("options"),
                 image_url=q_data.get("image_url"),
                 score_weight=q_data.get("score_weight", 0.25),
                 explanation=q_data.get("explanation", ""),
                 source_label=q_data.get("source_label"),
                 topic=q_data.get("topic"),
+                parent_id=parent_id,
             )
-            db_questions.append(db_question)
-        if db_questions:
-            db.add_all(db_questions)
+            question_rows.append(db_question)
+
+        if question_rows:
+            db.add_all(question_rows)
+        if passage_questions or question_rows:
             await db.commit()
-        return len(db_questions)
+        return len(passage_questions) + len(question_rows)
 
     async def check_exist_question_by_id_crud(self, db: AsyncSession, id: UUID):
         stmt = select(exists().where(Questions.id == id))

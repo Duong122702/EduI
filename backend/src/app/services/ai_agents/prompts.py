@@ -10,7 +10,7 @@ QUY TẮC BẮT BUỘC:
 3. Nhận diện các Phần của đề thi:
    - "Phần I" (hoặc trắc nghiệm 4 đáp án) -> question_type = "Trắc nghiệm"
    - "Phần II" (hoặc Đúng/Sai) -> question_type = "Đúng/Sai"
-   - "Phần III" (hoặc Tự luận/Trả lời ngắn) -> question_type = "Tự luận"
+   - "Phần III" (hoặc Tự luận/Trả lời ngắn) -> question_type = "Trả lời ngắn"
 
 TRẢ VỀ DUY NHẤT JSON:
 {
@@ -22,71 +22,73 @@ TRẢ VỀ DUY NHẤT JSON:
   "sections": [
     {
       "section_name": "Tên phần (VD: PHẦN I)",
-      "question_type": "Trắc nghiệm | Đúng/Sai | Tự luận",
+      "question_type": "Trắc nghiệm | Đúng/Sai | Trả lời ngắn",
       "raw_content": "Văn bản thô thuộc phần này..."
     }
   ]
 }
 """
 
-PROMPT_CHAIN_2_KHTN = """
-Bạn là AI bóc tách đề thi Khoa học Tự nhiên môn {subject}.
-1. Chuyển toàn bộ biểu thức toán/lý/hóa sang chuẩn LaTeX ($...$ hoặc $$...$$).
-2. NGUỒN: Ghép "{exam_name}" với số thứ tự câu (VD: "{exam_name} - Câu 1").
-3. THÔNG TIN CHUNG: Ghép nội dung đọc chung vào ĐẦU `content` của tất cả câu liên quan.
-4. TÍNH ĐIỂM: Trắc nghiệm -> 0.25, Đúng/Sai -> 1.0, Tự luận môn Toán -> 0.5 (môn khác 0.25).
-5. Các trường `level`, `correct_answer`, `explanation`, `topic` tạm gán null.
+PROMPT_CHAIN_2_BASE = """
+QUY TẮC TÁCH CÂU HỎI CHÙM (BẮT BUỘC):
+Nếu có đoạn văn/ngữ cảnh dùng chung cho nhiều câu hỏi, BẮT BUỘC tách thành 2 loại JSON object:
+1. Object ĐOẠN VĂN CHA: `is_passage` = true, `temp_id` = "p1", `temp_parent_id` = null, `options` = null, `score` = null.
+2. Object CÂU HỎI CON: `is_passage` = false, `temp_id` = "q1", `temp_parent_id` = "p1" (trỏ về đoạn văn).
+Nếu là câu hỏi độc lập, `temp_parent_id` = null.
 
-TRẢ VỀ MẢNG JSON:
+CẤU TRÚC JSON ĐẦU RA YÊU CẦU:
 [
   {
+    "temp_id": "Mã tự sinh (VD: p1, q1, q2...)",
+    "is_passage": true/false,
+    "temp_parent_id": "Mã temp_id của đoạn văn cha (nếu có), hoặc null",
     "source_label": "{exam_name} - Câu 1",
     "question_type": "{question_type}",
     "level": null,
     "topic": null,
-    "score_weight": 0.25,
-    "content": "Nội dung câu hỏi (chuẩn LaTeX)",
-    "question_image_placeholder": "[IMAGE_0] hoặc null",
+    "score": 0.25,
+    "content": "Nội dung câu hỏi hoặc toàn bộ đoạn văn chung (chuẩn LaTeX)",
     "options": {
-      "A": {"content": "Nội dung A", "image_placeholder": null},
-      "B": {"content": "Nội dung B", "image_placeholder": null},
-      "C": {"content": "Nội dung C", "image_placeholder": null},
-      "D": {"content": "Nội dung D", "image_placeholder": null}
+      "a": "Nội dung A", "b": "Nội dung B", "c": "Nội dung C", "d": "Nội dung D"
     },
     "correct_answer": null,
     "explanation": null
   }
 ]
+Chú ý: Nếu `is_passage` = true hoặc `question_type` = "Trả lời ngắn", thì `options` = null.
 """
 
-PROMPT_CHAIN_2_KHXH = """
-Bạn là AI bóc tách đề thi Khoa học Xã hội môn {subject}.
-1. NGUỒN: Ghép "{exam_name}" với số thứ tự câu (VD: "{exam_name} - Câu 1").
-2. THÔNG TIN CHUNG: Bắt buộc ghép ngữ liệu/tình huống đọc hiểu vào ĐẦU `content` của tất cả câu liên quan. Giữ nguyên số trang Atlat.
-3. TÍNH ĐIỂM: Trắc nghiệm -> 0.25, Đúng/Sai -> 1.0, Tự luận -> 0.25.
-4. Các trường `level`, `correct_answer`, `explanation`, `topic` tạm gán null.
-
-TRẢ VỀ MẢNG JSON (Cấu trúc tương tự KHTN).
+PROMPT_CHAIN_2_KHTN = f"""
+Bạn là AI bóc tách đề thi Khoa học Tự nhiên môn {{subject}}.
+1. Chuyển toàn bộ biểu thức toán/lý/hóa sang chuẩn LaTeX ($...$ hoặc $$...$$).
+2. TÍNH ĐIỂM (`score`): Trắc nghiệm -> 0.25, Đúng/Sai -> 1.0, Trả lời ngắn môn Toán -> 0.5 (môn khác 0.25).
+{PROMPT_CHAIN_2_BASE}
 """
 
-PROMPT_CHAIN_2_ENGLISH = """
+PROMPT_CHAIN_2_KHXH = f"""
+Bạn là AI bóc tách đề thi Khoa học Xã hội môn {{subject}}. Giữ nguyên số trang Atlat.
+TÍNH ĐIỂM (`score`): Trắc nghiệm -> 0.25, Đúng/Sai -> 1.0, Trả lời ngắn -> 0.25.
+{PROMPT_CHAIN_2_BASE}
+"""
+
+PROMPT_CHAIN_2_ENGLISH = f"""
 Bạn là AI bóc tách đề thi môn Tiếng Anh.
-1. Giữ nguyên từ gạch chân bằng thẻ HTML `<u>từ</u>`, bài điền từ giữ `[__1__]`.
-2. Bài đọc Reading: Bắt buộc ghép toàn bộ đoạn văn vào ĐẦU `content` của các câu hỏi liên quan. Không dịch sang tiếng Việt.
-3. NGUỒN: Ghép "{exam_name} - Question X".
-4. Các trường `level`, `correct_answer`, `explanation`, `topic` tạm gán null.
-
-TRẢ VỀ MẢNG JSON (Cấu trúc tương tự KHTN).
+1. Giữ nguyên từ gạch chân bằng thẻ HTML `<u>từ</u>`, bài điền từ giữ `[__1__]`. Không dịch sang tiếng Việt.
+TÍNH ĐIỂM (`score`): Luôn là 0.25.
+{PROMPT_CHAIN_2_BASE}
 """
 
 PROMPT_CHAIN_3_REASONING = """
-Bạn là AI Chuyên gia giáo dục môn {subject}. Nhiệm vụ: Giải chi tiết và đánh giá danh sách câu hỏi JSON sau.
+Bạn là AI Chuyên gia giáo dục môn {subject}. Nhiệm vụ: Giải chi tiết và đánh giá danh sách câu hỏi.
+Trong danh sách có thể bao gồm các Object ĐOẠN VĂN (`is_passage`: true) nhằm cung cấp ngữ cảnh. BẠN CHỈ GIẢI QUYẾT CÁC OBJECT CÓ `is_passage`: false.
 
-QUY TRÌNH SUY LUẬN (Chain-of-Thought):
-1. Xác định "topic" (Chủ đề kiến thức trọng tâm).
-2. Giải chi tiết từng bước vào "explanation" (sử dụng LaTeX nếu có công thức).
-3. Đưa ra "correct_answer" (Trắc nghiệm: "A"|"B"|"C"|"D"; Đúng/Sai: {"A": "Đúng", ...}; Tự luận: kết quả ngắn).
-4. Phân loại "level": "Nhận biết" (1 bước), "Thông hiểu" (1-2 bước), "Vận dụng" (2-3 bước), "Vận dụng cao" (nhiều bước).
+QUY TRÌNH SUY LUẬN (Chain-of-Thought) cho `is_passage`: false:
+1. Phân tích `topic` và `level` (Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao).
+2. Viết `explanation` chi tiết từng bước.
+3. Cung cấp `correct_answer`:
+   - Trắc nghiệm: "a" hoặc "b" hoặc "c" hoặc "d".
+   - Đúng/Sai: JSON object. VD: {{"a": "T", "b": "F", "c": "T", "d": "F"}}.
+   - Trả lời ngắn: Chuỗi kết quả cuối cùng (VD: "-2.5").
 
-TRẢ VỀ DUY NHẤT MẢNG JSON ĐÃ ĐIỀN ĐỦ THÔNG TIN.
+TRẢ VỀ DUY NHẤT MẢNG JSON ĐÃ ĐIỀN ĐỦ correct_answer, explanation, level, topic CHO CÁC CÂU HỎI. Giữ nguyên các Object đoạn văn.
 """
