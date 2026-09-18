@@ -68,6 +68,29 @@ class QuestionCRUD:
             question_image_url = await upload_file_to_supabase(question_image)
             # 2. Xử lý đóng gói & upload ảnh cho các Option (A, B, C, D)
 
+        if data.is_passage:
+            passage_data = {
+                field: value
+                for field, value in data.to_dict().items()
+                if field
+                not in {
+                    "is_passage",
+                    "option_A_content",
+                    "option_B_content",
+                    "option_C_content",
+                    "option_D_content",
+                }
+                and value is not None
+            }
+            if question_image_url is not None:
+                passage_data["image_url"] = question_image_url
+
+            db_question = Questions(**passage_data)
+            db.add(db_question)
+            await db.commit()
+            await db.refresh(db_question)
+            return db_question
+
         # Map nội dung text từ schema
         option_contents = {
             "A": data.option_A_content,

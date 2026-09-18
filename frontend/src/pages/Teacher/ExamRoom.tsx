@@ -67,7 +67,7 @@ export const ExamRoom = () => {
                   TỔNG ĐỀ THI ĐÃ TẠO
                 </p>
                 <h2 className="text-3xl font-bold text-slate-900">
-                  Số đề ở đây
+                  {data?.total || 0}
                 </h2>
                 <p className="text-xs text-slate-500">
                   Nạp nhiều nhất:{' '}

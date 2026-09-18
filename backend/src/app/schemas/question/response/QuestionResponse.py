@@ -16,3 +16,4 @@ class QuestionResponse(AppBaseModel):
     level: str | None
     subject: str
     image_url: str | None
+    parent_id: UUID | None

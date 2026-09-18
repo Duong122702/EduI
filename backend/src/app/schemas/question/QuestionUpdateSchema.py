@@ -10,8 +10,9 @@ class QuestionUpdateSchema(AppBaseModel):
     question_type: str | None = None
     correct_answer: str | None = None
     topic: str | None = None
-    exlpanation: str | None = None
-
+    explanation: str | None = None
+    parent_id: str | None = None
+    is_passage: bool | None = None
     option_A_content: str | None = None
     option_B_content: str | None = None
     option_C_content: str | None = None

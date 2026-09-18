@@ -27,6 +27,9 @@ class Questions(Base):
     level: Mapped[str | None] = mapped_column(String, nullable=True)
     subject: Mapped[str] = mapped_column(String, nullable=False)
     image_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True, index=True
+    )
     question_exams = relationship(
         "QuestionExam",
         back_populates="question",
