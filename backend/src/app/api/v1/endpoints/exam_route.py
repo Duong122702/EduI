@@ -1,6 +1,5 @@
 from collections import Counter
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +9,7 @@ from src.app.api.deps import (
     get_questions_by_questions_ids,
     get_user_role,
 )
-from src.app.constant.subject_rules import SUBJECT_RULES, QuestionType, Subject
+from src.app.constant.subject_rules import SUBJECT_RULES, Subject
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.core.security import verify_token
@@ -19,7 +18,6 @@ from src.app.schemas.exam.exam_schema import ExamSchemaFilter
 from src.app.schemas.exam.response.exam_response import ExamResponse
 from src.app.schemas.response import APIResponse
 from src.app.services.exam_service import exam_service
-from src.app.utils.index_pool import get_index_pool_for_subject
 
 router = APIRouter()
 
@@ -108,7 +106,12 @@ async def create_exam_route(
         actual_counts = Counter(question_types)
 
         for q_type, count in actual_counts.items():
-            if q_type in rules:
+            # Bỏ qua câu hỏi dạng passage không đếm vào rule
+            if q_type == "passage":
+                continue
+
+            # Đã sửa lỗi logic: phải là "not in" (không có trong rules mới báo lỗi)
+            if q_type not in rules:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     code="BAD_REQUEST",
@@ -124,16 +127,13 @@ async def create_exam_route(
     exam = await exam_service.create_exams(db, data)
 
     if data.question_ids:
-        index_pools = get_index_pool_for_subject(data.subject)
-        question_type_map = {q.id: q.question_type for q in question_data}
         exam_question_data = []
-        for q_id in data.question_ids:
+        # Lặp qua mảng gốc truyền lên, đánh số thứ tự (index) bắt đầu từ 1
+        for index, q_id in enumerate(data.question_ids, start=1):
             if q_id:
-                q_type = question_type_map[UUID(q_id)]
-            assigned_index = index_pools[QuestionType(q_type)].pop()
-            exam_question_data.append(
-                {"exam_id": exam.id, "question_id": q_id, "order_index": assigned_index}
-            )
+                exam_question_data.append(
+                    {"exam_id": exam.id, "question_id": q_id, "order_index": index}
+                )
         await exam_service.add_question_to_exam(db, exam_question_data)
     return APIResponse(message="Tạo đề thi thành công")
 
@@ -202,28 +202,42 @@ async def add_questions_to_exam_route(
             subject_key = exam.subject
         rules = SUBJECT_RULES.get(subject_key, {}) if subject_key else {}
         for q_type, count in actual_counts.items():
-            if q_type in rules:
+            # Bỏ qua không đếm rule cho passage
+            if q_type == "passage":
+                continue
+
+            # Đã sửa "in" thành "not in"
+            if q_type not in rules:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     code="BAD_REQUEST",
                     message=f"Câu hỏi loại {q_type} không được phép cho môn học này",
                 )
+
+            # LƯU Ý LỚN: `count` ở đây chỉ là số câu hỏi MỚI thêm vào.
+            # Nếu muốn chặt chẽ, bạn phải lấy "số câu cũ trong DB + count mới" để so sánh với rules[q_type]
             if count > rules[q_type]:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     code="BAD_REQUEST",
-                    message=f"Số lượng câu hỏi loại {q_type} vượt quá giới hạn cho phép ({rules[q_type]})",
+                    message=f"Số lượng câu hỏi loại {q_type} thêm vào vượt quá giới hạn cho phép ({rules[q_type]})",
                 )
 
-        index_pools = get_index_pool_for_subject(exam.subject)
-        question_type_map = {q.id: q.question_type for q in question_data}
         exam_question_data = []
-        for q_id in question_ids:
+
+        # BƯỚC QUAN TRỌNG: Lấy index lớn nhất hiện tại của đề thi để nối tiếp
+        # Nếu chưa có hàm này, bạn cần viết thêm trong exam_service
+        # Ví dụ: SELECT MAX(order_index) FROM exam_questions WHERE exam_id = exam_id
+        current_max_index = await exam_service.get_max_order_index_of_exam(db, exam.id)
+
+        # Nếu đề chưa có câu nào thì bắt đầu từ 1, nếu đã có thì nối tiếp
+        start_index = (current_max_index or 0) + 1
+
+        for index, q_id in enumerate(question_ids, start=start_index):
             if q_id:
-                q_type = question_type_map[UUID(q_id)]
-            assigned_index = index_pools[QuestionType(q_type)].pop()
-            exam_question_data.append(
-                {"exam_id": exam.id, "question_id": q_id, "order_index": assigned_index}
-            )
+                exam_question_data.append(
+                    {"exam_id": exam.id, "question_id": q_id, "order_index": index}
+                )
+
         await exam_service.add_question_to_exam(db, exam_question_data)
     return APIResponse(message="Thêm câu hỏi vào đề thi thành công")

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.crud.crud_exams import ExamCRUD
@@ -32,6 +34,10 @@ class ExamService:
         self, db: AsyncSession, exam_question_data: list[dict]
     ) -> None:
         await ExamCRUD().add_questions_to_exam(db, exam_question_data)
+
+    async def get_max_order_index_of_exam(self, db: AsyncSession, exam_id: UUID) -> int:
+        max_order_index = await ExamCRUD().get_max_order_index_of_exam(db, exam_id)
+        return max_order_index
 
 
 exam_service = ExamService()

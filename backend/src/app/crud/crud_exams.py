@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -88,3 +90,12 @@ class ExamCRUD:
         db.add_all(new_question_exams)
         await db.commit()
         return None
+
+    async def get_max_order_index_of_exam(self, db: AsyncSession, exam_id: UUID) -> int:
+        result = await db.execute(
+            select(func.max(QuestionExam.order_index)).where(
+                QuestionExam.exam_id == exam_id
+            )
+        )
+        max_order_index = result.scalar()
+        return max_order_index if max_order_index is not None else 0

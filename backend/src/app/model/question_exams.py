@@ -25,6 +25,7 @@ class QuestionExam(Base):
         nullable=False,
         index=True,
     )
+    order_index: Mapped[int] = mapped_column(nullable=False, default=0)
 
     # Relationship ngược lại
     question = relationship("Questions", back_populates="question_exams")
