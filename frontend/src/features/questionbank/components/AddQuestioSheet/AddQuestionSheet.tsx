@@ -45,6 +45,8 @@ const defaultFormValues: QuestionFormAddValue = {
     C: { content: '', image_file: null },
     D: { content: '', image_file: null },
   },
+  isPassage: false,
+  parent_ids: [],
 };
 
 function AddQuestionSheet({

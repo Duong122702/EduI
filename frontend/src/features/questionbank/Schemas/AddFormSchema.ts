@@ -50,6 +50,8 @@ export const addFormSchema = Yup.object().shape({
   explanation: Yup.string().optional(),
   sourceLabel: Yup.string().optional(),
   scoreWeight: Yup.number().required('Vui lòng nhập số điểm'),
+  isPassage: Yup.boolean().optional().default(false),
+  parent_ids: Yup.array().of(Yup.string()).default([]).optional(),
 });
 
 export type QuestionFormAddValue = Yup.InferType<typeof addFormSchema>;
