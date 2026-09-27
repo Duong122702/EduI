@@ -1,21 +1,20 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
 import {
   SUBJECTS_WITH_SHORT_ANSWER,
   SUBJECTS_WITH_TRUE_FALSE,
 } from '@/constants/typeQuestionSubject';
 import type { Question } from '@/Models/questions.model';
-import { Trash } from 'lucide-react';
+import { PlusCircle, FileQuestion } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ListQuestion } from './ListQuestion';
-import { ContentRenderer } from './ContentRenderer';
-import { SubjectBadge } from '@/features/questionbank/components/SubjectBadge';
+import { checkLimit } from '@/utils/checkLimit';
+import { QuestionCard } from './QuestionCard';
 
 interface ListQuestionExamProps {
-  selectedIds?: string[]; // Mảng ID câu hỏi từ form
+  selectedIds?: string[];
   onUpdateIds: (ids: string[]) => void;
-  subject: string; // Thêm prop subject
+  subject: string;
 }
 
 export const ListQuestionExam = ({
@@ -24,6 +23,10 @@ export const ListQuestionExam = ({
 }: ListQuestionExamProps) => {
   const [openAddQuestionDialog, setOpenAddQuestionDialog] = useState(false);
   const [questionType, setQuestionType] = useState('multiple-choice');
+  const [activeParentId, setActiveParentId] = useState<string | undefined>(
+    undefined
+  );
+
   const [multipleChoiceQuestions, setMultipleChoiceQuestions] = useState<
     Question[] | null
   >(null);
@@ -33,46 +36,53 @@ export const ListQuestionExam = ({
   const [shortAnswerQuestions, setShortAnswerQuestions] = useState<
     Question[] | null
   >(null);
+  const [passageQuestions, setPassageQuestions] = useState<Question[] | null>(
+    null
+  );
 
   useEffect(() => {
     const allQuestions = [
       ...(multipleChoiceQuestions || []),
       ...(trueFalseQuestions || []),
       ...(shortAnswerQuestions || []),
+      ...(passageQuestions || []),
     ];
     onUpdateIds(allQuestions.map((q) => q.id));
   }, [
     multipleChoiceQuestions,
     trueFalseQuestions,
     shortAnswerQuestions,
+    passageQuestions,
     onUpdateIds,
   ]);
 
-  const openAddQuestionDialogHandler = (questionType: string) => {
-    setOpenAddQuestionDialog(true);
-    setQuestionType(questionType);
-  };
+  // const openAddQuestionDialogHandler = (questionType: string) => {
+  //   setOpenAddQuestionDialog(true);
+  //   setQuestionType(questionType);
+  // };
 
-  // 2. Hàm helper để lấy đúng mảng câu hỏi dựa vào type hiện tại
   const getCurrentSelectedQuestions = () => {
     switch (questionType) {
       case 'true-false':
         return trueFalseQuestions || [];
       case 'short-answer':
         return shortAnswerQuestions || [];
+      case 'passage':
+        return passageQuestions || [];
       case 'multiple-choice':
       default:
         return multipleChoiceQuestions || [];
     }
   };
 
-  // 3. Hàm helper để lấy đúng hàm set state dựa vào type hiện tại
   const getCurrentSetSelectedQuestions = () => {
     switch (questionType) {
       case 'true-false':
         return setTrueFalseQuestions;
       case 'short-answer':
         return setShortAnswerQuestions;
+      case 'passage':
+        return setPassageQuestions;
       case 'multiple-choice':
       default:
         return setMultipleChoiceQuestions;
@@ -87,173 +97,175 @@ export const ListQuestionExam = ({
     const setQuestions = getCurrentSetSelectedQuestions();
     setQuestions(updatedQuestions);
   };
+
+  // --- HÀM RENDER UI CHUNG CHO CÁC NHÓM CÂU HỎI ---
+  const renderQuestionSection = (
+    title: string,
+    type: string,
+    questions: Question[] | null,
+    isVisible: boolean
+  ) => {
+    if (!isVisible) return null;
+    const { isLimitReached, maxLimit } = checkLimit(type, questions, subject);
+    // LỌC RENDER: Chỉ render các câu hỏi KHÔNG PHẢI LÀ CÂU CON (không có parent_id)
+    const displayQuestions =
+      type === 'passage' ? questions : questions?.filter((q) => !q.parent_id);
+    return (
+      <div className="mb-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {/* Header của từng Section */}
+        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-4">
+          <div>
+            <h3 className="text-sm font-bold tracking-wide text-slate-800 uppercase">
+              {title}
+            </h3>
+            <p className="mt-1 text-xs text-slate-500">
+              Đã chọn:{' '}
+              <span
+                className={`font-bold ${isLimitReached ? 'text-red-600' : 'text-blue-600'}`}
+              >
+                {questions?.length || 0}
+              </span>{' '}
+              {maxLimit !== undefined ? `/ ${maxLimit}` : ``}câu
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            disabled={isLimitReached}
+            className={`flex items-center gap-2 ${
+              isLimitReached
+                ? 'cursor-not-allowed bg-slate-300 text-slate-500 hover:bg-slate-300'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+            onClick={() => {
+              setOpenAddQuestionDialog(true);
+              setQuestionType(type);
+              setActiveParentId(undefined); // Reset active parent ID khi thêm câu hỏi mới
+            }}
+          >
+            <PlusCircle className="h-4 w-4" />
+            {isLimitReached ? 'Đã đạt giới hạn' : 'Thêm câu hỏi'}
+          </Button>
+        </div>
+
+        {/* Danh sách câu hỏi */}
+        <div className="bg-slate-50/50 p-4">
+          {!displayQuestions || displayQuestions.length === 0 ? (
+            // Trạng thái trống (Empty state)
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 py-10 text-slate-400">
+              <FileQuestion className="mb-2 h-10 w-10 text-slate-300" />
+              <p className="text-sm">Chưa có câu hỏi nào được thêm.</p>
+            </div>
+          ) : (
+            <div className="custom-scrollbar max-h-125 space-y-4 overflow-y-auto pr-2">
+              {displayQuestions.map((question, index) => (
+                <div key={question.id} className="space-y-4">
+                  <QuestionCard
+                    question={question}
+                    index={index}
+                    type={type}
+                    handleDeleteQuestion={handleDeleteQuestion}
+                    multipleChoiceQuestions={multipleChoiceQuestions}
+                    trueFalseQuestions={trueFalseQuestions}
+                    shortAnswerQuestions={shortAnswerQuestions}
+                    setActiveParentId={setActiveParentId}
+                    setOpenAddQuestionDialog={setOpenAddQuestionDialog}
+                    setQuestionType={setQuestionType}
+                    subject={subject}
+                  />
+                  {/* TÌM VÀ RENDER CÁC CÂU HỎI CON NẾU ĐÂY LÀ PASSAGE */}
+                  {type === 'passage' && (
+                    <>
+                      {[
+                        ...(multipleChoiceQuestions || []),
+                        ...(trueFalseQuestions || []),
+                        ...(shortAnswerQuestions || []),
+                      ]
+                        .filter((childQ) => childQ.parent_id === question.id)
+                        .map((childQ, childIndex) => {
+                          let childType = 'multiple-choice';
+                          if (
+                            trueFalseQuestions?.some((q) => q.id === childQ.id)
+                          )
+                            childType = 'true-false';
+                          if (
+                            shortAnswerQuestions?.some(
+                              (q) => q.id === childQ.id
+                            )
+                          )
+                            childType = 'short-answer';
+                          return (
+                            <QuestionCard
+                              key={childQ.id}
+                              question={childQ}
+                              index={childIndex}
+                              type={childType}
+                              handleDeleteQuestion={handleDeleteQuestion}
+                              multipleChoiceQuestions={multipleChoiceQuestions}
+                              trueFalseQuestions={trueFalseQuestions}
+                              shortAnswerQuestions={shortAnswerQuestions}
+                              setActiveParentId={setActiveParentId}
+                              setOpenAddQuestionDialog={
+                                setOpenAddQuestionDialog
+                              }
+                              setQuestionType={setQuestionType}
+                              subject={subject}
+                              isChild={true}
+                            />
+                          );
+                        })}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
-      <div className="lg:col-spans-8 space-y-4">
-        {/* Danh sách câu hỏi trắc nghiệm */}
-        <div className="rounded-2xl border-b border-slate-300 bg-white px-4 py-2 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-900">
-              Danh sách câu hỏi trắc nghiệm:{' '}
-              {multipleChoiceQuestions?.length || 0}
-            </h3>
-            <Button
-              type="button"
-              variant="default"
-              size="lg"
-              className="hover:bg-dark text-white"
-              onClick={() => openAddQuestionDialogHandler('multiple-choice')}
-            >
-              Thêm câu hỏi
-            </Button>
-          </div>
-          <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-            {multipleChoiceQuestions?.map((question) => (
-              <Card
-                key={question.id}
-                className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
-              >
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                  <div className="flex flex-wrap gap-2">
-                    <SubjectBadge subject={subject} topic={question.topic} />
-                  </div>
-                  <Trash
-                    className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
-                    onClick={() => handleDeleteQuestion(question.id)}
-                  />
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                  <ContentRenderer
-                    content={question.content}
-                    block={true}
-                    imageUrl={question.image_url}
-                  />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-        {/* Danh sách câu hỏi đúng sai */}
-        {SUBJECTS_WITH_TRUE_FALSE.includes(subject) && (
-          <div className="rounded-2xl border-b border-slate-300 bg-white px-4 py-2 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-900">
-                Danh sách câu hỏi trắc nghiệm:{' '}
-                {multipleChoiceQuestions?.length || 0}
-              </h3>
-              <Button
-                type="button"
-                variant="default"
-                size="lg"
-                className="hover:bg-dark text-white"
-                onClick={() => openAddQuestionDialogHandler('true-false')}
-              >
-                Thêm câu hỏi
-              </Button>
-            </div>
-            <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-              {trueFalseQuestions?.map((question) => (
-                <Card
-                  key={question.id}
-                  className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
-                >
-                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge
-                        variant="secondary"
-                        className="border-transparent bg-transparent text-base text-slate-900"
-                      >
-                        {question.topic}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
-                      >
-                        {question.level}
-                      </Badge>
-                    </div>
-                    <Trash
-                      className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
-                      onClick={() => handleDeleteQuestion(question.id)}
-                    />
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                    <ContentRenderer
-                      content={question.content}
-                      block={true}
-                      imageUrl={question.image_url}
-                    />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+      <div className="lg:col-spans-8 space-y-6">
+        {/* Render 3 danh sách bằng hàm dùng chung */}
+
+        {renderQuestionSection(
+          'Trắc nghiệm nhiều lựa chọn',
+          'multiple-choice',
+          multipleChoiceQuestions,
+          true
         )}
 
-        {/* Danh sách câu hỏi trả lời ngắn */}
-        {SUBJECTS_WITH_SHORT_ANSWER.includes(subject) && (
-          <div className="rounded-2xl border-b border-slate-300 bg-white px-4 py-2 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-900">
-                Danh sách câu hỏi trắc nghiệm:{' '}
-                {multipleChoiceQuestions?.length || 0}
-              </h3>
-              <Button
-                type="button"
-                variant="default"
-                size="lg"
-                className="hover:bg-dark text-white"
-                onClick={() => openAddQuestionDialogHandler('short-answer')}
-              >
-                Thêm câu hỏi
-              </Button>
-            </div>
-            <div className="custom-scrollbar max-h-150 space-y-2 overflow-y-auto pr-2">
-              {shortAnswerQuestions?.map((question) => (
-                <Card
-                  key={question.id}
-                  className="mx-auto mb-4 w-full max-w-3xl transition-all hover:shadow-md"
-                >
-                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge
-                        variant="secondary"
-                        className="border-transparent bg-transparent text-base text-slate-900"
-                      >
-                        {question.topic}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="border-transparent bg-orange-100 text-base text-slate-900 hover:bg-orange-100"
-                      >
-                        {question.level}
-                      </Badge>
-                    </div>
-                    <Trash
-                      onClick={() => handleDeleteQuestion(question.id)}
-                      className="h-4 w-4 cursor-pointer text-red-500 transition-all hover:scale-110 hover:text-red-600"
-                    />
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center justify-center space-y-5 text-center">
-                    <ContentRenderer
-                      content={question.content}
-                      block={true}
-                      imageUrl={question.image_url}
-                    />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+        {renderQuestionSection(
+          'Trắc nghiệm Đúng / Sai',
+          'true-false',
+          trueFalseQuestions,
+          SUBJECTS_WITH_TRUE_FALSE.includes(subject)
+        )}
+
+        {renderQuestionSection(
+          'Câu hỏi trả lời ngắn',
+          'short-answer',
+          shortAnswerQuestions,
+          SUBJECTS_WITH_SHORT_ANSWER.includes(subject)
         )}
       </div>
+
       <ListQuestion
         open={openAddQuestionDialog}
-        onOpenChange={setOpenAddQuestionDialog}
+        onOpenChange={(open) => {
+          setOpenAddQuestionDialog(open);
+          if (!open) {
+            setActiveParentId(undefined); // Reset active parent ID khi đóng dialog
+          }
+        }}
         subject={subject}
         questionType={questionType}
         selectedQuestions={getCurrentSelectedQuestions()}
         setSelectedQuestions={getCurrentSetSelectedQuestions()}
+        parentId={activeParentId}
       />
     </>
   );

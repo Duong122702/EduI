@@ -19,4 +19,5 @@ export interface Question {
   topic?: string;
   level?: 'Nhận biết' | 'Thông hiểu' | 'Vận dụng' | 'Vận dụng cao' | string;
   subject: string;
+  parent_id?: string; // Thêm trường parent_id để xác định câu hỏi con
 }

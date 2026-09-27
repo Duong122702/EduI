@@ -19,6 +19,7 @@ interface ListQuestionProps {
   setSelectedQuestions: React.Dispatch<React.SetStateAction<Question[] | null>>;
   subject: string; // Thêm prop subject
   questionType: string; // Thêm prop questionType
+  parentId?: string; // Thêm prop parentId nếu cần
 }
 
 export const ListQuestion = ({
@@ -28,19 +29,21 @@ export const ListQuestion = ({
   setSelectedQuestions,
   subject,
   questionType,
+  parentId,
 }: ListQuestionProps) => {
   const { data: QUESTIONS } = useQuestions({
     subject,
     question_type: questionType,
     page: 1,
     page_size: 10,
+    ...(parentId && { parent_id: parentId }),
   });
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <Command>
         <div className="border-b border-gray-100 px-4 py-3">
           <h2 className="text-lg font-semibold text-gray-800">
-            Danh sách câu hỏi
+            {parentId ? 'Thêm câu hỏi con cho đoạn văn' : 'Danh sách câu hỏi'}
           </h2>
         </div>
         <CommandInput placeholder="Gõ câu hỏi để tìm kiếm..." />
@@ -59,8 +62,11 @@ export const ListQuestion = ({
                   value={question.content}
                   onSelect={() => {
                     setSelectedQuestions((prev) => {
+                      const processedQuestion = parentId
+                        ? { ...question, parent_id: parentId }
+                        : question;
                       // Nếu prev đang là null, khởi tạo mảng mới chứa câu hỏi này
-                      if (!prev) return [question];
+                      if (!prev) return [processedQuestion];
 
                       const isExisting = prev.some((q) => q.id === question.id);
 
@@ -74,7 +80,7 @@ export const ListQuestion = ({
                       }
 
                       // Chọn thêm: Nối vào mảng cũ
-                      return [...prev, question];
+                      return [...prev, processedQuestion];
                     });
                   }}
                   className={`flex cursor-pointer items-center justify-between transition-all duration-200 ${

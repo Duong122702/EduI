@@ -12,6 +12,7 @@ const QUESTION_TYPES = {
   MULTIPLE_CHOICE: 'Trắc nghiệm',
   TRUE_FALSE: 'Đúng/Sai',
   SHORT_ANSWER: 'Tự luận',
+  PASSAGE: 'Đọc hiểu',
 };
 
 const NUMBER_OF_QUESTIONS_BY_SUBJECT = {
