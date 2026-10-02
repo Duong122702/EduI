@@ -1,4 +1,4 @@
-import type { CustomIconName } from '../components/ui/CustomIcon';
+import type { CustomIconName } from '../../components/ui/CustomIcon';
 
 export interface FeatureCardProps {
   name: CustomIconName;

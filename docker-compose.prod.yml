@@ -1,0 +1,25 @@
+services:
+  backend:
+    image: duongcao150103/examedu-backend:latest
+    container_name: examedu_api_prod
+    ports:
+      - "8000:8000"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    networks:
+      - examedu_network
+
+  frontend:
+    image: duongcao150103/examedu-frontend:latest
+    container_name: examedu_web_prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - examedu_network
+
+networks:
+  examedu_network:
+    driver: bridge

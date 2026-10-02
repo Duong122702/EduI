@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    container_name: examedu_api
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    volumes:
+      - ./backend:/app
+    networks:
+      - examedu_network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: examedu_web
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - examedu_network
+
+networks:
+  examedu_network:
+    driver: bridge
