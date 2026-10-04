@@ -57,7 +57,9 @@ app = FastAPI()
 app.router.route_class = LoggingRoute
 # Cấu hình CORS để React có thể gọi API mà không bị chặn
 origins = [
-    "http://localhost:5173",  # URL mặc định của Vite
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",  # URL mặc định của Vite
 ]
 
 app.include_router(api_router)
