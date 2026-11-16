@@ -2,7 +2,7 @@
 import asyncio
 import json
 import re
-from typing import Any, cast
+from typing import Any
 
 import anthropic
 
@@ -76,15 +76,3 @@ async def run_chain_2_parser(
     )
 
 
-async def run_chain_3_evaluator(
-    questions_batch: list[dict[str, Any]], subject: str
-) -> list[dict[str, Any]]:
-    prompt = prompts.PROMPT_CHAIN_3_REASONING.format(subject=subject)
-    full_prompt = f"{prompt}\n\nDANH SÁCH CÂU HỎI:\n{json.dumps(questions_batch, ensure_ascii=False)}"
-    result = await call_claude_with_retry(
-        model="claude-3-5-sonnet-20241022", contents=full_prompt
-    )
-
-    if isinstance(result, list):
-        return cast(list[dict[str, Any]], result)
-    return questions_batch

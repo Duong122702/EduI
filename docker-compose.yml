@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: examedu_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - examedu_network
+
   backend:
     build:
       context: ./backend
@@ -8,6 +16,9 @@ services:
     environment:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
     volumes:
       - ./backend:/app
     networks:

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     CORS_ORIGINS: str = os.getenv(
         "CORS_ORIGINS",
         "http://localhost:5173,http://localhost:3000,http://127.0.0.1:3000",

@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import {
   Form,
@@ -10,6 +11,8 @@ import {
 import {
   ChevronLeft,
   CircleQuestionMark,
+  FileUp,
+  Loader2,
   SlidersVertical,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -22,6 +25,8 @@ import { Input } from '@/components/ui/Input';
 import { ListQuestionExam } from './ListQuestionExam';
 import { SubjectCombobox } from './SubjectCombobox';
 import { useAddExam } from '@/hooks/Exam/useAddExam';
+import { useExtractPdf } from '@/hooks/Exam/useExtractPdf';
+import type { ExtractedQuestion } from '@/api/exam/extractExamPdf.api';
 
 interface AddExamProps {
   isOpen: boolean;
@@ -35,6 +40,7 @@ const defaultFormValues: addExamFormSchemaType = {
   subject: '',
   status: 'Uncompleted',
   question_ids: [],
+  extraction_id: null,
 };
 
 export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
@@ -43,15 +49,46 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
     defaultValues: defaultFormValues,
   });
   const { mutate: addExam, isPending } = useAddExam();
+  const { mutate: extractPdf, isPending: isExtracting } = useExtractPdf();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [extractedQuestions, setExtractedQuestions] = useState<
+    ExtractedQuestion[]
+  >([]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    extractPdf(file, {
+      onSuccess: (res) => {
+        const data = res.data.data;
+        if (!data) return;
+
+        form.setValue('title', data.exam_metadata.exam_name);
+        form.setValue('subject', data.exam_metadata.subject);
+        form.setValue('extraction_id', data.extraction_id);
+        form.setValue('question_ids', []);
+
+        setExtractedQuestions(data.questions);
+      },
+    });
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const onSubmit = (data: addExamFormSchemaType) => {
     addExam(data, {
       onSuccess: () => {
         setIsOpen(false);
         form.reset();
+        setExtractedQuestions([]);
       },
     });
   };
+
+  const actualQuestions = extractedQuestions.filter((q) => !q.is_passage);
+  const hasExtraction = !!form.watch('extraction_id');
+
   return (
     <div className={`w-full space-y-6 p-6 ${isOpen ? 'block' : 'hidden'}`}>
       <div className="flex flex-col gap-4 border-b border-slate-300 pb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -71,16 +108,45 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
             <p className="text-xs text-slate-400">Cấu hình đề thi</p>
           </div>
         </div>
-        <Button
-          variant={'orange'}
-          size={'lg'}
-          form="add-exam-form"
-          type="submit"
-          className="rounded-lg px-4 py-2 text-lg font-semibold text-white"
-          disabled={isPending}
-        >
-          Lưu đề thi
-        </Button>
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="rounded-lg border-blue-500 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+            disabled={isExtracting}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {isExtracting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang trích xuất...
+              </>
+            ) : (
+              <>
+                <FileUp className="mr-2 h-4 w-4" />
+                Import từ PDF
+              </>
+            )}
+          </Button>
+          <Button
+            variant={'orange'}
+            size={'lg'}
+            form="add-exam-form"
+            type="submit"
+            className="rounded-lg px-4 py-2 text-lg font-semibold text-white"
+            disabled={isPending || isExtracting}
+          >
+            Lưu đề thi
+          </Button>
+        </div>
       </div>
       <div className="">
         <Form {...form}>
@@ -179,27 +245,69 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
               />
             </div>
             <div className="space-y-4 lg:col-span-8">
-              <FormField
-                control={form.control}
-                name="question_ids"
-                render={({ field }) => (
-                  <div>
-                    <div className="flex items-center gap-3 rounded-2xl border-b border-slate-300 bg-white px-4 py-3 shadow-sm">
-                      <CircleQuestionMark />
-                      <span className="text-sm font-medium text-gray-700">
-                        Danh sách câu hỏi: {field.value?.length || 0}
-                      </span>
-                    </div>
-                    <div className="rounded-xl border-slate-400 p-3 shadow-sm">
-                      <ListQuestionExam
-                        selectedIds={(field.value as string[]) || []}
-                        onUpdateIds={field.onChange}
-                        subject={form.watch('subject')}
-                      />
-                    </div>
+              {hasExtraction && extractedQuestions.length > 0 ? (
+                <div>
+                  <div className="flex items-center gap-3 rounded-2xl border-b border-slate-300 bg-white px-4 py-3 shadow-sm">
+                    <CircleQuestionMark />
+                    <span className="text-sm font-medium text-gray-700">
+                      Câu hỏi trích xuất từ PDF: {actualQuestions.length}
+                    </span>
+                    <span className="ml-auto rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                      Tự động
+                    </span>
                   </div>
-                )}
-              />
+                  <div className="mt-3 max-h-[600px] space-y-3 overflow-y-auto rounded-xl border border-slate-200 p-3">
+                    {actualQuestions.map((q, idx) => (
+                      <div
+                        key={q.temp_id || idx}
+                        className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                      >
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">
+                            {idx + 1}
+                          </span>
+                          <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                            {q.question_type}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-800">{q.content}</p>
+                        {q.options && (
+                          <div className="mt-2 space-y-1 pl-4">
+                            {Object.entries(q.options).map(([key, opt]) => (
+                              <p key={key} className="text-xs text-slate-600">
+                                <span className="font-semibold">{key}.</span>{' '}
+                                {opt.content}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="question_ids"
+                  render={({ field }) => (
+                    <div>
+                      <div className="flex items-center gap-3 rounded-2xl border-b border-slate-300 bg-white px-4 py-3 shadow-sm">
+                        <CircleQuestionMark />
+                        <span className="text-sm font-medium text-gray-700">
+                          Danh sách câu hỏi: {field.value?.length || 0}
+                        </span>
+                      </div>
+                      <div className="rounded-xl border-slate-400 p-3 shadow-sm">
+                        <ListQuestionExam
+                          selectedIds={(field.value as string[]) || []}
+                          onUpdateIds={field.onChange}
+                          subject={form.watch('subject')}
+                        />
+                      </div>
+                    </div>
+                  )}
+                />
+              )}
             </div>
           </form>
         </Form>

@@ -228,7 +228,9 @@ class QuestionCRUD:
             db.add_all(question_rows)
         if passage_questions or question_rows:
             await db.commit()
-        return len(passage_questions) + len(question_rows)
+
+        all_ids = [str(q.id) for q in passage_questions] + [str(q.id) for q in question_rows]
+        return all_ids
 
     async def check_exist_question_by_id_crud(self, db: AsyncSession, id: UUID):
         stmt = select(exists().where(Questions.id == id))

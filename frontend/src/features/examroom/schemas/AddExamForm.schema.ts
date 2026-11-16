@@ -6,6 +6,7 @@ export const addExamFormSchema = yup.object().shape({
   subject: yup.string().required('Môn học là bắt buộc'),
   status: yup.string().required('Trạng thái là bắt buộc'),
   question_ids: yup.array().of(yup.string().optional()),
+  extraction_id: yup.string().optional().nullable(),
 });
 
 export type addExamFormSchemaType = yup.InferType<typeof addExamFormSchema>;

@@ -1,4 +1,10 @@
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: examedu_redis_prod
+    networks:
+      - examedu_network
+
   backend:
     image: duongcao150103/examedu-backend:latest
     container_name: examedu_api_prod
@@ -7,6 +13,9 @@ services:
     environment:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
     networks:
       - examedu_network
 

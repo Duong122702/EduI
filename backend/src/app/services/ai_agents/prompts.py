@@ -78,17 +78,3 @@ TÍNH ĐIỂM (`score`): Luôn là 0.25.
 {PROMPT_CHAIN_2_BASE}
 """
 
-PROMPT_CHAIN_3_REASONING = """
-Bạn là AI Chuyên gia giáo dục môn {subject}. Nhiệm vụ: Giải chi tiết và đánh giá danh sách câu hỏi.
-Trong danh sách có thể bao gồm các Object ĐOẠN VĂN (`is_passage`: true) nhằm cung cấp ngữ cảnh. BẠN CHỈ GIẢI QUYẾT CÁC OBJECT CÓ `is_passage`: false.
-
-QUY TRÌNH SUY LUẬN (Chain-of-Thought) cho `is_passage`: false:
-1. Phân tích `topic` và `level` (Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao).
-2. Viết `explanation` chi tiết từng bước.
-3. Cung cấp `correct_answer`:
-   - Trắc nghiệm: "a" hoặc "b" hoặc "c" hoặc "d".
-   - Đúng/Sai: JSON object. VD: {{"a": "T", "b": "F", "c": "T", "d": "F"}}.
-   - Trả lời ngắn: Chuỗi kết quả cuối cùng (VD: "-2.5").
-
-TRẢ VỀ DUY NHẤT MẢNG JSON ĐÃ ĐIỀN ĐỦ correct_answer, explanation, level, topic CHO CÁC CÂU HỎI. Giữ nguyên các Object đoạn văn.
-"""

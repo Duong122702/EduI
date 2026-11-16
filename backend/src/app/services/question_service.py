@@ -14,7 +14,7 @@ from src.app.schemas.question.response.MostSubjectResponse import (
 )
 from src.app.schemas.question.response.QuestionForm import QuestionCreateSchema
 from src.app.schemas.question.response.QuestionResponse import QuestionResponse
-from src.app.services.ai_agents.pipeline import execute_exam_agent_pipeline
+from src.app.services.ai_agents.pipeline import extract_exam_from_text
 from src.app.utils.pdf_parser import extract_text_with_image_placeholders
 from src.app.utils.storage import upload_bytes_to_supabase
 
@@ -69,7 +69,7 @@ class QuestionService:
                 message="Không tìm thấy câu hỏi nào hoặc sai format.",
             )
         # 2. Xử lý upload ảnh và chuẩn bị dữ liệu
-        exam_meta, parsed_questions = await execute_exam_agent_pipeline(raw_text)
+        exam_meta, parsed_questions = await extract_exam_from_text(raw_text)
         if not parsed_questions:
             raise CustomAPIException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -161,12 +161,11 @@ class QuestionService:
                 message="Đã xảy ra lỗi trong quá trình trích xuất và upload ảnh.",
             )
 
-        # 3. Gọi tầng CRUD để lưu DB
-        success_count = await QuestionCRUD().add_multiple_questions_crud(
+        inserted_ids = await QuestionCRUD().add_multiple_questions_crud(
             db, questions_to_insert
         )
 
-        return success_count, len(parsed_questions)
+        return len(inserted_ids), len(parsed_questions)
 
     async def delete_question(self, db: AsyncSession, id: str):
         question_id = UUID(id)
