@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -18,9 +19,9 @@ class Exam(Base):
     created_by: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), nullable=False
     )  # User ID of the creator
-    created_at: Mapped[str] = mapped_column(
-        String, nullable=False
-    )  # Timestamp of creation
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     status: Mapped[str] = mapped_column(
         String, nullable=False
     )  # e.g., 'draft', 'published', 'archived'

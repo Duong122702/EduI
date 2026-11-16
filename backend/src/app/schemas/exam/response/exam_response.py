@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from src.app.schemas.base import AppBaseModel
 
@@ -9,7 +10,7 @@ class DataResponse(AppBaseModel):
     description: str | None
     duration: int
     created_by: uuid.UUID
-    created_at: str
+    created_at: datetime
     status: str
     subject: str
     room_codes: list[str | None] = []

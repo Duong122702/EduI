@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 import jwt
@@ -189,7 +189,7 @@ class UserService:
 
         # 4. Kiểm tra hết hạn trong DB
         now = (
-            datetime.now(datetime.astimezone.utc)
+            datetime.now(UTC)
             if session_record.expires_at.tzinfo
             else datetime.now()
         )
@@ -206,7 +206,7 @@ class UserService:
         new_access_token = create_access_token(subject=str(user_id_uuid))
         new_refresh_token = create_refresh_token(subject=str(user_id_uuid))
 
-        new_expires_at = datetime.now(datetime.astimezone.utc) + timedelta(
+        new_expires_at = datetime.now(UTC) + timedelta(
             minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
         )
         # 7. Lưu session mới vào DB
