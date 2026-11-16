@@ -1,5 +1,5 @@
 export const SUBJECTS_WITH_TRUE_FALSE = [
-  'Toán',
+  'Toán học',
   'Vật lý',
   'Hóa học',
   'Sinh học',
@@ -8,7 +8,7 @@ export const SUBJECTS_WITH_TRUE_FALSE = [
 ];
 
 export const SUBJECTS_WITH_SHORT_ANSWER = [
-  'Toán',
+  'Toán học',
   'Vật lý',
   'Hóa học',
   'Sinh học',

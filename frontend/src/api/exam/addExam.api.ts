@@ -3,5 +3,5 @@ import axiosClient from '../config/axiosClient';
 import type { ApiResponse } from '@/schemas/response/apiResponse';
 
 export const addExamApi = async (examData: addExamFormSchemaType) => {
-  return await axiosClient.post<ApiResponse<string>>('/api/exams', examData);
+  return await axiosClient.post<ApiResponse<string>>('/exams/create', examData);
 };

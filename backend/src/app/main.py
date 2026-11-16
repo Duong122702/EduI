@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
 from src.app.api.v1.api import api_router
+from src.app.core.config import settings
 from src.app.core.exceptions import CustomAPIException
 from src.app.model import Base
 
@@ -55,17 +56,11 @@ class LoggingRoute(APIRoute):
 app = FastAPI()
 
 app.router.route_class = LoggingRoute
-# Cấu hình CORS để React có thể gọi API mà không bị chặn
-origins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",  # URL mặc định của Vite
-]
 
 app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

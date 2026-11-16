@@ -1,5 +1,5 @@
 const SUBJECTS_IN_EXAM = {
-  MATH: 'Toán',
+  MATH: 'Toán học',
   ENGLISH: 'Tiếng anh',
   PHYSICS: 'Vật lý',
   CHEMISTRY: 'Hóa học',
