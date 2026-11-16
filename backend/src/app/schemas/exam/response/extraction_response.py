@@ -1,5 +1,3 @@
-from typing import Any
-
 from src.app.schemas.base import AppBaseModel
 
 
@@ -9,10 +7,16 @@ class ExamMetadataResponse(AppBaseModel):
     routing_group: str
 
 
+class OptionDetail(AppBaseModel):
+    content: str = ""
+    image_url: str | None = None
+
+
 class ExtractedQuestionResponse(AppBaseModel):
+    subject: str
     content: str
     question_type: str
-    options: dict[str, Any] | None = None
+    options: dict[str, OptionDetail] | None = None
     image_url: str | None = None
     source_label: str = ""
     score_weight: float = 0
