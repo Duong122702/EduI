@@ -39,7 +39,6 @@ export const useAuthStore = create<AuthState>()(
       // Chỉ lưu những trường cần thiết (tùy chọn)
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
         role: state.role,
       }),

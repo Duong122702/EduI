@@ -1,11 +1,13 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.database import get_db
+from src.app.core.exceptions import CustomAPIException
+from src.app.core.security import verify_token
 from src.app.crud.crud_questions import QuestionCRUD
 from src.app.crud.crud_user import user_crud
 from src.app.model.questions import Questions
@@ -28,6 +30,47 @@ async def get_current_token(
 ) -> str:
     token = credenticals.credentials
     return token
+
+
+async def get_current_user(
+    token: Annotated[str, Depends(get_current_token)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User:
+    user_id = verify_token(token)
+    if not user_id:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ hoặc đã hết hạn",
+        )
+    try:
+        user_id_uuid = UUID(user_id)
+    except ValueError:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Token không hợp lệ",
+        ) from None
+    user = await user_crud.get_user_by_id(user_id_uuid, db)
+    if not user:
+        raise CustomAPIException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            code="UNAUTHORIZED",
+            message="Người dùng không tồn tại",
+        )
+    return user
+
+
+async def get_current_teacher(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    if current_user.role != "teacher":
+        raise CustomAPIException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
+            message="Bạn không có quyền truy cập vào tài nguyên này",
+        )
+    return current_user
 
 
 async def get_user_role(

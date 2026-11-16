@@ -1,4 +1,3 @@
-import uuid
 from typing import Annotated
 
 from fastapi import (
@@ -12,12 +11,10 @@ from fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.app.api.deps import get_current_token
-from src.app.constant.codes import UserCodes
-from src.app.constant.messages import UserMessages
+from src.app.api.deps import get_current_user
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
-from src.app.core.security import verify_token
+from src.app.model.user import User
 from src.app.schemas.response import APIResponse
 from src.app.schemas.user.CreateUser import CreateUser
 from src.app.schemas.user.response.GetUserResponse import GetUserResponse
@@ -96,28 +93,12 @@ async def login_user_routes(
 )
 async def get_profile_routes(
     request: Request,
-    token: Annotated[str, Depends(get_current_token)],
+    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> APIResponse:
-    user_id = verify_token(token)
-    if user_id is None:
-        raise CustomAPIException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            code="UNAUTHORIZED",
-            message="Token không hợp lệ hoặc đã hết hạn",
-        )
-    try:
-        user_id_uuid = uuid.UUID(user_id)
-    except ValueError:
-        # Phòng trường hợp chuỗi ID trong token không đúng định dạng UUID chuẩn
-        raise CustomAPIException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            code=UserCodes.INVALID_USER_ID,
-            message=UserMessages.INVALID_USER_ID,
-        ) from None
     ip_address = request.client.host if request.client else "127.0.0.1"
-    user_agent = request.headers.get("user_agent") or "unknown"
-    user_data = await user_service.get_profile(user_id_uuid, ip_address, user_agent, db)
+    user_agent = request.headers.get("user-agent") or "unknown"
+    user_data = await user_service.get_profile(current_user.id, ip_address, user_agent, db)
 
     return APIResponse(data=user_data)
 

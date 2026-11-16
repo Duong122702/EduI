@@ -5,14 +5,13 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.deps import (
-    get_current_token,
+    get_current_teacher,
     get_questions_by_questions_ids,
-    get_user_role,
 )
 from src.app.constant.subject_rules import SUBJECT_RULES, Subject
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
-from src.app.core.security import verify_token
+from src.app.model.user import User
 from src.app.schemas.exam.create_exam_schema import CreateExamSchema
 from src.app.schemas.exam.exam_schema import ExamSchemaFilter
 from src.app.schemas.exam.response.exam_response import ExamResponse
@@ -26,26 +25,12 @@ router = APIRouter()
     "/get_all", response_model=APIResponse[ExamResponse], status_code=status.HTTP_200_OK
 )
 async def get_all_exam_route(
-    token: Annotated[str, Depends(get_current_token)],
+    teacher: Annotated[User, Depends(get_current_teacher)],
     db: Annotated[AsyncSession, Depends(get_db)],
     params: Annotated[ExamSchemaFilter, Depends()],
     page: int = 1,
     page_size: int = 10,
 ) -> APIResponse[ExamResponse]:
-    user_id = verify_token(token)
-    if not user_id:
-        raise CustomAPIException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            code="UNAUTHORIZED",
-            message="Token không hợp lệ hoặc đã hết hạn",
-        )
-    user_role = await get_user_role(user_id, db)
-    if user_role != "teacher":
-        raise CustomAPIException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            code="FORBIDDEN",
-            message="Bạn không có quyền truy cập vào tài nguyên này",
-        )
     exams = await exam_service.get_all_exam(
         db, params=params, page=page, page_size=page_size
     )
@@ -54,34 +39,19 @@ async def get_all_exam_route(
 
 @router.post("/create", response_model=APIResponse, status_code=status.HTTP_201_CREATED)
 async def create_exam_route(
-    token: Annotated[str, Depends(get_current_token)],
+    teacher: Annotated[User, Depends(get_current_teacher)],
     db: Annotated[AsyncSession, Depends(get_db)],
     data: CreateExamSchema,
 ) -> APIResponse:
     if isinstance(data.subject, str):
         try:
-            subject_key = Subject[
-                data.subject
-            ]  # Hoặc Subject(data.subject) tùy cách bạn định nghĩa Enum
+            subject_key = Subject[data.subject]
         except KeyError:
             subject_key = None
     else:
         subject_key = data.subject
     rules = SUBJECT_RULES.get(subject_key, {}) if subject_key else {}
-    user_id = verify_token(token)
-    if not user_id:
-        raise CustomAPIException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            code="UNAUTHORIZED",
-            message="Token không hợp lệ hoặc đã hết hạn",
-        )
-    user_role = await get_user_role(user_id, db)
-    if user_role != "teacher":
-        raise CustomAPIException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            code="FORBIDDEN",
-            message="Bạn không có quyền truy cập vào tài nguyên này",
-        )
+
     if data.question_ids:
         valid_ids = [qid for qid in data.question_ids if qid is not None]
         question_data = await get_questions_by_questions_ids(
@@ -106,11 +76,9 @@ async def create_exam_route(
         actual_counts = Counter(question_types)
 
         for q_type, count in actual_counts.items():
-            # Bỏ qua câu hỏi dạng passage không đếm vào rule
             if q_type == "passage":
                 continue
 
-            # Đã sửa lỗi logic: phải là "not in" (không có trong rules mới báo lỗi)
             if q_type not in rules:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -124,11 +92,10 @@ async def create_exam_route(
                     message=f"Số lượng câu hỏi loại {q_type} vượt quá giới hạn cho phép ({rules[q_type]})",
                 )
 
-    exam = await exam_service.create_exams(db, data)
+    exam = await exam_service.create_exams(db, data, created_by=teacher.id)
 
     if data.question_ids:
         exam_question_data = []
-        # Lặp qua mảng gốc truyền lên, đánh số thứ tự (index) bắt đầu từ 1
         for index, q_id in enumerate(data.question_ids, start=1):
             if q_id:
                 exam_question_data.append(
@@ -142,25 +109,11 @@ async def create_exam_route(
     "/add_questions", response_model=APIResponse, status_code=status.HTTP_200_OK
 )
 async def add_questions_to_exam_route(
-    token: Annotated[str, Depends(get_current_token)],
+    teacher: Annotated[User, Depends(get_current_teacher)],
     db: Annotated[AsyncSession, Depends(get_db)],
     exam_id: str,
     question_ids: list[str],
 ) -> APIResponse:
-    user_id = verify_token(token)
-    if not user_id:
-        raise CustomAPIException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            code="UNAUTHORIZED",
-            message="Token không hợp lệ hoặc đã hết hạn",
-        )
-    user_role = await get_user_role(user_id, db)
-    if user_role != "teacher":
-        raise CustomAPIException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            code="FORBIDDEN",
-            message="Bạn không có quyền truy cập vào tài nguyên này",
-        )
     exam = await exam_service.get_exam_by_id(db, exam_id)
     if not exam:
         raise CustomAPIException(
@@ -193,20 +146,16 @@ async def add_questions_to_exam_route(
 
         if isinstance(exam.subject, str):
             try:
-                subject_key = Subject[
-                    exam.subject
-                ]  # Hoặc Subject(exam.subject) tùy cách bạn định nghĩa Enum
+                subject_key = Subject[exam.subject]
             except KeyError:
                 subject_key = None
         else:
             subject_key = exam.subject
         rules = SUBJECT_RULES.get(subject_key, {}) if subject_key else {}
         for q_type, count in actual_counts.items():
-            # Bỏ qua không đếm rule cho passage
             if q_type == "passage":
                 continue
 
-            # Đã sửa "in" thành "not in"
             if q_type not in rules:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -214,8 +163,6 @@ async def add_questions_to_exam_route(
                     message=f"Câu hỏi loại {q_type} không được phép cho môn học này",
                 )
 
-            # LƯU Ý LỚN: `count` ở đây chỉ là số câu hỏi MỚI thêm vào.
-            # Nếu muốn chặt chẽ, bạn phải lấy "số câu cũ trong DB + count mới" để so sánh với rules[q_type]
             if count > rules[q_type]:
                 raise CustomAPIException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -225,12 +172,7 @@ async def add_questions_to_exam_route(
 
         exam_question_data = []
 
-        # BƯỚC QUAN TRỌNG: Lấy index lớn nhất hiện tại của đề thi để nối tiếp
-        # Nếu chưa có hàm này, bạn cần viết thêm trong exam_service
-        # Ví dụ: SELECT MAX(order_index) FROM exam_questions WHERE exam_id = exam_id
         current_max_index = await exam_service.get_max_order_index_of_exam(db, exam.id)
-
-        # Nếu đề chưa có câu nào thì bắt đầu từ 1, nếu đã có thì nối tiếp
         start_index = (current_max_index or 0) + 1
 
         for index, q_id in enumerate(question_ids, start=start_index):
