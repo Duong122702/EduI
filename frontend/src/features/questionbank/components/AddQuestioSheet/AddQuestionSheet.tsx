@@ -81,23 +81,19 @@ function AddQuestionSheet({
           question_image_file: null, // Ảnh cũ giữ nguyên trên backend nếu không chọn file mới
           options: {
             A: {
-              content:
-                editData.options?.find((o) => o.key === 'A')?.content || '',
+              content: editData.options?.A?.content || '',
               image_file: null,
             },
             B: {
-              content:
-                editData.options?.find((o) => o.key === 'B')?.content || '',
+              content: editData.options?.B?.content || '',
               image_file: null,
             },
             C: {
-              content:
-                editData.options?.find((o) => o.key === 'C')?.content || '',
+              content: editData.options?.C?.content || '',
               image_file: null,
             },
             D: {
-              content:
-                editData.options?.find((o) => o.key === 'D')?.content || '',
+              content: editData.options?.D?.content || '',
               image_file: null,
             },
           },
