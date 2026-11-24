@@ -1,7 +1,4 @@
-import {
-  extractExamPdfApi,
-  type ExtractionResult,
-} from '@/api/exam/extractExamPdf.api';
+import { extractExamPdfApi } from '@/api/exam/extractExamPdf.api';
 import { useMutation } from '@tanstack/react-query';
 
 export const useExtractPdf = () => {

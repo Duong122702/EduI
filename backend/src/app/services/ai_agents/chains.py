@@ -50,7 +50,7 @@ async def call_claude_with_retry(
 async def run_chain_1_router(raw_text: str) -> dict[str, Any]:
     prompt = f"{prompts.PROMPT_CHAIN_1}\n\nVĂN BẢN ĐỀ THI:\n{raw_text}"
     return await call_claude_with_retry(
-        model="claude-3-haiku-20240307", contents=prompt
+        model="claude-haiku-4-5-20251001", contents=prompt
     )
 
 
@@ -72,7 +72,7 @@ async def run_chain_2_parser(
     )
     full_prompt = f"{prompt}\n\nVĂN BẢN CẦN XỬ LÝ:\n{section.get('raw_content', '')}"
     return await call_claude_with_retry(
-        model="claude-3-haiku-20240307", contents=full_prompt
+        model="claude-haiku-4-5-20251001", contents=full_prompt
     )
 
 
