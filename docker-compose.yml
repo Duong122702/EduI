@@ -13,9 +13,9 @@ services:
     ports:
       - "8000:8000"
     container_name: examedu_api
+    env_file:
+      - ./backend/.env
     environment:
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_KEY=${SUPABASE_KEY}
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis

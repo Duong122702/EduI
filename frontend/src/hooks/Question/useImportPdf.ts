@@ -1,21 +1,31 @@
-import { importQuestionsFromPdfApi } from '@/api/question/importQuestionFromPdf.api';
+import {
+  confirmImportQuestionsApi,
+  extractQuestionsFromPdfApi,
+} from '@/api/question/importQuestionFromPdf.api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { AxiosError } from 'axios';
 
-export const useImportPdf = () => {
+export const useExtractQuestionsPdf = () => {
+  return useMutation({
+    mutationFn: (file: File) => extractQuestionsFromPdfApi(file),
+    onError: (error: any) => {
+      const msg = error?.message || 'Có lỗi khi trích xuất câu hỏi từ PDF';
+      console.error(msg);
+    },
+  });
+};
+
+export const useConfirmImport = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => importQuestionsFromPdfApi(file),
+    mutationFn: (extractionId: string) =>
+      confirmImportQuestionsApi(extractionId),
     onSuccess: () => {
-      // Refresh lại danh sách câu hỏi trong bảng
       queryClient.invalidateQueries({ queryKey: ['questions'] });
-      alert('Import PDF thành công!');
     },
-    onError: (error: AxiosError<{ message?: string }>) => {
-      const errorMessage =
-        error.response?.data.message || 'Có lỗi xảy ra khi import PDF';
-      alert(errorMessage);
+    onError: (error: any) => {
+      const msg = error?.message || 'Có lỗi khi lưu câu hỏi';
+      console.error(msg);
     },
   });
 };

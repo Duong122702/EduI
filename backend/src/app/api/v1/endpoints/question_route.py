@@ -1,12 +1,14 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.deps import get_current_teacher
 from src.app.core.database import get_db
 from src.app.core.exceptions import CustomAPIException
 from src.app.model.user import User
+from src.app.schemas.exam.response.extraction_response import ExtractionResponse
 from src.app.schemas.question.QuestionSchema import QuestionFilterParams
 from src.app.schemas.question.QuestionUpdateSchema import QuestionUpdateSchema
 from src.app.schemas.question.response.MostSubjectResponse import (
@@ -17,6 +19,7 @@ from src.app.schemas.question.response.QuestionListResponse import (
     QuestionListResponse,
 )
 from src.app.schemas.response import APIResponse
+from src.app.services.extraction_service import extraction_service
 from src.app.services.question_service import question_service
 
 router = APIRouter()
@@ -95,19 +98,39 @@ async def get_most_subject_route(
 
 
 @router.post(
-    "/import-pdf", response_model=APIResponse, status_code=status.HTTP_201_CREATED
+    "/extract-pdf",
+    response_model=APIResponse[ExtractionResponse],
+    status_code=status.HTTP_200_OK,
 )
-async def import_questions_from_pdf_route(
+async def extract_questions_from_pdf_route(
+    teacher: Annotated[User, Depends(get_current_teacher)],
+    file: Annotated[UploadFile, File(description="File PDF đề thi")],
+) -> APIResponse[ExtractionResponse]:
+    file_bytes = await file.read()
+    result = await extraction_service.extract_pdf(file_bytes)
+    return APIResponse(data=result, message="Trích xuất câu hỏi thành công")
+
+
+class ConfirmImportBody(BaseModel):
+    extraction_id: str = Field(..., description="ID trích xuất từ Redis cache")
+
+
+@router.post(
+    "/confirm-import", response_model=APIResponse, status_code=status.HTTP_201_CREATED
+)
+async def confirm_import_questions_route(
     teacher: Annotated[User, Depends(get_current_teacher)],
     db: Annotated[AsyncSession, Depends(get_db)],
-    file: Annotated[UploadFile, File(description="File PDF đề thi")],
+    body: ConfirmImportBody,
 ):
-    file_bytes = await file.read()
-    success_count, total_count = await question_service.import_questions_from_pdf(
-        db, file_bytes
-    )
+    cached = await extraction_service.get_extraction(body.extraction_id)
+    questions_dicts = [q.model_dump() for q in cached.questions]
+    from src.app.crud.crud_questions import QuestionCRUD
+
+    inserted_ids = await QuestionCRUD().add_multiple_questions_crud(db, questions_dicts)
+    await extraction_service.delete_extraction(body.extraction_id)
     return APIResponse(
-        message=f"Import thành công {success_count}/{total_count} câu hỏi."
+        message=f"Import thành công {len(inserted_ids)}/{len(questions_dicts)} câu hỏi."
     )
 
 

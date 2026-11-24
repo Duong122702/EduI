@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
@@ -8,12 +9,25 @@ import {
 } from '@/components/ui/card';
 import AddQuestionSheet from '@/features/questionbank/components/AddQuestioSheet/AddQuestionSheet';
 import QuestionTable from '@/features/questionbank/components/QuestionTable';
-import { useImportPdf } from '@/hooks/Question/useImportPdf';
+import {
+  useExtractQuestionsPdf,
+  useConfirmImport,
+} from '@/hooks/Question/useImportPdf';
 import { useQuestions } from '@/hooks/Question/useQuestion';
 import type { Question } from '@/Models/questions.model';
+import type { ExtractedQuestion } from '@/api/exam/extractExamPdf.api';
 import type { GetQuestionsParams } from '@/schemas/payload/questionParamPayload.type';
 import { getListLevelQuestion } from '@/utils/getListLevelQuestion';
-import { BarChart3, Database, FileText, Loader2, Package } from 'lucide-react';
+import {
+  BarChart3,
+  Check,
+  CircleQuestionMark,
+  Database,
+  FileText,
+  Loader2,
+  Package,
+  X,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 function QuestionBank() {
@@ -29,8 +43,16 @@ function QuestionBank() {
   });
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { mutate: importPdf, isPending: isImporting } = useImportPdf();
+  const { mutate: extractPdf, isPending: isExtracting } =
+    useExtractQuestionsPdf();
+  const { mutate: confirmImport, isPending: isConfirming } =
+    useConfirmImport();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [extractionId, setExtractionId] = useState<string | null>(null);
+  const [extractedQuestions, setExtractedQuestions] = useState<
+    ExtractedQuestion[]
+  >([]);
+  const [extractedSubject, setExtractedSubject] = useState('');
 
   // Debounce tìm kiếm
   useEffect(() => {
@@ -51,19 +73,42 @@ function QuestionBank() {
   const { easyQuestions, hardQuestions, normalQuestions, veryHardQuestions } =
     getListLevelQuestion({ questions });
 
-  // --- HÀM XỬ LÝ UPLOAD PDF ---
   const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Gọi API kèm theo subject đã chọn
-    importPdf(file);
+    extractPdf(file, {
+      onSuccess: (res) => {
+        const data = res.data.data;
+        if (!data) return;
+        setExtractionId(data.extraction_id);
+        setExtractedQuestions(data.questions);
+        setExtractedSubject(data.exam_metadata.subject);
+      },
+    });
 
-    // Reset thẻ input file
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  const handleConfirmImport = () => {
+    if (!extractionId) return;
+    confirmImport(extractionId, {
+      onSuccess: () => {
+        setExtractionId(null);
+        setExtractedQuestions([]);
+        setExtractedSubject('');
+      },
+    });
+  };
+
+  const handleCancelImport = () => {
+    setExtractionId(null);
+    setExtractedQuestions([]);
+    setExtractedSubject('');
+  };
+
+  const isImporting = isExtracting;
+  const actualQuestions = extractedQuestions.filter((q) => !q.is_passage);
 
   return (
     <div className="w-full space-y-6 p-6">
@@ -175,66 +220,155 @@ function QuestionBank() {
         </Card>
       </div>
 
-      {/* 3. Hàng Công Cụ: AI Generation & Excel Import */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <Card className="flex min-h-55 items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-100 p-6 text-gray-500 shadow-sm lg:col-span-7 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-base font-semibold tracking-wide">
-              Đang phát triển...
-            </span>
-          </div>
-        </Card>
-
-        {/* Card Nhập PDF (Chiếm 5/12 cột trình bày) */}
-        <Card className="flex flex-col justify-between rounded-3xl border-slate-100 bg-white shadow-sm lg:col-span-5">
-          <CardHeader className="space-y-2 pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
-              NHẬP TỪ FILE PDF
-            </CardTitle>
-            <CardDescription className="text-xs text-slate-500">
-              Tự động quét text và ảnh, nhận diện câu hỏi & đáp án.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4 pt-2">
-            {/* Khu vực Tải lên PDF */}
-            <div>
-              <input
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handlePdfUpload}
-              />
-              <div
-                onClick={() => {
-                  if (!isImporting) fileInputRef.current?.click();
-                }}
-                className={`group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors ${
-                  isImporting
-                    ? 'cursor-wait border-emerald-200 bg-emerald-50/50'
-                    : 'cursor-pointer border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50'
-                }`}
+      {extractionId && extractedQuestions.length > 0 ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <CircleQuestionMark className="h-5 w-5 text-blue-600" />
+              <div>
+                <span className="text-sm font-semibold text-slate-800">
+                  Câu hỏi trích xuất từ PDF: {actualQuestions.length}
+                </span>
+                {extractedSubject && (
+                  <Badge
+                    variant="outline"
+                    className="ml-2 text-xs text-blue-600"
+                  >
+                    {extractedSubject}
+                  </Badge>
+                )}
+              </div>
+              <Badge className="bg-blue-100 text-xs font-medium text-blue-700">
+                Chờ xác nhận
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-lg border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                onClick={handleCancelImport}
+                disabled={isConfirming}
               >
-                <div className="mb-3 rounded-full border border-slate-100 bg-white p-3 shadow-sm transition-transform group-hover:scale-110">
-                  {isImporting ? (
-                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-                  ) : (
-                    <FileText className="h-6 w-6 text-emerald-500 transition-colors group-hover:text-emerald-600" />
+                <X className="mr-1 h-4 w-4" />
+                Hủy
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-lg bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
+                onClick={handleConfirmImport}
+                disabled={isConfirming}
+              >
+                {isConfirming ? (
+                  <>
+                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-1 h-4 w-4" />
+                    Xác nhận lưu {actualQuestions.length} câu
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+          <div className="max-h-[600px] space-y-3 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
+            {actualQuestions.map((q, idx) => (
+              <div
+                key={q.temp_id || idx}
+                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">
+                    {idx + 1}
+                  </span>
+                  <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                    {q.question_type}
+                  </span>
+                  {q.score_weight > 0 && (
+                    <span className="rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-700">
+                      {q.score_weight} điểm
+                    </span>
                   )}
                 </div>
-                <p className="text-xs font-bold text-emerald-700">
-                  {isImporting
-                    ? 'Đang xử lý PDF...'
-                    : 'Tải lên tệp PDF từ máy tính'}
-                </p>
-                <p className="mt-1 text-[10px] text-slate-400">
-                  Kích thước tối đa 5MB
-                </p>
+                <p className="text-sm text-slate-800">{q.content}</p>
+                {q.options && (
+                  <div className="mt-2 space-y-1 pl-4">
+                    {Object.entries(q.options).map(([key, opt]) => (
+                      <p key={key} className="text-xs text-slate-600">
+                        <span className="font-semibold">{key}.</span>{' '}
+                        {opt.content}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 3. Hàng Công Cụ: AI Generation & Excel Import */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            <Card className="flex min-h-55 items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-100 p-6 text-gray-500 shadow-sm lg:col-span-7 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-base font-semibold tracking-wide">
+                  Đang phát triển...
+                </span>
+              </div>
+            </Card>
+
+            <Card className="flex flex-col justify-between rounded-3xl border-slate-100 bg-white shadow-sm lg:col-span-5">
+              <CardHeader className="space-y-2 pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+                  NHẬP TỪ FILE PDF
+                </CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  Tự động quét text và ảnh, nhận diện câu hỏi & đáp án.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4 pt-2">
+                <div>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handlePdfUpload}
+                  />
+                  <div
+                    onClick={() => {
+                      if (!isImporting) fileInputRef.current?.click();
+                    }}
+                    className={`group flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors ${
+                      isImporting
+                        ? 'cursor-wait border-emerald-200 bg-emerald-50/50'
+                        : 'cursor-pointer border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <div className="mb-3 rounded-full border border-slate-100 bg-white p-3 shadow-sm transition-transform group-hover:scale-110">
+                      {isImporting ? (
+                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                      ) : (
+                        <FileText className="h-6 w-6 text-emerald-500 transition-colors group-hover:text-emerald-600" />
+                      )}
+                    </div>
+                    <p className="text-xs font-bold text-emerald-700">
+                      {isImporting
+                        ? 'Đang xử lý PDF...'
+                        : 'Tải lên tệp PDF từ máy tính'}
+                    </p>
+                    <p className="mt-1 text-[10px] text-slate-400">
+                      Kích thước tối đa 5MB
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
       <QuestionTable
         onClick={() => {
           setIsOpen(true);
