@@ -124,7 +124,7 @@ async def confirm_import_questions_route(
     body: ConfirmImportBody,
 ):
     cached = await extraction_service.get_extraction(body.extraction_id)
-    questions_dicts = [q.model_dump() for q in cached.questions]
+    questions_dicts = [q.model_dump(by_alias=False) for q in cached.questions]
     from src.app.crud.crud_questions import QuestionCRUD
 
     inserted_ids = await QuestionCRUD().add_multiple_questions_crud(db, questions_dicts)

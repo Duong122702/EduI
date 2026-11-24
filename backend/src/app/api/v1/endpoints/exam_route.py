@@ -64,7 +64,7 @@ async def create_exam_route(
 
     if data.extraction_id:
         cached = await extraction_service.get_extraction(data.extraction_id)
-        questions_dicts = [q.model_dump() for q in cached.questions]
+        questions_dicts = [q.model_dump(by_alias=False) for q in cached.questions]
         inserted_ids = await QuestionCRUD().add_multiple_questions_crud(db, questions_dicts)
         question_ids = inserted_ids
         await extraction_service.delete_extraction(data.extraction_id)

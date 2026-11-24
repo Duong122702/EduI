@@ -64,9 +64,9 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
         const data = res.data.data;
         if (!data) return;
 
-        form.setValue('title', data.exam_metadata.exam_name);
-        form.setValue('subject', data.exam_metadata.subject);
-        form.setValue('extraction_id', data.extraction_id);
+        form.setValue('title', data.examMetadata.examName);
+        form.setValue('subject', data.examMetadata.subject);
+        form.setValue('extraction_id', data.extractionId);
         form.setValue('question_ids', []);
 
         setExtractedQuestions(data.questions);
@@ -86,7 +86,7 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
     });
   };
 
-  const actualQuestions = extractedQuestions.filter((q) => !q.is_passage);
+  const actualQuestions = extractedQuestions.filter((q) => !q.isPassage);
   const hasExtraction = !!form.watch('extraction_id');
 
   return (
@@ -259,7 +259,7 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
                   <div className="mt-3 max-h-[600px] space-y-3 overflow-y-auto rounded-xl border border-slate-200 p-3">
                     {actualQuestions.map((q, idx) => (
                       <div
-                        key={q.temp_id || idx}
+                        key={q.tempId || idx}
                         className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                       >
                         <div className="mb-2 flex items-center gap-2">
@@ -267,7 +267,7 @@ export const AddExam = ({ isOpen, setIsOpen }: AddExamProps) => {
                             {idx + 1}
                           </span>
                           <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                            {q.question_type}
+                            {q.questionType}
                           </span>
                         </div>
                         <p className="text-sm text-slate-800">{q.content}</p>

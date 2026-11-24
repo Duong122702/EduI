@@ -81,9 +81,9 @@ function QuestionBank() {
       onSuccess: (res) => {
         const data = res.data.data;
         if (!data) return;
-        setExtractionId(data.extraction_id);
+        setExtractionId(data.extractionId);
         setExtractedQuestions(data.questions);
-        setExtractedSubject(data.exam_metadata.subject);
+        setExtractedSubject(data.examMetadata.subject);
       },
     });
 
@@ -108,7 +108,7 @@ function QuestionBank() {
   };
 
   const isImporting = isExtracting;
-  const actualQuestions = extractedQuestions.filter((q) => !q.is_passage);
+  const actualQuestions = extractedQuestions.filter((q) => !q.isPassage);
 
   return (
     <div className="w-full space-y-6 p-6">
@@ -276,7 +276,7 @@ function QuestionBank() {
           <div className="max-h-[600px] space-y-3 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
             {actualQuestions.map((q, idx) => (
               <div
-                key={q.temp_id || idx}
+                key={q.tempId || idx}
                 className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
               >
                 <div className="mb-2 flex items-center gap-2">
@@ -284,11 +284,11 @@ function QuestionBank() {
                     {idx + 1}
                   </span>
                   <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                    {q.question_type}
+                    {q.questionType}
                   </span>
-                  {q.score_weight > 0 && (
+                  {q.scoreWeight > 0 && (
                     <span className="rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-700">
-                      {q.score_weight} điểm
+                      {q.scoreWeight} điểm
                     </span>
                   )}
                 </div>
